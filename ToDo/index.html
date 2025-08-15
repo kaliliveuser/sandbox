@@ -2,71 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: grid;
-            place-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .todo-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            margin: 40px;
+            background: #f6f8fa;
         }
         h1 {
-            text-align: center;
+            color: #333;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        #todo-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
         }
-        li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+        .todo-item {
+            background: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+            font-size: 1rem;
+            word-break: break-word;
         }
-        input[type="text"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        #add-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
+        #add-input {
+            flex: 1;
+            padding: 9px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        #add-btn {
+            padding: 9px 20px;
             border: none;
-            border-radius: 4px;
+            background: #2563eb;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 1rem;
             cursor: pointer;
         }
-        button:hover {
-            background-color: #218838;
+        #add-btn:active {
+            background: #1e40af;
+        }
+        .error {
+            color: #c00;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="todo-container">
-        <h1>To-Do List</h1>
-        <input type="text" id="todo-input" placeholder="Add a new task...">
-        <button id="add-todo">Add Task</button>
-        <ul id="todo-list"></ul>
-    </div>
+    <h1>To-Do List</h1>
+    <form id="add-form" autocomplete="off">
+        <input type="text" id="add-input" placeholder="Add a new item..." required />
+        <button type="submit" id="add-btn">Add</button>
+    </form>
+    <div id="todo-list-container"></div>
+    <div class="error" id="error-msg"></div>
+
     <script>
-        document.getElementById('add-todo').addEventListener('click', function() {
-            const input = document.getElementById('todo-input');
-            const newTask = input.value;
-            if (newTask) {
-                const li = document.createElement('li');
-                li.textContent = newTask;
-                document.getElementById('todo-list').appendChild(li);
-                input.value = '';
+        // Path to the todo file (relative to this HTML file)
+        const TODO_FILE_PATH = 'todo-list.txt';
+
+        // Read the todo-list.txt file and display items
+        async function loadToDoList() {
+            try {
+                const response = await fetch(TODO_FILE_PATH + '?cache=' + Date.now());
+                if (!response.ok) throw new Error('Failed to load todo-list.txt');
+                const text = await response.text();
+                const items = text.split('\n').map(line => line.trim()).filter(Boolean);
+                displayToDoList(items);
+                window.todoList = items; // Save current list globally
+            } catch (err) {
+                document.getElementById('error-msg').textContent = 'Could not load the to-do list.';
+            }
+        }
+
+        // Display items in a grid
+        function displayToDoList(items) {
+            const container = document.getElementById('todo-list-container');
+            container.innerHTML = '';
+            if (items.length === 0) {
+                container.innerHTML = '<div class="todo-item" style="opacity:0.6;">No items yet.</div>';
+                return;
+            }
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'todo-item';
+                div.textContent = item;
+                container.appendChild(div);
+            });
+        }
+
+        // Add new item to the list and update the file in memory
+        function addItem(item) {
+            if (!item.trim()) return;
+            window.todoList.push(item.trim());
+            displayToDoList(window.todoList);
+            saveToDoListToLocal();
+        }
+
+        // Save to-do list to localStorage (since we can't write to file directly)
+        function saveToDoListToLocal() {
+            localStorage.setItem('todoList', JSON.stringify(window.todoList));
+        }
+
+        // Load todo list from localStorage if available
+        function loadToDoListFromLocal() {
+            const local = localStorage.getItem('todoList');
+            if (local) {
+                try {
+                    const items = JSON.parse(local);
+                    if (Array.isArray(items)) {
+                        window.todoList = items;
+                        displayToDoList(items);
+                        return true;
+                    }
+                } catch {}
+            }
+            return false;
+        }
+
+        // Form submit handler
+        document.getElementById('add-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('add-input');
+            const newItem = input.value;
+            if (!newItem.trim()) return;
+            addItem(newItem);
+            input.value = '';
+        });
+
+        // On load: try localStorage first, else fetch file
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!loadToDoListFromLocal()) {
+                loadToDoList();
             }
         });
     </script>
