@@ -84,7 +84,7 @@
 
         async function fetchToDoList() {
             clearMsg();
-            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${TODO_FILE_PATH}`;
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/${TODO_FILE_PATH}`;
             const headers = {
                 "Accept": "application/vnd.github.v3+json",
                 "Authorization": `token ${GITHUB_TOKEN}`
