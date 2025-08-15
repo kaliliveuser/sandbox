@@ -129,7 +129,7 @@
             const newContentArr = [...todoList, newItem.trim()];
             const newContent = newContentArr.join('\n');
             const base64Content = btoa(unescape(encodeURIComponent(newContent)));
-            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${TODO_FILE_PATH}`;
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/${TODO_FILE_PATH}`;
             const payload = {
                 message: `Add to-do item: ${newItem}`,
                 content: base64Content,
