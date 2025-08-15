@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid #fff;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tetris" width="240" height="400"></canvas>
+    <script>
+        // Tetris game implementation goes here
+        const canvas = document.getElementById('tetris');
+        const context = canvas.getContext('2d');
+
+        context.scale(20, 20); // Scale up the context
+
+        function drawSquare(x, y) {
+            context.fillStyle = 'red';
+            context.fillRect(x, y, 1, 1);
+        }
+
+        // Draw a simple square (for demonstration)
+        drawSquare(5, 5);
+
+        // Add more game logic here...
+    </script>
+</body>
+</html>
