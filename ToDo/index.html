@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>To-Do List</title>
+    <title>To-Do List (GitHub API Demo)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,36 +54,55 @@
             color: #c00;
             margin-top: 10px;
         }
+        .success {
+            color: #0a0;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>To-Do List</h1>
+    <h1>To-Do List (GitHub API Demo)</h1>
     <form id="add-form" autocomplete="off">
         <input type="text" id="add-input" placeholder="Add a new item..." required />
         <button type="submit" id="add-btn">Add</button>
     </form>
     <div id="todo-list-container"></div>
     <div class="error" id="error-msg"></div>
+    <div class="success" id="success-msg"></div>
 
     <script>
-        // Path to the todo file (relative to this HTML file)
-        const TODO_FILE_PATH = 'todo-list.txt';
+        // --- CONFIGURATION ---
+        const GITHUB_OWNER = "kaliliveuser";
+        const GITHUB_REPO = "sandbox";
+        const TODO_FILE_PATH = "ToDo/todo-list.txt";
+        // For demo purposes only. NEVER share or commit your PAT.
+        const GITHUB_TOKEN = "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";
+        // ---------------------
 
-        // Read the todo-list.txt file and display items
-        async function loadToDoList() {
+        let fileSha = null;
+        let todoList = [];
+
+        async function fetchToDoList() {
+            clearMsg();
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${TODO_FILE_PATH}`;
+            const headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "Authorization": `token ${GITHUB_TOKEN}`
+            };
             try {
-                const response = await fetch(TODO_FILE_PATH + '?cache=' + Date.now());
-                if (!response.ok) throw new Error('Failed to load todo-list.txt');
-                const text = await response.text();
-                const items = text.split('\n').map(line => line.trim()).filter(Boolean);
-                displayToDoList(items);
-                window.todoList = items; // Save current list globally
+                const res = await fetch(url, { headers });
+                if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+                const data = await res.json();
+                fileSha = data.sha;
+                const content = atob(data.content.replace(/\n/g, ''));
+                todoList = content.split('\n').map(line => line.trim()).filter(Boolean);
+                displayToDoList(todoList);
             } catch (err) {
-                document.getElementById('error-msg').textContent = 'Could not load the to-do list.';
+                document.getElementById('error-msg').textContent = 'Could not load the to-do list from GitHub. ' + err.message;
+                document.getElementById('todo-list-container').innerHTML = "";
             }
         }
 
-        // Display items in a grid
         function displayToDoList(items) {
             const container = document.getElementById('todo-list-container');
             container.innerHTML = '';
@@ -99,51 +118,61 @@
             });
         }
 
-        // Add new item to the list and update the file in memory
-        function addItem(item) {
-            if (!item.trim()) return;
-            window.todoList.push(item.trim());
-            displayToDoList(window.todoList);
-            saveToDoListToLocal();
-        }
-
-        // Save to-do list to localStorage (since we can't write to file directly)
-        function saveToDoListToLocal() {
-            localStorage.setItem('todoList', JSON.stringify(window.todoList));
-        }
-
-        // Load todo list from localStorage if available
-        function loadToDoListFromLocal() {
-            const local = localStorage.getItem('todoList');
-            if (local) {
-                try {
-                    const items = JSON.parse(local);
-                    if (Array.isArray(items)) {
-                        window.todoList = items;
-                        displayToDoList(items);
-                        return true;
-                    }
-                } catch {}
+        // Add a new item and update todo-list.txt via GitHub API
+        async function addItemToGitHub(newItem) {
+            clearMsg();
+            if (!fileSha) {
+                document.getElementById('error-msg').textContent = "Cannot update file: SHA missing.";
+                return;
             }
-            return false;
+            // Compose new content
+            const newContentArr = [...todoList, newItem.trim()];
+            const newContent = newContentArr.join('\n');
+            const base64Content = btoa(unescape(encodeURIComponent(newContent)));
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${TODO_FILE_PATH}`;
+            const payload = {
+                message: `Add to-do item: ${newItem}`,
+                content: base64Content,
+                sha: fileSha
+            };
+            const headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Content-Type": "application/json"
+            };
+            try {
+                const res = await fetch(url, {
+                    method: "PUT",
+                    headers,
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(`Failed to update: ${res.status}`);
+                const data = await res.json();
+                fileSha = data.content.sha;
+                todoList.push(newItem.trim());
+                displayToDoList(todoList);
+                document.getElementById('success-msg').textContent = "To-do item added and saved to GitHub!";
+            } catch (err) {
+                document.getElementById('error-msg').textContent = 'Could not update the to-do list on GitHub. ' + err.message;
+            }
         }
 
-        // Form submit handler
-        document.getElementById('add-form').addEventListener('submit', function(e) {
+        function clearMsg() {
+            document.getElementById('error-msg').textContent = '';
+            document.getElementById('success-msg').textContent = '';
+        }
+
+        document.getElementById('add-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const input = document.getElementById('add-input');
             const newItem = input.value;
             if (!newItem.trim()) return;
-            addItem(newItem);
+            await addItemToGitHub(newItem);
             input.value = '';
         });
 
-        // On load: try localStorage first, else fetch file
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!loadToDoListFromLocal()) {
-                loadToDoList();
-            }
-        });
+        // Load from GitHub on start
+        window.addEventListener('DOMContentLoaded', fetchToDoList);
     </script>
 </body>
 </html>
