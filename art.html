@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Artillery Simulator</title>
+<style>
+  body {
+    background-color: #000;
+    color: #00ff00;
+    font-family: "Courier New", Courier, monospace;
+    text-align: center;
+  }
+  canvas {
+    background-color: #000;
+    border: 2px solid #00ff00;
+  }
+  input {
+    background-color: #000;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    font-family: "Courier New", Courier, monospace;
+  }
+  button {
+    background-color: #00ff00;
+    color: #000;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: "Courier New", Courier, monospace;
+  }
+  #gameOver {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #000;
+    border: 2px solid #00ff00;
+    padding: 20px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<h1>Artillery Simulator</h1>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div>
+  <h2>Player 1</h2>
+  <label for="angle">Angle (0-90):</label>
+  <input type="number" id="angle" min="0" max="90" value="45">
+  <label for="velocity">Velocity (1-200):</label>
+  <input type="number" id="velocity" min="1" max="200" value="100">
+  <button id="fireButton">Fire!</button>
+</div>
+<div>
+  <h2>Player 2</h2>
+  <label for="angle2">Angle (0-90):</label>
+  <input type="number" id="angle2" min="0" max="90" value="45">
+  <label for="velocity2">Velocity (1-200):</label>
+  <input type="number" id="velocity2" min="1" max="200" value="100">
+  <button id="fireButton2">Fire!</button>
+</div>
+<div id="gameOver" style="display: none;">
+  <h2 id="winnerText"></h2>
+  <button id="playAgainButton">Play Again</button>
+</div>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const screenWidth = canvas.width;
+  const screenHeight = canvas.height;
+
+  let player1X, player1Y, player2X, player2Y;
+  let terrain = [];
+  let currentPlayer = 1;
+  let timerInterval;
+  let timeLeft = 5;
+
+  const angleInput1 = document.getElementById('angle');
+  const velocityInput1 = document.getElementById('velocity');
+  const fireButton1 = document.getElementById('fireButton');
+
+  const angleInput2 = document.getElementById('angle2');
+  const velocityInput2 = document.getElementById('velocity2');
+  const fireButton2 = document.getElementById('fireButton2');
+
+  function generateTerrain() {
+    let y = screenHeight - 50;
+    terrain = [];
+    for (let x = 0; x < screenWidth; x++) {
+      terrain.push(y);
+      y += (Math.random() - 0.5) * 10;
+      if (y < screenHeight - 300) y = screenHeight - 300;
+      if (y > screenHeight - 10) y = screenHeight - 10;
+    }
+  }
+
+  function placeTanks() {
+    player1X = Math.floor(Math.random() * (screenWidth / 4));
+    player1Y = terrain[player1X] - 10;
+    player2X = Math.floor(Math.random() * (screenWidth / 4)) + (screenWidth * 3 / 4);
+    player2Y = terrain[player2X] - 10;
+  }
+
+  function draw() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, screenWidth, screenHeight);
+
+    // Draw terrain
+    ctx.fillStyle = '#00ff00';
+    for (let x = 0; x < screenWidth; x++) {
+      ctx.fillRect(x, terrain[x], 1, screenHeight - terrain[x]);
+    }
+
+    // Draw tanks
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(player1X - 5, player1Y - 5, 10, 5);
+    ctx.fillRect(player2X - 5, player2Y - 5, 10, 5);
+  }
+
+  function fire(startX, startY, angle, velocity, targetX, targetY) {
+    clearInterval(timerInterval);
+    let rad = angle * Math.PI / 180;
+    let vx = Math.cos(rad) * velocity / 5;
+    if (currentPlayer === 2) {
+        vx *= -1;
+    }
+    let vy = -Math.sin(rad) * velocity / 5;
+    let x = startX;
+    let y = startY;
+    let path = [];
+
+    let shotInterval = setInterval(() => {
+      vy += 0.1; // gravity
+      x += vx;
+      y += vy;
+      path.push({x, y});
+
+      // Draw projectile path
+      ctx.fillStyle = '#fff';
+      for(let p of path) {
+        ctx.fillRect(p.x, p.y, 2, 2);
+      }
+
+
+      if (x < 0 || x > screenWidth || y > screenHeight) {
+        clearInterval(shotInterval);
+        draw(); // Redraw to clear the projectile path
+        switchPlayer();
+      }
+
+      if (y >= terrain[Math.floor(x)]) {
+        clearInterval(shotInterval);
+        draw();
+        switchPlayer();
+      }
+
+      if (Math.abs(x - targetX) < 5 && Math.abs(y - targetY) < 5) {
+        clearInterval(shotInterval);
+        document.getElementById('winnerText').innerText = `PLAYER ${currentPlayer} WINS!`
+        document.getElementById('gameOver').style.display = 'block';
+      }
+    }, 20);
+  }
+
+
+  function startTimer() {
+    timeLeft = 5;
+    document.getElementById('timer').innerText = `Time left: ${timeLeft}`;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').innerText = `Time left: ${timeLeft}`;
+      if (timeLeft === 0) {
+        clearInterval(timerInterval);
+        switchPlayer();
+      }
+    }, 1000);
+  }
+
+  function switchPlayer() {
+    if (currentPlayer === 1) {
+      currentPlayer = 2;
+      angleInput1.disabled = true;
+      velocityInput1.disabled = true;
+      fireButton1.disabled = true;
+      angleInput2.disabled = false;
+      velocityInput2.disabled = false;
+      fireButton2.disabled = false;
+    } else {
+      currentPlayer = 1;
+      angleInput1.disabled = false;
+      velocityInput1.disabled = false;
+      fireButton1.disabled = false;
+      angleInput2.disabled = true;
+      velocityInput2.disabled = true;
+      fireButton2.disabled = true;
+    }
+    startTimer();
+  }
+
+  function init() {
+    generateTerrain();
+    placeTanks();
+    draw();
+    currentPlayer = 1;
+    angleInput1.disabled = false;
+    velocityInput1.disabled = false;
+    fireButton1.disabled = false;
+    angleInput2.disabled = true;
+    velocityInput2.disabled = true;
+    fireButton2.disabled = true;
+    startTimer();
+  }
+
+  fireButton1.addEventListener('click', () => {
+    let angle = angleInput1.value;
+    let velocity = velocityInput1.value;
+    fire(player1X, player1Y, angle, velocity, player2X, player2Y);
+  });
+
+  fireButton2.addEventListener('click', () => {
+    let angle = angleInput2.value;
+    let velocity = velocityInput2.value;
+    fire(player2X, player2Y, angle, velocity, player1X, player1Y);
+  });
+
+  document.getElementById('playAgainButton').addEventListener('click', () => {
+      document.getElementById('gameOver').style.display = 'none';
+      init();
+  });
+
+  init();
+</script>
+</body>
+</html>
