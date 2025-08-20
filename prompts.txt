@@ -1,0 +1,7 @@
+Create a single-file web page that explains the basics of survival skills. Include how to make fire, shelter, weapons, tools, and hunting equipment. Make sure to include how to use a crack-stone knife and how to make fishing gear. Make the website in the style of a field manual. Expand each section with deep details, pointers and tips. I would like this manual to be at least 20 pages long.
+
+Create a single-file webpage that shows a blue 3D animated blob slowly floating up and down. Make the blob shiny and light it from the bottom. The blob should be undulating and bulbous. It should move very slowly like the liquid inside a lavalamp.
+
+Create a single-file web page that plays snake. Allow the snake to wrap around the edges.
+
+Create a single-file web page that plays tetris. Include a look-ahead feature.
