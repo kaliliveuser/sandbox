@@ -131,8 +131,17 @@
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
-                        context.fillStyle = COLORS[value];
-                        context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                                            context.fillStyle = COLORS[value];
+                    context.fillRect(x + offset.x,
+                                     y + offset.y,
+                                     1, 1);
+                    context.save(); // Save the current drawing state
+                    context.strokeStyle = '#000'; // Black border
+                    context.lineWidth = 0.05; // Thin border
+                    context.strokeRect(x + offset.x,
+                                       y + offset.y,
+                                       1, 1);
+                    context.restore(); // Restore the drawing state
                     }
                 });
             });
@@ -153,6 +162,11 @@
                 row.forEach((value, x) => {
                     if (value !== 0) {
                         nextPieceContext.fillRect(x + xOffset, y + yOffset, 1, 1);
+                        nextPieceContext.save(); // Save the current drawing state
+                        nextPieceContext.strokeStyle = '#000'; // Black border
+                        nextPieceContext.lineWidth = 0.05; // Thin border
+                        nextPieceContext.strokeRect(x + xOffset, y + yOffset, 1, 1);
+                        nextPieceContext.restore(); // Restore the drawing state
                     }
                 });
             });
