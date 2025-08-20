@@ -8,167 +8,191 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 40px;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: #282c34; /* Dark background */
+            color: #abb2bf; /* Light text */
             line-height: 1.6;
         }
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background-color: #ffffff;
-            padding: 30px 40px;
+            background: #3a404a; /* Slightly lighter dark background for container */
+            padding: 30px 50px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow */
         }
         h1, h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            margin-top: 30px;
+            color: #61afef; /* Blueish heading color */
+            text-align: center;
+            margin-bottom: 30px;
         }
         h1 {
-            text-align: center;
             font-size: 2.5em;
-            margin-bottom: 40px;
+            border-bottom: 2px solid #4b5263; /* Darker border */
+            padding-bottom: 15px;
         }
         h2 {
             font-size: 1.8em;
-            margin-bottom: 20px;
+            margin-top: 40px;
+            border-bottom: 1px solid #4b5263; /* Darker border */
+            padding-bottom: 10px;
         }
-        .link-section {
-            margin-bottom: 30px;
-        }
-        .link-list {
+        .project-list, .document-list {
             list-style: none;
             padding: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
         }
-        .link-list li {
-            background-color: #e9f5f3;
-            border: 1px solid #d1e7e4;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-        .link-list li:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .link-list a {
-            display: block;
+        .project-item, .document-item {
+            background: #4a505c; /* Darker background for list items */
+            margin-bottom: 15px;
             padding: 15px 20px;
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-            font-size: 1.1em;
+            border-radius: 6px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            border: 1px solid #5c6370; /* Darker border */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .link-list a:hover {
-            color: #0056b3;
+        .project-item:hover, .document-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4); /* Darker shadow on hover */
         }
-        .link-list a::after {
-            content: '→';
-            margin-left: 10px;
+        .project-name, .document-name {
             font-size: 1.2em;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-        .link-list a:hover::after {
-            opacity: 1;
-        }
-        .document-list {
-            list-style: none;
-            padding: 0;
-        }
-        .document-list li {
-            margin-bottom: 10px;
-        }
-        .document-list a {
-            text-decoration: none;
-            color: #28a745;
             font-weight: bold;
-            font-size: 1.1em;
+            color: #e06c75; /* Reddish project name color */
+            flex-grow: 1;
+        }
+        .project-links a, .document-links a {
             display: inline-block;
-            padding: 8px 0;
-            transition: color 0.3s ease;
+            margin-left: 15px;
+            padding: 8px 15px;
+            background-color: #56b6c2; /* Cyan for general links */
+            color: #282c34; /* Dark text on links */
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-size: 0.9em;
+            font-weight: 600;
         }
-        .document-list a:hover {
-            color: #218838;
-            text-decoration: underline;
+        .project-links a:hover, .document-links a:hover {
+            background-color: #48a0ab;
+            transform: translateY(-1px);
         }
-        .document-list a::before {
-            content: '📄 ';
-            margin-right: 5px;
-            color: #6c757d;
+        .project-links a:active, .document-links a:active {
+            transform: translateY(0);
         }
-        body.dark-mode {
-            background-color: #282c34;
-            color: #e0e0e0;
+        .project-links .code-link {
+            background-color: #98c379; /* Green for code */
         }
-        body.dark-mode .container {
-            background-color: #3a3f4b;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        .project-links .code-link:hover {
+            background-color: #82b366;
         }
-        body.dark-mode h1,
-        body.dark-mode h2 {
-            color: #61dafb;
-            border-bottom-color: #444;
+        .project-links .preview-link {
+            background-color: #c678dd; /* Purple for preview */
         }
-        body.dark-mode .link-list li {
-            background-color: #4a4f5b;
-            border-color: #5a606c;
-        }
-        body.dark-mode .link-list li:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-        body.dark-mode .link-list a {
-            color: #98c379;
-        }
-        body.dark-mode .link-list a:hover {
-            color: #6aa64a;
-        }
-        body.dark-mode .document-list a {
-            color: #e5c07b;
-        }
-        body.dark-mode .document-list a:hover {
-            color: #d1a050;
-        }
-        body.dark-mode .document-list a::before {
-            color: #888;
+        .project-links .preview-link:hover {
+            background-color: #af61c4;
         }
     </style>
 </head>
-<body class="dark-mode">
+<body>
     <div class="container">
-        <h1>Welcome to the Project Hub</h1>
+        <h1>Gemini CLI Projects</h1>
 
-        <div class="link-section">
-            <h2>Games & Demos</h2>
-            <ul class="link-list">
-                <li><a href="arcade.html">Arcade</a></li>
-                <li><a href="artillery.html">Artillery</a></li>
-                <li><a href="blob.html">Blob</a></li>
-                <li><a href="dodecahedron.html">Dodecahedron</a></li>
-                <li><a href="lava.html">Lava</a></li>
-                <li><a href="monolith.html">Monolith</a></li>
-                <li><a href="snake.html">Snake</a></li>
-                <li><a href="survival.html">Survival</a></li>
-                <li><a href="tetris.html">Tetris</a></li>
-                <li><a href="webcam.html">Webcam Demo</a></li>
-            </ul>
-        </div>
+        <h2>Interactive Projects</h2>
+        <ul class="project-list">
+            <li class="project-item">
+                <span class="project-name">Arcade</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/arcade.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/arcade.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Artillery</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/artillery.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/artillery.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Blob</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/blob.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/blob.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Dodecahedron</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/dodecahedron.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/dodecahedron.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Lava</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/lava.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/lava.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Monolith</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/monolith.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/monolith.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Snake</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/snake.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/snake.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Survival</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/survival.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/survival.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Tetris</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/tetris.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/tetris.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+            <li class="project-item">
+                <span class="project-name">Webcam</span>
+                <div class="project-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/webcam.html" class="code-link">Code</a>
+                    <a href="https://kaliliveuser.github.io/sandbox/webcam.html" class="preview-link">Preview</a>
+                </div>
+            </li>
+        </ul>
 
-        <div class="link-section">
-            <h2>Documents</h2>
-            <ul class="document-list">
-                <li><a href="prompts.txt">Prompts (Text)</a></li>
-                <li><a href="QuantumForSWEng.pptx">Quantum For SW Eng (PPTX)</a></li>
-                <li><a href="SurvivalMCC250819.pdf">Survival MCC 250819 (PDF)</a></li>
-            </ul>
-        </div>
+        <h2>Documents</h2>
+        <ul class="document-list">
+            <li class="document-item">
+                <span class="document-name">Prompts</span>
+                <div class="document-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/prompts.txt" class="preview-link">View Document</a>
+                </div>
+            </li>
+            <li class="document-item">
+                <span class="document-name">Quantum For SW Eng</span>
+                <div class="document-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/QuantumForSWEng.pptx" class="preview-link">View Document</a>
+                </div>
+            </li>
+            <li class="document-item">
+                <span class="document-name">Survival MCC 250819</span>
+                <div class="document-links">
+                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/SurvivalMCC250819.pdf" class="preview-link">View Document</a>
+                </div>
+            </li>
+        </ul>
     </div>
 </body>
 </html>
