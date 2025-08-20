@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Landing Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        .link-section {
+            margin-bottom: 30px;
+        }
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .link-list li {
+            background-color: #e9f5f3;
+            border: 1px solid #d1e7e4;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .link-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .link-list a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .link-list a:hover {
+            color: #0056b3;
+        }
+        .link-list a::after {
+            content: '→';
+            margin-left: 10px;
+            font-size: 1.2em;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .link-list a:hover::after {
+            opacity: 1;
+        }
+        .document-list {
+            list-style: none;
+            padding: 0;
+        }
+        .document-list li {
+            margin-bottom: 10px;
+        }
+        .document-list a {
+            text-decoration: none;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: inline-block;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+        }
+        .document-list a:hover {
+            color: #218838;
+            text-decoration: underline;
+        }
+        .document-list a::before {
+            content: '📄 ';
+            margin-right: 5px;
+            color: #6c757d;
+        }
+        body.dark-mode {
+            background-color: #282c34;
+            color: #e0e0e0;
+        }
+        body.dark-mode .container {
+            background-color: #3a3f4b;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        body.dark-mode h1,
+        body.dark-mode h2 {
+            color: #61dafb;
+            border-bottom-color: #444;
+        }
+        body.dark-mode .link-list li {
+            background-color: #4a4f5b;
+            border-color: #5a606c;
+        }
+        body.dark-mode .link-list li:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        body.dark-mode .link-list a {
+            color: #98c379;
+        }
+        body.dark-mode .link-list a:hover {
+            color: #6aa64a;
+        }
+        body.dark-mode .document-list a {
+            color: #e5c07b;
+        }
+        body.dark-mode .document-list a:hover {
+            color: #d1a050;
+        }
+        body.dark-mode .document-list a::before {
+            color: #888;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <h1>Welcome to the Project Hub</h1>
+
+        <div class="link-section">
+            <h2>Games & Demos</h2>
+            <ul class="link-list">
+                <li><a href="arcade.html">Arcade</a></li>
+                <li><a href="artillery.html">Artillery</a></li>
+                <li><a href="blob.html">Blob</a></li>
+                <li><a href="dodecahedron.html">Dodecahedron</a></li>
+                <li><a href="lava.html">Lava</a></li>
+                <li><a href="monolith.html">Monolith</a></li>
+                <li><a href="snake.html">Snake</a></li>
+                <li><a href="survival.html">Survival</a></li>
+                <li><a href="tetris.html">Tetris</a></li>
+                <li><a href="webcam.html">Webcam Demo</a></li>
+            </ul>
+        </div>
+
+        <div class="link-section">
+            <h2>Documents</h2>
+            <ul class="document-list">
+                <li><a href="prompts.txt">Prompts (Text)</a></li>
+                <li><a href="QuantumForSWEng.pptx">Quantum For SW Eng (PPTX)</a></li>
+                <li><a href="SurvivalMCC250819.pdf">Survival MCC 250819 (PDF)</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
