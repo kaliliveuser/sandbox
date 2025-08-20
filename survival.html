@@ -8,74 +8,62 @@
         body {
             font-family: 'Courier New', Courier, monospace;
             line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0e6d6; /* Sepia-like background */
+            margin: 20px;
+            background-color: #f0f0e0;
             color: #333;
-            box-sizing: border-box;
-        }
-        .manual-page {
-            background-color: #fff;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
             border: 1px solid #ccc;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
-            page-break-after: always; /* Simulate page breaks for printing */
-            min-height: 800px; /* Approximate height for a page */
+            padding: 20px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
         }
-        .manual-page:last-child {
-            page-break-after: avoid;
-        }
-        h1, h2, h3, h4 {
-            color: #222;
+        h1, h2, h3 {
+            color: #555;
             border-bottom: 1px solid #aaa;
             padding-bottom: 5px;
             margin-top: 20px;
         }
-        h1 { font-size: 2.5em; text-align: center; margin-bottom: 40px; }
-        h2 { font-size: 1.8em; }
-        h3 { font-size: 1.4em; }
-        h4 { font-size: 1.2em; }
-        p {
-            margin-bottom: 1em;
-            text-align: justify;
-        }
-        ul, ol {
-            margin-bottom: 1em;
-            padding-left: 25px;
-        }
-        li {
-            margin-bottom: 0.5em;
-        }
-        .tip, .warning {
-            background-color: #e0f2f7;
-            border-left: 5px solid #2196f3;
-            padding: 15px;
-            margin: 20px 0;
-            font-style: italic;
-        }
-        .warning {
-            background-color: #ffe0b2;
-            border-left: 5px solid #ff9800;
-        }
-        .page-number {
+        h1 {
             text-align: center;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
+            font-size: 2em;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: square;
+            margin-left: 20px;
+        }
+        .note {
+            background-color: #e0e0c0;
+            border-left: 5px solid #888;
+            padding: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="manual-page">
+    
         <h1>SURVIVAL FIELD MANUAL</h1>
+        <p><strong>Edition:</strong> 2025-08-19</p>
+        <div class="note"><strong>Disclaimer:</strong> This manual provides basic information. Practical application in a real survival situation requires extensive training and experience. Always prioritize safety and respect local regulations.</div>
         <h2>INTRODUCTION</h2>
         <p>This manual serves as a foundational guide to essential survival skills, designed for individuals who may find themselves in unexpected wilderness situations. The principles outlined herein are not exhaustive but represent critical knowledge for self-reliance and increasing your chances of survival when modern conveniences are unavailable. Remember, knowledge is your most potent tool. Practice these skills in a controlled environment before you ever need them in a real emergency.</p>
         <p>Survival is not merely about enduring; it is about adapting, innovating, and maintaining a resilient mindset. The wilderness is unforgiving, but it also provides everything necessary for life if you know how to find and utilize it. This manual will cover the core pillars of survival: Fire, Shelter, Water (implicitly covered in other sections like finding resources), Tools, Weapons, Hunting, and Fishing. Mastering these areas will significantly enhance your ability to thrive, not just survive.</p>
         <p>Always prioritize your safety. Never attempt dangerous techniques without proper training and supervision. The information provided is for educational purposes and should be used responsibly. Your primary goal in any survival situation is to return to civilization safely.</p>
-        <div class="tip">
-            <strong>Tip: The Rule of Threes</strong><br>
+        <div class="note">
+            <strong>Note: The Rule of Threes</strong><br>
             Remember the "Rule of Threes" as a general guideline for survival priorities:<br>
             <ul>
                 <li>You can survive 3 minutes without air.</li>
@@ -85,10 +73,10 @@
             </ul>
             This hierarchy helps prioritize your immediate actions in a survival scenario.
         </div>
-        <div class="page-number">Page 1</div>
+
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 1: FIRE MAKING</h2>
         <h3>1.1 Importance of Fire</h3>
         <p>Fire is arguably the most crucial element for survival in the wilderness. Its benefits are multifaceted and directly contribute to your ability to sustain life:</p>
@@ -123,8 +111,8 @@
             <li><strong>Char Cloth (if available):</strong> Excellent for catching a spark.</li>
             <li><strong>Pocket Lint/Cotton Balls (if available):</strong> Pre-prepared tinder.</li>
         </ul>
-        <div class="tip">
-            <strong>Tip: Tinder Preparation</strong><br>
+        <div class="note">
+            <strong>Note: Tinder Preparation</strong><br>
             Always gather more tinder than you think you'll need. Fluff it up to increase surface area for oxygen. Keep it dry at all costs; store it in a waterproof container or inside your clothing.
         </div>
 
@@ -142,14 +130,14 @@
             <li><strong>Hardwoods (Oak, Maple, Hickory):</strong> Burn longer and hotter.</li>
             <li><strong>Softwoods (Pine, Fir, Spruce):</strong> Ignite faster but burn quicker and produce more sparks. Good for initial heat.</li>
         </ul>
-        <div class="warning">
-            <strong>Warning: Green Wood and Poisonous Plants</strong><br>
+        <div class="note">
+            <strong>Note: Green Wood and Poisonous Plants</strong><br>
             Never burn green (live) wood; it produces excessive smoke and little heat. Avoid burning poisonous plants (e.g., poison ivy, poison oak) as their smoke can cause severe respiratory irritation.
         </div>
-        <div class="page-number">Page 2</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h3>1.4 Fire Lay Structures</h3>
         <p>The way you arrange your fuel wood significantly impacts how efficiently your fire burns.</p>
         <h4>1.4.1 Teepee Lay</h4>
@@ -193,14 +181,14 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Wood Selection for Friction Fire</strong><br>
+        <div class="note">
+            <strong>Note: Wood Selection for Friction Fire</strong><br>
             For the fireboard and spindle, choose softwoods that are dry and free of knots. The friction between the two pieces of wood is what generates heat. Consistency in wood type helps.
         </div>
-        <div class="page-number">Page 3</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>1.5.2 Friction Fire: Hand Drill Method</h4>
         <p>More challenging than the bow drill, the hand drill relies solely on hand friction.</p>
         <ol>
@@ -217,8 +205,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="warning">
-            <strong>Warning: Hand Drill Difficulty</strong><br>
+        <div class="note">
+            <strong>Note: Hand Drill Difficulty</strong><br>
             The hand drill is physically demanding and requires significant practice. It's often considered a last resort if a bow drill cannot be constructed.
         </div>
 
@@ -249,8 +237,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Fire Safety and Maintenance</strong><br>
+        <div class="note">
+            <strong>Note: Fire Safety and Maintenance</strong><br>
             <ul>
                 <li>Clear a fire break around your fire pit (at least 10 feet) to prevent wildfires.</li>
                 <li>Never leave a fire unattended.</li>
@@ -260,10 +248,10 @@
                 <li>Conserve fuel by using efficient fire lays and only burning what you need.</li>
             </ul>
         </div>
-        <div class="page-number">Page 4</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 2: SHELTER</h2>
         <h3>2.1 Importance of Shelter</h3>
         <p>Shelter is your primary defense against the elements, protecting you from exposure, which is a leading cause of death in survival situations. It provides:</p>
@@ -285,8 +273,8 @@
             <li><strong>Sun/Shade:</strong> Consider the sun's path. In cold weather, choose a spot that gets morning sun. In hot weather, choose a shaded area.</li>
             <li><strong>Wind Direction:</strong> Position your shelter to block prevailing winds.</li>
         </ul>
-        <div class="tip">
-            <strong>Tip: Test the Ground</strong><br>
+        <div class="note">
+            <strong>Note: Test the Ground</strong><br>
             Before committing to a site, lie down on the ground for a few minutes. Feel for dampness, cold spots, or uncomfortable lumps. This quick test can save you discomfort later.
         </div>
 
@@ -306,10 +294,10 @@
                 </ul>
             </li>
         </ol>
-        <div class="page-number">Page 5</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>2.3.2 Debris Hut (A-Frame or Round)</h4>
         <p>An excellent, highly insulating shelter, especially effective in cold weather. It requires significant effort but provides superior protection.</p>
         <ol>
@@ -326,8 +314,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Debris Hut Insulation</strong><br>
+        <div class="note">
+            <strong>Note: Debris Hut Insulation</strong><br>
             The effectiveness of a debris hut comes from the trapped air within the packed organic material. The thicker the layer, the better the insulation. Think of it as a giant sleeping bag.
         </div>
 
@@ -348,8 +336,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="warning">
-            <strong>Warning: Snow Shelter Ventilation</strong><br>
+        <div class="note">
+            <strong>Note: Snow Shelter Ventilation</strong><br>
             Always ensure adequate ventilation in a snow shelter to prevent carbon monoxide poisoning from your breath or any internal heat source. A small ventilation hole is critical.
         </div>
 
@@ -359,10 +347,10 @@
             <li><strong>Materials:</strong> Dry leaves, pine needles, grass, moss, small evergreen boughs.</li>
             <li><strong>Application:</strong> Pile these materials at least 6-12 inches thick on your sleeping area. This creates an insulating barrier between your body and the cold ground.</li>
         </ul>
-        <div class="page-number">Page 6</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 3: WEAPONS</h2>
         <h3>3.1 Importance of Weapons</h3>
         <p>In a survival scenario, improvised weapons serve multiple purposes:</p>
@@ -371,8 +359,8 @@
             <li><strong>Hunting:</strong> For acquiring food.</li>
             <li><strong>Tool Augmentation:</strong> Can be adapted for tasks like digging or breaking.</li>
         </ul>
-        <div class="warning">
-            <strong>Warning: Ethical Considerations</strong><br>
+        <div class="note">
+            <strong>Note: Ethical Considerations</strong><br>
             The use of weapons for hunting should only be considered in dire survival situations where food is critical. Always prioritize ethical and humane methods. Avoid unnecessary harm to wildlife.
         </div>
 
@@ -412,14 +400,14 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Bow and Arrow Practice</strong><br>
+        <div class="note">
+            <strong>Note: Bow and Arrow Practice</strong><br>
             Mastering the bow and arrow takes immense practice. Focus on consistency in drawing, aiming, and releasing. Start with large, stationary targets.
         </div>
-        <div class="page-number">Page 7</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>3.2.3 Sling</h4>
         <p>A simple projectile weapon effective for small game or deterring larger animals.</p>
         <ol>
@@ -450,8 +438,8 @@
 
         <h3>3.3 Traps and Snares (Basic Principles)</h3>
         <p>Traps and snares can be highly effective for acquiring food with minimal energy expenditure. However, their construction and deployment require careful consideration of local regulations and ethical implications. This manual will only cover basic principles, not detailed construction of complex, potentially dangerous traps.</p>
-        <div class="warning">
-            <strong>Warning: Trap Legality and Ethics</strong><br>
+        <div class="note">
+            <strong>Note: Trap Legality and Ethics</strong><br>
             Building and setting traps is illegal in many areas and can be dangerous to both humans and non-target animals. Only consider this in extreme, life-threatening survival situations. Always prioritize humane methods and check local laws.
         </div>
         <h4>3.3.1 Snare (Basic Loop)</h4>
@@ -468,14 +456,14 @@
             </li>
             <li><strong>Usage:</strong> The animal walks into the loop, and as it tries to move, the loop tightens.</li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Trap Placement</strong><br>
+        <div class="note">
+            <strong>Note: Trap Placement</strong><br>
             Place traps in natural funnels or pinch points where animals are forced to pass, such as narrow trails, fallen logs, or gaps in dense vegetation.
         </div>
-        <div class="page-number">Page 8</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 4: TOOLS</h2>
         <h3>4.1 Importance of Tools</h3>
         <p>Tools are extensions of your hands and mind, enabling you to perform tasks that would be impossible or highly inefficient otherwise. They are essential for:</p>
@@ -510,14 +498,14 @@
                 </ul>
             </li>
         </ol>
-        <div class="warning">
-            <strong>Warning: Flintknapping Safety</strong><br>
+        <div class="note">
+            <strong>Note: Flintknapping Safety</strong><br>
             Flintknapping produces extremely sharp flakes and dust. Always wear eye protection, thick gloves, and work in a well-ventilated area. The edges are sharper than surgical steel.
         </div>
-        <div class="page-number">Page 9</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>4.2.2 Crack-Stone Knife Usage</h4>
         <p>Using a crack-stone knife effectively requires understanding its limitations and strengths.</p>
         <ol>
@@ -544,8 +532,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Practice with Stone Tools</strong><br>
+        <div class="note">
+            <strong>Note: Practice with Stone Tools</strong><br>
             Practice using your improvised stone tools on non-critical tasks first. Learn their limitations and how they interact with different materials before relying on them in a critical situation.
         </div>
 
@@ -563,10 +551,10 @@
             </li>
             <li><strong>Usage:</strong> Use a chopping motion. Be aware that improvised axes are less durable than modern ones.</li>
         </ol>
-        <div class="page-number">Page 10</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>4.2.4 Digging Stick</h4>
         <p>A simple but invaluable tool for foraging roots, digging fire pits, or creating trenches.</p>
         <ol>
@@ -591,8 +579,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Cordage Strength</strong><br>
+        <div class="note">
+            <strong>Note: Cordage Strength</strong><br>
             Test your cordage frequently during construction. The tighter the twist and the more consistent the fiber addition, the stronger the final product.
         </div>
 
@@ -608,10 +596,10 @@
                 </ul>
             </li>
         </ol>
-        <div class="page-number">Page 11</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 5: HUNTING EQUIPMENT</h2>
         <h3>5.1 Importance of Hunting Equipment</h3>
         <p>Hunting equipment allows for the acquisition of protein, fats, and hides, which are critical for long-term survival. It complements trapping by allowing for more active pursuit of game.</p>
@@ -641,8 +629,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Atlatl Practice</strong><br>
+        <div class="note">
+            <strong>Note: Atlatl Practice</strong><br>
             The atlatl requires considerable practice to master accuracy and power. Start with large, stationary targets.
         </div>
 
@@ -665,10 +653,10 @@
                 </ul>
             </li>
         </ol>
-        <div class="page-number">Page 12</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>5.2.3 Blowgun</h4>
         <p>Effective for small birds and rodents at close range, especially in dense vegetation.</p>
         <ol>
@@ -694,14 +682,14 @@
             <li><strong>Patience:</strong> Hunting can be a long, frustrating process. Persistence is key.</li>
             <li><strong>Targeting:</strong> Aim for vital organs for a quick, humane kill.</li>
         </ul>
-        <div class="tip">
-            <strong>Tip: Small Game First</strong><br>
+        <div class="note">
+            <strong>Note: Small Game First</strong><br>
             In a survival situation, focus on small game (squirrels, rabbits, birds) first. They are more abundant, easier to catch, and require less energy to process than large game.
         </div>
-        <div class="page-number">Page 13</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 6: FISHING GEAR</h2>
         <h3>6.1 Importance of Fishing</h3>
         <p>Fishing is an excellent way to acquire protein in many environments, often requiring less energy and risk than hunting land animals. It provides:</p>
@@ -738,10 +726,10 @@
             <li><strong>Floats:</strong> Small pieces of buoyant wood, cork, dried gourds, or tightly rolled bark.</li>
             <li><strong>Weights:</strong> Small stones, lead (if available), or heavy clay. Notch or groove stones to tie them to the line.</li>
         </ol>
-        <div class="page-number">Page 14</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h4>6.2.4 Fishing Rod</h4>
         <p>A simple rod provides leverage and casting ability.</p>
         <ol>
@@ -773,8 +761,8 @@
                 </ul>
             </li>
         </ol>
-        <div class="tip">
-            <strong>Tip: Fish Trap Placement</strong><br>
+        <div class="note">
+            <strong>Note: Fish Trap Placement</strong><br>
             Place fish traps in natural bottlenecks, along migration routes, or near areas where fish feed or seek shelter (e.g., under logs, near submerged vegetation).
         </div>
 
@@ -793,10 +781,10 @@
             <li><strong>Hand Noodling/Grabbling:</strong> In some areas, large fish can be caught by hand in submerged logs or holes. Dangerous and requires caution.</li>
             <li><strong>Night Fishing:</strong> Many fish are more active at night. Use a light source to attract them to your spear or net.</li>
         </ul>
-        <div class="page-number">Page 15</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 7: ADVANCED CONSIDERATIONS & MINDSET</h2>
         <h3>7.1 Water Procurement and Purification</h3>
         <p>While not a separate section, water is paramount. Always prioritize finding and purifying water.</p>
@@ -810,8 +798,8 @@
                 </ul>
             </li>
         </ul>
-        <div class="warning">
-            <strong>Warning: Untreated Water</strong><br>
+        <div class="note">
+            <strong>Note: Untreated Water</strong><br>
             Never drink untreated water from natural sources unless absolutely necessary and no other option exists. Waterborne pathogens can cause severe illness, leading to dehydration and incapacitation.
         </div>
 
@@ -829,14 +817,14 @@
                 </ul>
             </li>
         </ul>
-        <div class="tip">
-            <strong>Tip: Learn Local Flora</strong><br>
+        <div class="note">
+            <strong>Note: Learn Local Flora</strong><br>
             Before any wilderness excursion, learn to identify at least 3-5 common edible plants and 3-5 common poisonous plants in the region you will be in.
         </div>
-        <div class="page-number">Page 16</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h3>7.3 Navigation and Signaling</h3>
         <p>Knowing where you are and how to attract attention is vital for rescue.</p>
         <ul>
@@ -881,10 +869,10 @@
             <li><strong>Learn and Adapt:</strong> Continuously observe your environment and adjust your strategies.</li>
             <li><strong>Self-Talk:</strong> Encourage yourself, talk through problems.</li>
         </ul>
-        <div class="page-number">Page 17</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>SECTION 8: EMERGENCY SCENARIOS & PRIORITIES</h2>
         <h3>8.1 Lost in the Wilderness</h3>
         <p>If you realize you are lost, the first and most critical step is to STOP. Think, Observe, Plan (STOP).</p>
@@ -932,10 +920,10 @@
             <li><strong>Clothing:</strong> Wear loose-fitting, light-colored clothing to reflect sun.</li>
             <li><strong>Recognize Heatstroke:</strong> Hot, dry skin; confusion; rapid pulse; unconsciousness. Cool the body immediately.</li>
         </ul>
-        <div class="page-number">Page 18</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h3>8.3 Animal Encounters</h3>
         <p>Most wild animals will avoid humans. Understanding how to react can prevent dangerous encounters.</p>
         <ul>
@@ -965,19 +953,19 @@
             <li><strong>Hallucinations:</strong> Can occur due to extreme dehydration, exhaustion, or starvation. Stay grounded in reality.</li>
             <li><strong>Decision Fatigue:</strong> Making constant life-or-death decisions can be exhausting. Prioritize rest when possible.</li>
         </ul>
-        <div class="tip">
-            <strong>Tip: Maintain a Routine</strong><br>
+        <div class="note">
+            <strong>Note: Maintain a Routine</strong><br>
             Even in survival, try to establish a routine for daily tasks (gathering wood, checking traps, maintaining shelter). This provides structure and a sense of normalcy, which can be psychologically beneficial.
         </div>
-        <div class="page-number">Page 19</div>
+        
     </div>
 
-    <div class="manual-page">
+    
         <h2>CONCLUSION</h2>
         <p>This manual has provided a comprehensive overview of fundamental survival skills. Remember that theoretical knowledge is only the first step. True mastery comes from consistent practice and hands-on experience in a controlled environment. The wilderness is a demanding teacher, but it also offers profound lessons in self-reliance and resilience.</p>
         <p>Always prioritize safety, maintain a positive and adaptable mindset, and never underestimate the power of preparation. The skills detailed within these pages are not just about enduring hardship; they are about understanding your environment, respecting its power, and finding the resources necessary to thrive.</p>
         <p>May this knowledge serve you well, and may you always find your way home.</p>
-        <div class="page-number">Page 20</div>
+        
     </div>
 
 </body>
