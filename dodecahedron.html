@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spinning Dodecahedron</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000); // Black background
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Dodecahedron Geometry
+        const geometry = new THREE.DodecahedronGeometry(2);
+
+        // Materials for each face (12 faces for dodecahedron)
+        const materials = [];
+        for (let i = 0; i < 12; i++) {
+            materials.push(new THREE.MeshStandardMaterial({
+                color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+                metalness: 0.8,
+                roughness: 0.2
+            }));
+        }
+
+        // Define groups for each of the 12 pentagonal faces
+        // A dodecahedron has 12 faces. Each face is a pentagon,
+        // which is triangulated into 3 triangles in the geometry.
+        // Each triangle uses 3 indices. So, 3 triangles = 9 indices.
+        const indicesPerFace = 9; 
+
+        for (let i = 0; i < 12; i++) {
+            geometry.addGroup(i * indicesPerFace, indicesPerFace, i);
+        }
+        
+        const testObject = new THREE.Mesh(geometry, materials);
+        scene.add(testObject);
+
+        
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x606060); // Increased ambient light
+        scene.add(ambientLight);
+
+        const hemisphereLight = new THREE.HemisphereLight(0xb1e1ff, 0xb97a20, 0.5); // Sky color, ground color, intensity
+        scene.add(hemisphereLight);
+
+        const pointLight1 = new THREE.PointLight(0xffffff, 1.5, 50); // Increased intensity, reduced distance
+        pointLight1.position.set(3, 3, 3); // Closer to the object
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xffffff, 1.5, 50); // Increased intensity, reduced distance
+        pointLight2.position.set(-3, -3, 3); // Closer to the object
+        scene.add(pointLight2);
+
+        const pointLight3 = new THREE.PointLight(0xffffff, 1.5, 50); // Increased intensity, reduced distance
+        pointLight3.position.set(-3, 3, 3); // Closer to the object
+        scene.add(pointLight3);        
+        
+        const pointLight4 = new THREE.PointLight(0xffffff, 1.5, 50); // Increased intensity, reduced distance
+        pointLight4.position.set(3, -3, 3); // Closer to the object
+        scene.add(pointLight4);
+
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            testObject.rotation.x += 0.005;
+            testObject.rotation.y += 0.005;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
+
+        animate();
+    </script>
+</body>
+</html>
