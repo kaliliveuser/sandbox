@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random Moving and Spinning Monolith in WebVR</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script>
+      AFRAME.registerComponent('random-position', {
+        schema: {
+          minX: {type: 'number', default: -5},
+          maxX: {type: 'number', default: 5},
+          minY: {type: 'number', default: 1},
+          maxY: {type: 'number', default: 5},
+          minZ: {type: 'number', default: -5},
+          maxZ: {type: 'number', default: 5},
+          interval: {type: 'number', default: 2500}, // milliseconds between new target positions
+          duration: {type: 'number', default: 2000}  // milliseconds for animation duration
+        },
+
+        init: function () {
+          var data = this.data;
+          var el = this.el;
+
+          this.updatePosition = function() {
+            var x = Math.random() * (data.maxX - data.minX) + data.minX;
+            var y = Math.random() * (data.maxY - data.minY) + data.minY;
+            var z = Math.random() * (data.maxZ - data.minZ) + data.minZ;
+
+            el.setAttribute('animation', {
+              property: 'position',
+              to: `${x} ${y} ${z}`,
+              dur: data.duration,
+              easing: 'easeInOutQuad'
+            });
+          };
+
+          this.updatePosition(); // Set initial position and start animation
+          this.intervalId = setInterval(this.updatePosition, data.interval);
+        },
+
+        remove: function () {
+          clearInterval(this.intervalId);
+        }
+      });
+
+      AFRAME.registerComponent('random-rotation', {
+        schema: {
+          minSpeed: {type: 'number', default: 0.5},
+          maxSpeed: {type: 'number', default: 2},
+          interval: {type: 'number', default: 3000} // milliseconds
+        },
+
+        init: function () {
+          var data = this.data;
+          this.rotationSpeed = {x: 0, y: 0, z: 0};
+
+          this.updateRotationSpeed = function() {
+            this.rotationSpeed.x = (Math.random() * (data.maxSpeed - data.minSpeed) + data.minSpeed) * (Math.random() < 0.5 ? 1 : -1);
+            this.rotationSpeed.y = (Math.random() * (data.maxSpeed - data.minSpeed) + data.minSpeed) * (Math.random() < 0.5 ? 1 : -1);
+            this.rotationSpeed.z = (Math.random() * (data.maxSpeed - data.minSpeed) + data.minSpeed) * (Math.random() < 0.5 ? 1 : -1);
+          }.bind(this);
+
+          this.updateRotationSpeed(); // Set initial rotation speed
+          this.intervalId = setInterval(this.updateRotationSpeed, data.interval);
+        },
+
+        tick: function (time, deltaTime) {
+          var el = this.el;
+          var currentRotation = el.object3D.rotation;
+
+          currentRotation.x += THREE.MathUtils.degToRad(this.rotationSpeed.x * (deltaTime / 1000));
+          currentRotation.y += THREE.MathUtils.degToRad(this.rotationSpeed.y * (deltaTime / 1000));
+          currentRotation.z += THREE.MathUtils.degToRad(this.rotationSpeed.z * (deltaTime / 1000));
+        },
+
+        remove: function () {
+          clearInterval(this.intervalId);
+        }
+      });
+
+      AFRAME.registerComponent('procedural-stars', {
+        schema: {
+          count: {type: 'number', default: 1500},
+          radius: {type: 'number', default: 150},
+          minSize: {type: 'number', default: 0.05},
+          maxSize: {type: 'number', default: 0.3},
+          color: {type: 'color', default: '#FFFFFF'}
+        },
+
+        init: function () {
+          var data = this.data;
+          var starGeometry = new THREE.SphereGeometry(1, 8, 8); // Small sphere for each star
+          var starMaterial = new THREE.MeshBasicMaterial({ color: data.color });
+          var stars = new THREE.Group();
+
+          for (var i = 0; i < data.count; i++) {
+            var star = new THREE.Mesh(starGeometry, starMaterial);
+
+            // Random position within a sphere
+            var r = data.radius * Math.cbrt(Math.random()); // Distribute more evenly
+            var theta = Math.random() * Math.PI * 2;
+            var phi = Math.acos((2 * Math.random()) - 1);
+
+            star.position.x = r * Math.sin(phi) * Math.cos(theta);
+            star.position.y = r * Math.sin(phi) * Math.sin(theta);
+            star.position.z = r * Math.cos(phi);
+
+            // Random size
+            var size = Math.random() * (data.maxSize - data.minSize) + data.minSize;
+            star.scale.set(size, size, size);
+
+            stars.add(star);
+          }
+
+          this.el.setObject3D('stars', stars);
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <!-- No star texture needed for procedural stars -->
+      </a-assets>
+
+      <!-- Camera and cursor -->
+      <a-entity camera look-controls>
+        <a-entity cursor="fuse: true; rayOrigin: mouse"
+                  position="0 0 -1"
+                  geometry="primitive: ring; radiusOuter: 0.01; radiusInner: 0.005"
+                  material="color: black; shader: flat">
+        </a-entity>
+      </a-entity>
+
+      <!-- Monolith with random movement and rotation -->
+      <a-box color="#101010" depth="1" height="6" width="2"
+             random-position="minX: -3; maxX: 3; minY: 4.5; maxY: 8; minZ: -3; maxZ: 3; interval: 2500; duration: 2000"
+             random-rotation="minSpeed: 10; maxSpeed: 30; interval: 4000">
+      </a-box>
+
+      <!-- Ground -->
+      <a-plane static-body rotation="-90 0 0" width="100" height="100" color="#7BC8A4"></a-plane>
+
+      <!-- Sky (black) -->
+      <a-sky color="#000000"></a-sky>
+
+      <!-- Procedural Stars -->
+      <a-entity procedural-stars="count: 1500; radius: 150; minSize: 0.05; maxSize: 0.3;"></a-entity>
+    </a-scene>
+  </body>
+</html>
