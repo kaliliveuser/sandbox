@@ -1,7 +1,12 @@
 Create a single-file web page that explains details of survival skills. Include how to obtain water, make fire, shelter, weapons, tools, hunting equipment. Make sure to include how to use a stone knife and how to make fishing gear. Include a section about mental care. Expand each section with deep details, and multiple pointers and tips. Include icons from https://fonts.google.com/icons. Add a disclaimer and a table of contents at the beginning. Add a relevant story at the end of each chapter. Make the website in the style of a field manual. I would like this html manual to be at least 30 pages long so make it as detailed as possible. Add printing page-breaks after every chapter. 
 
 [if the chapters are too short, ask Gemini to write each chapter separately then merge them together in the html framework]
-Write a long chapter about procuring water in the wilderness in a survival situation.
+Write a long chapter about procuring water in the wilderness during a survival situation.
+Write a long chapter about making fire in the wilderness during a survival situation.
+Write a long chapter about building a shelter in the wilderness during a survival situation.
+Write a long chapter about making weapons and tools in the wilderness during a survival situation.
+Write a long chapter about hunting and foraging in the wilderness during a survival situation.
+Write a long chapter about mental care in the wilderness during a survival situation.
 Merge all the information above with the attached html file.
 
 Create a single-file web page that shows a blue 3D animated blob slowly floating up and down. Make the blob shiny and light it from the bottom. The blob should be undulating and bulbous. It should move very slowly like the liquid inside a lavalamp.
