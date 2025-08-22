@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Manual: Essential Survival Skills</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2F4F4F; /* Dark Slate Gray */
+            --secondary-color: #F5F5DC; /* Beige */
+            --text-color: #1a1a1a;
+            --header-font: 'Courier New', Courier, monospace;
+            --body-font: 'Georgia', serif;
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .manual-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid var(--primary-color);
+            padding: 20px 40px;
+            background-color: #ffffff;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--header-font);
+            color: var(--primary-color);
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 2em;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            border-bottom: 3px double var(--primary-color);
+            margin-bottom: 1em;
+        }
+
+        h2 {
+            font-size: 2em;
+        }
+        
+        h3 {
+            font-size: 1.5em;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .disclaimer, .toc {
+            border: 1px solid #c00;
+            background-color: #fff8f8;
+            padding: 15px;
+            margin: 2em 0;
+            border-radius: 5px;
+        }
+
+        .disclaimer h2, .toc h2 {
+            margin-top: 0;
+            color: #c00;
+            border-bottom: 1px solid #c00;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .toc li {
+            margin-bottom: 10px;
+            font-family: var(--header-font);
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .tip, .fact {
+            border-left: 4px solid var(--primary-color);
+            padding: 10px 15px;
+            margin: 1.5em 0;
+            background-color: #f0f8ff;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .tip strong, .fact strong {
+            font-family: var(--header-font);
+            color: var(--primary-color);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            margin: 1em 0;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                font-size: 12pt;
+                padding: 0;
+                margin: 0;
+            }
+
+            .manual-container {
+                border: none;
+                box-shadow: none;
+                padding: 1in;
+            }
+
+            h1, h2, h3 {
+                color: #000;
+            }
+            
+            .disclaimer, .toc {
+                background-color: #fff;
+                border: 2px solid #000;
+            }
+            
+            .tip, .fact {
+                background-color: #f0f0f0;
+                border-left: 3px solid #000;
+            }
+            
+            .material-icons {
+                display: none; /* Hide icons when printing to save ink */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="manual-container">
+        <header>
+            <h1>FIELD MANUAL: Gemini-2.5-Pro</h1>
+            <p style="text-align:center; font-family: var(--header-font);">ESSENTIAL SURVIVAL SKILLS</p>
+        </header>
+
+        <section class="disclaimer">
+            <h2><span class="material-icons">warning</span>LEGAL AND SAFETY DISCLAIMER</h2>
+            <p>This document is intended for informational and educational purposes only. The survival skills described herein are advanced and can be dangerous if practiced without professional supervision and extensive training. The author and publisher assume no responsibility for any injury, loss, or damage resulting from the use or misuse of the information contained in this manual. Always prioritize safety, consult with experts, and adhere to local laws and regulations concerning fire, hunting, trapping, and foraging. Survival situations are inherently dangerous; this guide does not guarantee safety or survival. Practice these skills in a controlled environment with experienced guidance before ever attempting to rely on them in a real-world emergency.</p>
+        </section>
+
+        <nav class="toc">
+            <h2><span class="material-icons">list_alt</span>TABLE OF CONTENTS</h2>
+            <ul>
+                <li><a href="#chapter1">CHAPTER 1: OBTAINING WATER</a></li>
+                <li><a href="#chapter2">CHAPTER 2: MAKING FIRE</a></li>
+                <li><a href="#chapter3">CHAPTER 3: BUILDING SHELTER</a></li>
+                <li><a href="#chapter4">CHAPTER 4: WEAPONS & TOOLS</a></li>
+                <li><a href="#chapter5">CHAPTER 5: HUNTING & FORAGING</a></li>
+                <li><a href="#chapter6">CHAPTER 6: MENTAL CARE</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="chapter1" class="page-break">
+                <h2><span class="material-icons">water_drop</span>CHAPTER 1: OBTAINING WATER</h2>
+                <p>Water is the most critical element for survival. The human body can last weeks without food, but only a few days without water. The "Rule of Threes" states you can survive 3 minutes without air, 3 hours without shelter in extreme conditions, 3 days without water, and 3 weeks without food. This chapter details how to find, collect, and purify water.</p>
+
+                <h3><span class="material-icons">search</span>Finding Water Sources</h3>
+                <p>Your first priority is locating a potential water source. Look for both direct and indirect signs.</p>
+                <h4>Direct Sources</h4>
+                <ul>
+                    <li><strong>Rivers, Streams, and Lakes:</strong> These are the most obvious sources. Always prefer moving water over stagnant water, as it is generally less contaminated.</li>
+                    <li><strong>Springs:</strong> Water flowing naturally from the ground is often filtered and safer to drink, but purification is still recommended. Look for them at the base of hills or in depressions.</li>
+                    <li><strong>Rainwater and Snow:</strong> Collecting rainwater is one of the safest methods. Use any container you have. Snow should be melted before consumption to avoid lowering your core body temperature.</li>
+                </ul>
+                
+                <h4>Indirect Indicators</h4>
+                <ul>
+                    <li><strong>Lush Green Vegetation:</strong> Plants need water to survive. A patch of vibrant green in an otherwise dry area is a strong indicator of groundwater. Cottonwoods, willows, and cattails are almost always found near water.</li>
+                    <li><strong>Animal Activity:</strong> Most animals need water daily. Converging animal trails, especially in the morning or evening, often lead to a water source. Follow them downhill.</li>
+                    <li><strong>Insect Life:</strong> Most insects, especially bees and non-migratory birds, stay close to water. The presence of swarming insects can indicate a nearby source.</li>
+                    <li><strong>Topography:</strong> Water flows downhill. Search for water in valleys, ravines, and the lowest accessible terrain.</li>
+                </ul>
+
+                <div class="tip">
+                    <strong><span class="material-icons">lightbulb</span>TIP:</strong> Dew collection can provide a small but vital amount of water. Before sunrise, tie absorbent cloths around your ankles and walk through tall grass. Wring out the collected moisture into a container.
+                </div>
+
+                <h3><span class="material-icons">science</span>Collecting Water</h3>
+                <p>Once a source is identified, you need a method to collect it.</p>
+                <h4>Solar Still</h4>
+                <p>A solar still uses the sun's heat to create condensation, producing distilled, purified water. It is effective in areas with ample sunlight but yields a low amount of water.</p>
+                <ol>
+                    <li>Dig a pit about 3 feet across and 2 feet deep.</li>
+                    <li>Place a container at the very center of the pit.</li>
+                    <li>Fill the area around the container with damp vegetation. If the soil is already moist, this is sufficient.</li>
+                    <li>Cover the pit with a plastic sheet or tarp, securing the edges with rocks or soil.</li>
+                    <li>Place a small stone in the center of the plastic sheet, directly over your container. This creates a low point for condensation to drip from.</li>
+                    <li>The sun heats the pit, causing water to evaporate from the soil and plants. This moisture condenses on the underside of the plastic, runs down to the low point, and drips into your container.</li>
+                </ol>
+
+                <h4>Transpiration Bag</h4>
+                <p>This method collects water vapor released by plants.</p>
+                <ol>
+                    <li>Find a leafy, non-poisonous tree or bush that is in direct sunlight.</li>
+                    <li>Tie a clear plastic bag securely over a branch with plenty of green leaves.</li>
+                    <li>Angle the bag so that one corner hangs lower than the rest.</li>
+                    <li>Over time, the plant will release water vapor (transpire), which will condense inside the bag and collect in the low corner.</li>
+                    <li>You can then pierce the corner to drink or pour the water into a larger container.</li>
+                </ol>
+
+                <h3><span class="material-icons">filter_alt</span>Water Purification</h3>
+                <p><strong>NEVER</strong> assume water is safe to drink without purification. Waterborne pathogens like Giardia and Cryptosporidium can cause severe illness, dehydration, and even death.</p>
+                <h4>Boiling</h4>
+                <p>This is the most effective method for killing all pathogens. Bring water to a rolling boil for at least one full minute. At high altitudes (above 5,000 feet or 1,500 meters), you should boil for at least three minutes to compensate for the lower boiling point.</p>
+
+                <h4>Makeshift Filtration</h4>
+                <p>Filtration removes sediment and larger particles but does not remove viruses or bacteria. It should always be followed by boiling. A simple filter can be made by layering materials in a container (like a hollow log, a piece of bark, or a cone made from clothing).</p>
+                <ol>
+                    <li><strong>Container:</strong> Create a cone shape with a small hole at the bottom.</li>
+                    <li><strong>Bottom Layer:</strong> A small piece of cloth to prevent materials from falling through.</li>
+                    <li><strong>Layer 1 (Fine):</strong> Crushed charcoal from your fire. This helps absorb some impurities.</li>
+                    <li><strong>Layer 2 (Fine):</strong> Sand.</li>
+                    <li><strong>Layer 3 (Coarse):</strong> Small gravel or pebbles.</li>
+                    <li><strong>Layer 4 (Coarse):</strong> Larger rocks.</li>
+                </ol>
+                <p>Pour water through the top and collect the clearer water that drips from the bottom. Remember to boil this filtered water.</p>
+                
+                <div class="fact">
+                    <strong><span class="material-icons">info</span>FACT:</strong> The murkier the water, the more it needs pre-filtering. Letting water sit for several hours will allow heavy sediment to settle at the bottom, making it easier to filter.
+                </div>
+            </section>
+
+            <section id="chapter2" class="page-break">
+                <h2><span class="material-icons">local_fire_department</span>CHAPTER 2: MAKING FIRE</h2>
+                <p>Fire is a survivor's best friend. It provides warmth, light, protection from predators, a means to cook food and purify water, and a significant psychological boost. Understanding the principles of fire and practicing various ignition methods is paramount.</p>
+                
+                <h3><span class="material-icons">whatshot</span>The Fire Triangle</h3>
+                <p>Every fire needs three components: Heat, Fuel, and Oxygen. Removing any one of these will extinguish the fire. Your job is to bring them together effectively.</p>
+                <ul>
+                    <li><strong>Heat:</strong> The initial spark or ember needed to start combustion.</li>
+                    <li><strong>Fuel:</strong> The material that will burn. This must be gathered in stages from finest to largest.</li>
+                    <li><strong>Oxygen:</strong> Air. You must build your fire in a way that allows for adequate airflow.</li>
+                </ul>
+
+                <h3><span class="material-icons">forest</span>Fuel Preparation</h3>
+                <p>Gathering and arranging fuel correctly is more important than the ignition method itself. All fuel must be as dry as possible.</p>
+                <ul>
+                    <li><strong>Tinder Bundle:</strong> The heart of your fire. This is a fist-sized bundle of the finest, driest, most flammable material you can find. It is designed to catch a spark and burst into flame. Examples:
+                        <ul>
+                            <li>Dried grass, shredded cedar or birch bark, cattail fluff, fungus, cotton from clothing, bird down.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Kindling:</strong> Small twigs, roughly the diameter of a pencil lead up to the thickness of your thumb. This is added to the burning tinder to build the flame.</li>
+                    <li><strong>Fuelwood:</strong> Larger pieces of wood that will sustain the fire. Start with wrist-thick pieces and gradually add larger logs.</li>
+                </ul>
+                <div class="tip">
+                    <strong><span class="material-icons">lightbulb</span>TIP:</strong> Create "feather sticks" by using your knife to shave thin curls of wood from a larger, dry stick. These curls act as excellent kindling, especially in wet conditions as the wood inside a branch is often dry.
+                </div>
+                
+                <h3><span class="material-icons">fireplace</span>Fire Lays</h3>
+                <p>A fire lay is the structure you build with your wood before ignition.</p>
+                <ul>
+                    <li><strong>Teepee:</strong> Arrange kindling in a cone shape over your tinder bundle. This structure provides good airflow and directs heat upwards, making it excellent for starting a fire quickly.</li>
+                    <li><strong>Log Cabin:</strong> Place two larger pieces of fuelwood parallel on the ground. Then place two slightly smaller pieces on top, perpendicular to the first two. Continue building upwards, creating a "cabin" or box. Place your tinder and kindling inside. This lay is stable and burns for a long time.</li>
+                </ul>
+
+                <h3><span class="material-icons">flare</span>Ignition Methods</h3>
+                <h4>Friction Fire: The Bow Drill</h4>
+                <p>This is a classic, reliable friction method, but it requires practice and preparation.</p>
+                <ol>
+                    <li><strong>Components:</strong>
+                        <ul>
+                            <li><strong>Hearth Board:</strong> A flat piece of soft, non-resinous wood (like basswood, cedar, or yucca), about thumb-thick. Carve a small depression near one edge.</li>
+                            <li><strong>Spindle:</strong> A straight, dowel-like stick of a slightly harder wood, about 8-12 inches long. Round one end and point the other.</li>
+                            <li><strong>Handhold (Bearing Block):</strong> A piece of rock or hardwood with a depression carved into it. This holds the top of the spindle and applies downward pressure. Use a green leaf inside to lubricate it.</li>
+                            <li><strong>Bow:</strong> A curved, sturdy branch about the length of your arm. The string can be a shoelace, paracord, or cordage made from plant fibers.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Technique:</strong>
+                        <ul>
+                            <li>Carve your depression in the hearth board. Cut a "V" shaped notch from the edge of the board into the center of the depression. This notch is where the hot dust will collect.</li>
+                            <li>Loop the bowstring once around the spindle.</li>
+                            <li>Place the pointed end of the spindle into the hearth board's depression.</li>
+                            <li>Hold the handhold on top of the spindle, applying firm downward pressure.</li>
+                            <li>Place your foot on the hearth board to keep it steady.</li>
+                            <li>Begin sawing back and forth with the bow, keeping it parallel to the ground. The spindle should rotate rapidly.</li>
+                            <li>Smoke will begin to appear as fine, dark dust collects in the V-notch. Increase your speed and pressure until a glowing red ember (a "coal") is formed in the dust pile.</li>
+                            <li>Carefully transfer this ember to your tinder bundle. Gently blow on it until it bursts into flame.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="fact">
+                    <strong><span class="material-icons">info</span>FACT:</strong> Wood selection is critical for friction fire. Using two different types of wood for the spindle and hearth board, with the spindle being slightly harder, often yields the best results.
+                </div>
+            </section>
+            
+            <section id="chapter3" class="page-break">
+                <h2><span class="material-icons">foundation</span>CHAPTER 3: BUILDING SHELTER</h2>
+                <p>A shelter is your primary defense against the elements—sun, wind, rain, and cold. Exposure can kill much faster than hunger or thirst. An effective shelter protects you, conserves body heat, and provides crucial psychological comfort.</p>
+
+                <h3><span class="material-icons">explore</span>Site Selection: The 5 Ws</h3>
+                <p>Choosing the right location is as important as the shelter itself. Consider the following:</p>
+                <ul>
+                    <li><strong>Water:</strong> Be near a water source, but not so close that you are in danger of flooding or attracting too many insects.</li>
+                    <li><strong>Wood:</strong> You need ample building materials and firewood.</li>
+                    <li><strong>Wind:</strong> Choose a location that offers a natural windbreak, such as a rock outcropping or a thicket of trees. Build the shelter entrance away from the prevailing wind.</li>
+                    <li><strong>Widowmakers:</strong> Look up! Avoid camping under dead trees or branches that could fall in a storm.</li>
+                    <li><strong>Wildlife:</strong> Avoid setting up on game trails or near obvious signs of dangerous animal habitats.</li>
+                </ul>
+
+                <h3><span class="material-icons">cottage</span>Types of Survival Shelters</h3>
+                <h4>The Lean-To</h4>
+                <p>A simple, quick shelter effective for blocking wind and rain from one direction. It's best for short-term use.</p>
+                <ol>
+                    <li>Find a sturdy, horizontal support. This can be a fallen log or a ridgepole you lash between two trees.</li>
+                    <li>Lean long poles or branches against one side of the ridgepole, close together, at roughly a 45-degree angle.</li>
+                    <li>Weave smaller, flexible branches horizontally through the main poles to create a lattice.</li>
+                    <li>Cover the entire framework with debris: leaves, pine needles, bark, or sod. Start from the bottom and work your way up, creating layers like shingles on a roof to shed water. The thicker the debris, the better the insulation and waterproofing.</li>
+                </ol>
+
+                <h4>The Debris Hut</h4>
+                <p>This is one of the most effective shelters for cold weather survival as it relies on trapping your own body heat.</p>
+                <ol>
+                    <li><strong>Frame:</strong> Find a strong ridgepole (a long, thick branch) and prop one end up on a tree stump, a low-hanging branch, or a small A-frame you build. The other end rests on the ground. The opening should be just large enough for you to crawl into.</li>
+                    <li><strong>Ribs:</strong> Lean branches and sticks along both sides of the ridgepole, creating a triangular or cone-like shape. Place them close together.</li>
+                    <li><strong>Lattice:</strong> Weave smaller, flexible sticks through the ribs to create a mesh that will hold the debris in place.</li>
+                    <li><strong>Insulation:</strong> This is the most crucial step. Pile on massive amounts of dry, fluffy debris—leaves, pine needles, grass, moss. The goal is to have a layer at least 2-3 feet thick on all sides. This thick layer of trapped air is what will keep you warm.</li>
+                    <li><strong>Bedding:</strong> Fill the inside of the hut with the same dry, soft debris. You want at least a foot of compressed material underneath you to insulate you from the cold ground.</li>
+                    <li><strong>Entrance:</strong> Block the entrance with a pile of leaves or a "door" made from a bundle of sticks and debris after you crawl inside.</li>
+                </ol>
+
+                <div class="tip">
+                    <strong><span class="material-icons">lightbulb</span>TIP:</strong> A good test for your debris hut's insulation is to see if you can poke your arm through the debris layer from the outside and touch the inner ribs. If you can, you need to add more debris.
+                </div>
+                
+                <div class="fact">
+                    <strong><span class="material-icons">info</span>FACT:</strong> The ground will sap your body heat faster than the air will. Insulating your bed from the ground is more important than the thickness of your overhead cover. Never sleep directly on the bare ground.
+                </div>
+            </section>
+            
+            <section id="chapter4" class="page-break">
+                <h2><span class="material-icons">construction</span>CHAPTER 4: WEAPONS & TOOLS</h2>
+                <p>Tools are what separate humans from other animals. In a survival situation, the ability to create effective tools and simple weapons from natural materials is a force multiplier, enabling you to build, hunt, and defend yourself more effectively.</p>
+
+                <h3><span class="material-icons">hardware</span>The Stone Knife: Flintknapping</h3>
+                <p>A sharp-edged stone was mankind's first and most essential tool. Learning the basics of flintknapping (the process of making stone tools) is a fundamental skill.</p>
+                
+                <h4>1. Selecting the Right Material</h4>
+                <p>You need a cryptocrystalline stone that will break with a conchoidal fracture (like glass). Look for:</p>
+                <ul>
+                    <li><strong>Flint/Chert:</strong> Hard, dense, and commonly found in sedimentary rock formations. Often found in riverbeds.</li>
+                    <li><strong>Obsidian:</strong> Volcanic glass. It is the easiest to work with and creates the sharpest edge, but it is also very brittle.</li>
+                    <li><strong>Fine-grained Basalt or Quartzite:</strong> Usable, but more difficult to work with.</li>
+                </ul>
+                <p>A good stone will have a uniform texture and be free of cracks or inclusions. It should make a high-pitched "ring" when tapped with another rock.</p>
+
+                <h4>2. The Tools of Knapping</h4>
+                <ul>
+                    <li><strong>Hammerstone:</strong> A hard, rounded river cobble used for percussion flaking.</li>
+                    <li><strong>Billet:</strong> A softer hammer made of antler, bone, or very hard wood. Used for thinning the blade.</li>
+                    <li><strong>Pressure Flaker:</strong> A pointed tool, like the tip of an antler tine or a piece of copper, used for fine-tuning and sharpening the edge.</li>
+                    <li><strong>Leather Pad:</strong> A thick piece of leather to protect your hand while holding the stone.</li>
+                </ul>
+
+                <h4>3. The Process</h4>
+                <ol>
+                    <li><strong>Spalling (Roughing Out):</strong> Place your core stone on your leg (protected by the leather pad). Using the hammerstone, strike a sharp, glancing blow near an edge. The goal is to break off a large, relatively flat flake (a spall) that will become your knife blade. This takes practice to control the angle and force.</li>
+                    <li><strong>Shaping and Thinning:</strong> Using the antler billet, strike the edges of the spall to remove smaller flakes. This thins the blade and begins to give it its desired shape. Always strike on a platform (a strong edge) that is below the centerline of the stone.</li>
+                    <li><strong>Pressure Flaking (Sharpening):</strong> This is the final step. Hold the blade firmly in your padded hand. Press the tip of your pressure flaker against the very edge of the blade and apply inward and downward pressure until a small, long flake "pops" off the other side. Repeat this process along the entire edge, alternating sides, to create a sharp, serrated edge.</li>
+                </ol>
+
+                <h4>4. How to Use a Stone Knife</h4>
+                <ul>
+                    <li><strong>Cutting:</strong> A stone knife works best with a sawing motion, not a direct push like a steel knife. The serrated edge is excellent for cutting cordage, meat, and soft vegetation.</li>
+                    <li><strong>Scraping:</strong> The edge can be used to scrape hides or strip bark from wood.</li>
+                    <li><strong>Safety:</strong> Stone flakes are razor sharp—often sharper than surgical steel. Handle them with extreme care to avoid deep cuts. Never apply prying force, as the blade will snap.</li>
+                </ul>
+                <div class="tip">
+                    <strong><span class="material-icons">lightbulb</span>TIP:</strong> Hafting (attaching a handle) dramatically increases the utility and safety of a stone knife. Carve a split in the end of a stick, insert the base of the blade, and secure it tightly with cordage made from plant fibers, wrapping it with pine pitch or resin as a glue.
+                </div>
+            </section>
+            
+            <section id="chapter5" class="page-break">
+                <h2><span class="material-icons">pets</span>CHAPTER 5: HUNTING & FORAGING</h2>
+                <p>Securing food provides the calories and nutrients necessary to maintain strength and morale. This requires knowledge of both active hunting techniques and passive trapping, as well as an understanding of edible plants.</p>
+                
+                <h3><span class="material-icons">phishing</span>Making Fishing Gear</h3>
+                <p>Waterways are often a more reliable source of protein than hunting large game. Simple, effective fishing gear can be made from natural materials.</p>
+                
+                <h4>Gorge Hook</h4>
+                <p>A gorge hook is a simple device that lodges sideways in a fish's throat. It does not hook the lip like a modern hook.</p>
+                <ol>
+                    <li><strong>Material:</strong> Find a small, straight, and hard piece of wood, bone, or thorn about 1-2 inches long.</li>
+                    <li><strong>Shaping:</strong> Sharpen both ends to a fine point.</li>
+                    <li><strong>Attachment:</strong> Carve a small notch or groove in the exact center of the gorge. Tie your fishing line securely around this notch.</li>
+                    <li><strong>Baiting:</strong> Conceal the gorge hook lengthwise inside a piece of bait (like an insect or piece of meat).</li>
+                    <li><strong>Use:</strong> When a fish swallows the bait, the line pulls the gorge sideways, and the sharp ends lodge it in the fish's gullet.</li>
+                </ol>
+
+                <h4>Fishing Line (Cordage)</h4>
+                <p>Strong cordage is essential. It can be made from various plant fibers.</p>
+                <ol>
+                    <li><strong>Harvest:</strong> Gather fibrous material like stinging nettle, milkweed, dogbane, or the inner bark of cedar or willow trees.</li>
+                    <li><strong>Process:</strong> Dry the stalks until they are brittle. Break them and pull out the long, stringy fibers from within.</li>
+                    <li><strong>Reverse Wrap:</strong> Take a small bundle of fibers. Hold it in the middle and twist it away from you until it kinks and forms a loop. You now have two strands. Hold the base of the loop. Twist the top strand away from you, then bring it toward you over the other strand. Now twist the new top strand away from you and bring it toward you. Repeat this process, known as the reverse wrap, adding in new fibers as you go to create a continuous, strong cord.</li>
+                </ol>
+
+                <h4>Simple Fish Trap</h4>
+                <p>A funnel trap allows fish to swim in easily but makes it difficult for them to find the exit.</p>
+                <ol>
+                    <li>Create a large basket-like structure from woven branches or reeds. This will be the main body of the trap.</li>
+                    <li>Create a second, cone-shaped basket with a small opening at the narrow end.</li>
+                    <li>Insert the cone into the opening of the main basket, with the narrow opening pointing inward. Secure it in place.</li>
+                    <li>Place some bait inside the trap.</li>
+                    <li>Submerge the trap in a slow-moving part of a stream or pond, with the opening facing downstream. Weigh it down with rocks.</li>
+                    <li>Fish will follow the scent of the bait, swim through the wide part of the cone and through the small opening, and then become trapped in the larger basket.</li>
+                </ol>
+
+                <div class="fact">
+                    <strong><span class="material-icons">info</span>FACT:</strong> The most energy-efficient methods of food procurement are passive, like trapping and fishing. Active hunting expends a great deal of calories and has a low success rate for the inexperienced.
+                </div>
+            </section>
+            
+            <section id="chapter6" class="page-break">
+                <h2><span class="material-icons">psychology</span>CHAPTER 6: MENTAL CARE</h2>
+                <p>Survival is as much a mental game as it is a physical one. A strong, positive mental attitude is your most important tool. Panic, fear, and despair can be more deadly than any environmental threat.</p>
+
+                <h3><span class="material-icons">pan_tool</span>The S.T.O.P. Acronym</h3>
+                <p>When you first realize you are in a survival situation, the urge to panic is strong. Fight it. The first thing you should do is S.T.O.P.:</p>
+                <ul>
+                    <li><strong>Stop:</strong> Do not move. Do not take another step. Cease all activity. Sit down. Take a deep breath.</li>
+                    <li><strong>Think:</strong> Engage your brain. Acknowledge the situation calmly and rationally. Think about your immediate needs: water, shelter, fire. Think about the resources you have on your person and in your immediate vicinity.</li>
+                    <li><strong>Observe:</strong> Look around you. What is the weather doing? What time of day is it? What natural resources are available? Are there immediate dangers?</li>
+                    <li><strong>Plan:</strong> Formulate a simple plan. Prioritize your needs based on the Rule of Threes and your specific situation. A plan, no matter how small, provides purpose and combats feelings of helplessness.</li>
+                </ul>
+
+                <h3><span class="material-icons">task_alt</span>Managing Fear and Maintaining Hope</h3>
+                <p>Fear is a natural response, but it must be controlled. Hope is the fuel that keeps you going.</p>
+                <ul>
+                    <li><strong>Set Small, Achievable Goals:</strong> Don't think about "being rescued." Think about "finding water," then "gathering tinder," then "building a shelter wall." Each small victory provides a powerful psychological boost and builds momentum.</li>
+                    <li><strong>Stay Busy:</strong> Idleness allows your mind to wander to negative thoughts. There is always something that needs to be done: improve your shelter, gather more firewood, set a trap, find a better water source. Meaningful work provides a sense of control.</li>
+                    <li><strong>Accept Your Reality:</strong> Do not waste energy on denial or anger about your situation. Accept the reality of it and focus all your mental energy on improving it.</li>
+                    <li><strong>Remember Your Reasons to Live:</strong> Think about your family, your friends, your goals. Having a powerful reason to survive is a potent motivator that can help you push through incredible hardship.</li>
+                </ul>
+
+                <div class="tip">
+                    <strong><span class="material-icons">lightbulb</span>TIP:</strong> Talk to yourself. It's not a sign of madness; it's a way to organize your thoughts, work through problems, and combat crushing loneliness. Verbally state your plan and congratulate yourself on completing tasks.
+                </div>
+
+                <div class="fact">
+                    <strong><span class="material-icons">info</span>FACT:</strong> The will to live is a recognized factor in survival scenarios. Individuals who maintain a positive outlook and actively fight for their survival are statistically more likely to endure than those who resign themselves to their fate. Your mindset is your ultimate weapon.
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
