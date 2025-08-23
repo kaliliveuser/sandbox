@@ -23,10 +23,6 @@ Create a single-file web page that has the game tetris. Include a look-ahead fea
 
 ---
 
-Create a landing page (index.html) that has professionally styled links for the following items in the same folder: arcade.html, artillery.html, blob.html, dodecahedron.html, lava.html, monolith.html, prompts.txt, snake.html, survival.html, tetris.html, webcam.html. Add a section for the following documents in the same folder: QuantumForSWEng.pptx, SurvivalMCC250819.pdf. List the projects vertically with one link to the code and one to the preview. Use placeholder links for now.
-
----
-
 Create a presentation on the topic of Quantum Computing for Software Engineers.
 
 Write an apps script to write a slide deck in Google Slides. Include icons from https://fonts.google.com/icons to make the presentation professional and interesting. Please insert all the links and texts manually. Avoid using apps script functions because of their high failure rate.
@@ -47,3 +43,7 @@ Create a single-file webpage that draws a spinning dodecahedron. Make each facet
 ---
 
 Create a single-file webpage that plays 'Artillery Simulator' exactly the same as the game released for the Apple][e (based on Artillery.png included in the folder). Let a second player control the enemy cannon. This should be a turn based game with textual user input. It should show a flat playing field with a randomly-sized mountain in the middle and have wind effects with random speed and direction.
+
+---
+
+Create a landing page (index.html) that has professionally styled links for the following items in the same folder: arcade.html, artillery.html, blob.html, dodecahedron.html, lava.html, monolith.html, prompts.txt, snake.html, survival.html, tetris.html, webcam.html. Add a section for the following documents in the same folder: QuantumForSWEng.pptx, SurvivalMCC250819.pdf. List the projects vertically with one link to the code and one to the preview. Use placeholder links for now.
