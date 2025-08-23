@@ -19,3 +19,5 @@ Create a landing page (index.html) that has professionally styled links for the 
 
 Create a presentation on the topic of Quantum Computing for Software Engineers.
 Write an apps script to write a slide deck in Google Slides. Include icons from https://fonts.google.com/icons to make the presentation professional and interesting. Please insert all the links and texts manually. Avoid using apps script functions because of their high failure rate.
+
+List the top 50 games of the 1980s in a 1980s style web page. When the name of the game is clicked, show a pop-up message that has the publisher, the author, the game description and interesting facts about the game.
