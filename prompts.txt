@@ -47,3 +47,26 @@ Create a single-file webpage that plays 'Artillery Simulator' exactly the same a
 ---
 
 Create a landing page (index.html) that has professionally styled links for the following items in the same folder: arcade.html, artillery.html, blob.html, dodecahedron.html, lava.html, monolith.html, prompts.txt, snake.html, survival.html, tetris.html, webcam.html. Add a section for the following documents in the same folder: QuantumForSWEng.pptx, SurvivalMCC250819.pdf. List the projects vertically with one link to the code and one to the preview. Use placeholder links for now.
+
+---
+
+Using my current resume, write a modern one-page ATS-compatible resume that is custom for this job description. Provide a short professional summary at the top. List relevant positions in full then summarize the remaining companies in one entry. Do not add skills that aren't already listed in the original resume. Collect relevant skills in their own section. Then, write a matching cover letter. Finally list 30 interview questions relevant to this role and potential answers. Provide no explanation or preamble. Make no comments after.
+
+<resume>...</resume>
+<jd>...</jd>
+
+---
+
+Details about the protagonist of a story follows:{Details} 
+Write a long story based on the above information. Give the story a happy ending. Provide no explanation or preamble. Do not use markdown. Just state the title and jump into the story. After, write the line '---' then provide {ImageCount} very long, very descriptive image generation prompts that depict important moments in the story. Treat each image prompt as stand-alone and independent. 
+Write out the full visual descriptions of each character. Do not number the image prompts or use markdown. In the story, refer to the protagonist by his or her name, not by description. However, in the image prompts describe the protagonist in full detail as {Description} every time.
+
+---
+
+Create a responsive, aesthetically-pleasing, one-file website based on the following company information. Re-write and expand on the descriptions below to make the company interesting. Do not just list out the information verbatum.
+
+Use {image link} for the graphic and the favicon. Keep the size of graphics small and surround it with a subtle, glowing, circular border consistent with the site accent colour. Use embedded boxes where aesthetically pleasing. Use embedded boxes with glowing borders for each section. Use relevant icons for bullets lists. Keep widths consistent. Keep fonts consistent in size and color. Be consistent with the accent for the overall site. Add a copyright at the bottom using the company name for the year 2025.
+
+Use Javascript to add animations and inline CSS to make the page look dark-professional. Provide no explanation or preamble. Don't use markdown. Only write tags that are meant to be between the <body> </body> tag. Never use double quotes, use single quotes instead.
+
+<company>...</company>
