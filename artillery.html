@@ -1,235 +1,215 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Artillery Simulator</title>
-<style>
-  body {
-    background-color: #000;
-    color: #00ff00;
-    font-family: "Courier New", Courier, monospace;
-    text-align: center;
-  }
-  canvas {
-    background-color: #000;
-    border: 2px solid #00ff00;
-  }
-  input {
-    background-color: #000;
-    color: #00ff00;
-    border: 1px solid #00ff00;
-    font-family: "Courier New", Courier, monospace;
-  }
-  button {
-    background-color: #00ff00;
-    color: #000;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-family: "Courier New", Courier, monospace;
-  }
-  #gameOver {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #000;
-    border: 2px solid #00ff00;
-    padding: 20px;
-    text-align: center;
-  }
-</style>
+    <title>Artillery Simulator</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+        }
+        canvas {
+            background-color: #000;
+            border: 1px solid #00FF00;
+        }
+        input {
+            background-color: #000;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        button {
+            background-color: #00FF00;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
 </head>
 <body>
-<h1>Artillery Simulator</h1>
-<canvas id="gameCanvas" width="800" height="600"></canvas>
-<div>
-  <h2>Player 1</h2>
-  <label for="angle">Angle (0-90):</label>
-  <input type="number" id="angle" min="0" max="90" value="45">
-  <label for="velocity">Velocity (1-200):</label>
-  <input type="number" id="velocity" min="1" max="200" value="100">
-  <button id="fireButton">Fire!</button>
-</div>
-<div>
-  <h2>Player 2</h2>
-  <label for="angle2">Angle (0-90):</label>
-  <input type="number" id="angle2" min="0" max="90" value="45">
-  <label for="velocity2">Velocity (1-200):</label>
-  <input type="number" id="velocity2" min="1" max="200" value="100">
-  <button id="fireButton2">Fire!</button>
-</div>
-<div id="gameOver" style="display: none;">
-  <h2 id="winnerText"></h2>
-  <button id="playAgainButton">Play Again</button>
-</div>
-<script>
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
+    <h1>Artillery Simulator</h1>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="controls">
+        <p id="wind"></p>
+        <p id="playerTurn"></p>
+        <label for="angle">Angle:</label>
+        <input type="text" id="angle" size="5">
+        <label for="force">Force:</label>
+        <input type="text" id="force" size="5">
+        <button id="fireButton">Fire!</button>
+        <p id="message"></p>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-  const screenWidth = canvas.width;
-  const screenHeight = canvas.height;
+        const windElement = document.getElementById('wind');
+        const playerTurnElement = document.getElementById('playerTurn');
+        const angleInput = document.getElementById('angle');
+        const forceInput = document.getElementById('force');
+        const fireButton = document.getElementById('fireButton');
+        const messageElement = document.getElementById('message');
 
-  let player1X, player1Y, player2X, player2Y;
-  let terrain = [];
-  let currentPlayer = 1;
-  let timerInterval;
-  let timeLeft = 5;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const groundHeight = 50;
 
-  const angleInput1 = document.getElementById('angle');
-  const velocityInput1 = document.getElementById('velocity');
-  const fireButton1 = document.getElementById('fireButton');
+        let player1, player2;
+        let mountain;
+        let wind;
+        let currentPlayer;
+        let projectile;
+        let gameOver;
 
-  const angleInput2 = document.getElementById('angle2');
-  const velocityInput2 = document.getElementById('velocity2');
-  const fireButton2 = document.getElementById('fireButton2');
+        function init() {
+            const player1X = Math.random() * (canvasWidth / 4);
+            const player2X = canvasWidth - Math.random() * (canvasWidth / 4);
 
-  function generateTerrain() {
-    let y = screenHeight - 50;
-    terrain = [];
-    for (let x = 0; x < screenWidth; x++) {
-      terrain.push(y);
-      y += (Math.random() - 0.5) * 10;
-      if (y < screenHeight - 300) y = screenHeight - 300;
-      if (y > screenHeight - 10) y = screenHeight - 10;
-    }
-  }
+            player1 = { x: player1X, y: canvasHeight - groundHeight, color: 'white', score: 0 };
+            player2 = { x: player2X, y: canvasHeight - groundHeight, color: 'magenta', score: 0 };
 
-  function placeTanks() {
-    player1X = Math.floor(Math.random() * (screenWidth / 4));
-    player1Y = terrain[player1X] - 10;
-    player2X = Math.floor(Math.random() * (screenWidth / 4)) + (screenWidth * 3 / 4);
-    player2Y = terrain[player2X] - 10;
-  }
+            const mountainWidth = 100 + Math.random() * 100;
+            const mountainHeight = 100 + Math.random() * 150;
+            const mountainX = (canvasWidth - mountainWidth) / 2;
+            mountain = { x: mountainX, y: canvasHeight - groundHeight, width: mountainWidth, height: mountainHeight };
 
-  function draw() {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, screenWidth, screenHeight);
+            wind = (Math.random() - 0.5) * 20;
+            currentPlayer = player1;
+            projectile = null;
+            gameOver = false;
 
-    // Draw terrain
-    ctx.fillStyle = '#00ff00';
-    for (let x = 0; x < screenWidth; x++) {
-      ctx.fillRect(x, terrain[x], 1, screenHeight - terrain[x]);
-    }
+            draw();
+            updateUI();
+        }
 
-    // Draw tanks
-    ctx.fillStyle = '#00ff00';
-    ctx.fillRect(player1X - 5, player1Y - 5, 10, 5);
-    ctx.fillRect(player2X - 5, player2Y - 5, 10, 5);
-  }
+        function draw() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  function fire(startX, startY, angle, velocity, targetX, targetY) {
-    clearInterval(timerInterval);
-    let rad = angle * Math.PI / 180;
-    let vx = Math.cos(rad) * velocity / 5;
-    if (currentPlayer === 2) {
-        vx *= -1;
-    }
-    let vy = -Math.sin(rad) * velocity / 5;
-    let x = startX;
-    let y = startY;
-    let path = [];
+            // Draw ground
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(0, canvasHeight - groundHeight, canvasWidth, groundHeight);
 
-    let shotInterval = setInterval(() => {
-      vy += 0.1; // gravity
-      x += vx;
-      y += vy;
-      path.push({x, y});
+            // Draw mountain
+            ctx.beginPath();
+            ctx.moveTo(mountain.x, mountain.y);
+            ctx.quadraticCurveTo(
+                mountain.x + mountain.width / 2, mountain.y - mountain.height,
+                mountain.x + mountain.width, mountain.y
+            );
+            ctx.closePath();
+            ctx.fill();
 
-      // Draw projectile path
-      ctx.fillStyle = '#fff';
-      for(let p of path) {
-        ctx.fillRect(p.x, p.y, 2, 2);
-      }
+            // Draw cannons
+            drawCannon(player1);
+            drawCannon(player2);
+
+            // Draw projectile
+            if (projectile) {
+                ctx.fillStyle = 'yellow';
+                ctx.beginPath();
+                ctx.arc(projectile.x, projectile.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCannon(player) {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x - 10, player.y - 10, 20, 10);
+        }
+
+        function updateUI() {
+            windElement.textContent = `Wind: ${Math.round(wind)}` + (wind > 0 ? ' ->' : ' <-');
+            playerTurnElement.textContent = `Player ${currentPlayer === player1 ? 1 : 2}'s Turn`;
+            messageElement.textContent = '';
+        }
+
+        fireButton.addEventListener('click', () => {
+            if (gameOver) {
+                init();
+                return;
+            }
+
+            const angle = parseFloat(angleInput.value);
+            const force = parseFloat(forceInput.value);
+
+            if (isNaN(angle) || isNaN(force)) {
+                messageElement.textContent = 'Invalid input!';
+                return;
+            }
+
+            const angleRad = (currentPlayer === player1 ? angle : 180 - angle) * Math.PI / 180;
+            const velocityX = Math.cos(angleRad) * force;
+            const velocityY = -Math.sin(angleRad) * force;
+
+            projectile = {
+                x: currentPlayer.x,
+                y: currentPlayer.y - 10,
+                velocityX: velocityX,
+                velocityY: velocityY
+            };
+
+            animateProjectile();
+        });
+
+        function animateProjectile() {
+            if (!projectile) return;
+
+            projectile.velocityY += 0.1; // Gravity
+            projectile.x += projectile.velocityX + wind / 10;
+            projectile.y += projectile.velocityY;
+
+            draw();
+
+            // Collision detection
+            if (projectile.y > canvasHeight - groundHeight) {
+                messageElement.textContent = 'Miss!';
+                switchPlayer();
+                projectile = null;
+                return;
+            }
+
+            if (
+                projectile.x > mountain.x &&
+                projectile.x < mountain.x + mountain.width
+            ) {
+                const t = (projectile.x - mountain.x) / mountain.width;
+                const mountainY = mountain.y - 2 * t * (1 - t) * mountain.height;
+
+                if (projectile.y > mountainY) {
+                    messageElement.textContent = 'Hit the mountain!';
+                    switchPlayer();
+                    projectile = null;
+                    return;
+                }
+            }
 
 
-      if (x < 0 || x > screenWidth || y > screenHeight) {
-        clearInterval(shotInterval);
-        draw(); // Redraw to clear the projectile path
-        switchPlayer();
-      }
+            const opponent = currentPlayer === player1 ? player2 : player1;
+            if (
+                projectile.x > opponent.x - 10 &&
+                projectile.x < opponent.x + 10 &&
+                projectile.y > opponent.y - 10 &&
+                projectile.y < opponent.y
+            ) {
+                messageElement.textContent = `Player ${currentPlayer === player1 ? 1 : 2} wins!`;
+                currentPlayer.score++;
+                gameOver = true;
+                fireButton.textContent = 'Play Again?';
+                return;
+            }
 
-      if (y >= terrain[Math.floor(x)]) {
-        clearInterval(shotInterval);
-        draw();
-        switchPlayer();
-      }
+            requestAnimationFrame(animateProjectile);
+        }
 
-      if (Math.abs(x - targetX) < 5 && Math.abs(y - targetY) < 5) {
-        clearInterval(shotInterval);
-        document.getElementById('winnerText').innerText = `PLAYER ${currentPlayer} WINS!`
-        document.getElementById('gameOver').style.display = 'block';
-      }
-    }, 20);
-  }
+        function switchPlayer() {
+            currentPlayer = currentPlayer === player1 ? player2 : player1;
+            updateUI();
+        }
 
-
-  function startTimer() {
-    timeLeft = 5;
-    document.getElementById('timer').innerText = `Time left: ${timeLeft}`;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      document.getElementById('timer').innerText = `Time left: ${timeLeft}`;
-      if (timeLeft === 0) {
-        clearInterval(timerInterval);
-        switchPlayer();
-      }
-    }, 1000);
-  }
-
-  function switchPlayer() {
-    if (currentPlayer === 1) {
-      currentPlayer = 2;
-      angleInput1.disabled = true;
-      velocityInput1.disabled = true;
-      fireButton1.disabled = true;
-      angleInput2.disabled = false;
-      velocityInput2.disabled = false;
-      fireButton2.disabled = false;
-    } else {
-      currentPlayer = 1;
-      angleInput1.disabled = false;
-      velocityInput1.disabled = false;
-      fireButton1.disabled = false;
-      angleInput2.disabled = true;
-      velocityInput2.disabled = true;
-      fireButton2.disabled = true;
-    }
-    startTimer();
-  }
-
-  function init() {
-    generateTerrain();
-    placeTanks();
-    draw();
-    currentPlayer = 1;
-    angleInput1.disabled = false;
-    velocityInput1.disabled = false;
-    fireButton1.disabled = false;
-    angleInput2.disabled = true;
-    velocityInput2.disabled = true;
-    fireButton2.disabled = true;
-    startTimer();
-  }
-
-  fireButton1.addEventListener('click', () => {
-    let angle = angleInput1.value;
-    let velocity = velocityInput1.value;
-    fire(player1X, player1Y, angle, velocity, player2X, player2Y);
-  });
-
-  fireButton2.addEventListener('click', () => {
-    let angle = angleInput2.value;
-    let velocity = velocityInput2.value;
-    fire(player2X, player2Y, angle, velocity, player1X, player1Y);
-  });
-
-  document.getElementById('playAgainButton').addEventListener('click', () => {
-      document.getElementById('gameOver').style.display = 'none';
-      init();
-  });
-
-  init();
-</script>
+        init();
+    </script>
 </body>
 </html>
