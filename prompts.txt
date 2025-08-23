@@ -9,22 +9,41 @@ Write a long chapter about hunting and foraging in the wilderness during a survi
 Write a long chapter about mental care in the wilderness during a survival situation.
 Merge all the information above with the attached html file.
 
+---
+
 Create a single-file web page that shows a blue 3D animated blob slowly floating up and down. Make the blob shiny and light it from the bottom. The blob should be undulating and bulbous. It should move very slowly like the liquid inside a lavalamp.
+
+---
 
 Create a single-file web page that has the game snake. Allow the snake to wrap around the edges.
 
+---
+
 Create a single-file web page that has the game tetris. Include a look-ahead feature.
+
+---
 
 Create a landing page (index.html) that has professionally styled links for the following items in the same folder: arcade.html, artillery.html, blob.html, dodecahedron.html, lava.html, monolith.html, prompts.txt, snake.html, survival.html, tetris.html, webcam.html. Add a section for the following documents in the same folder: QuantumForSWEng.pptx, SurvivalMCC250819.pdf. List the projects vertically with one link to the code and one to the preview. Use placeholder links for now.
 
+---
+
 Create a presentation on the topic of Quantum Computing for Software Engineers.
+
 Write an apps script to write a slide deck in Google Slides. Include icons from https://fonts.google.com/icons to make the presentation professional and interesting. Please insert all the links and texts manually. Avoid using apps script functions because of their high failure rate.
+
+---
 
 List the top 50 games of the 1980s in a 1980s style web page. When the name of the game is clicked, show a pop-up message that 
 includes the game studio, author, detailed description of the game story, game objective, and any interesting facts about its history.
 
+---
+
 In the style of '2001 A Space Oddyssey' create a WebVR page that shows a randomly-spinning monolith (1.25x5x11) moving very slowly and smoothly from location to location. This will be viewed in a VR headset. Make the monolith dark grey and make the background black with a procedural star field in the distance.
 
+---
+
 Create a single-file webpage that draws a spinning dodecahedron. Make each facet shiny and a different colour. Place four light sources spaced evenly in front of the object.
+
+---
 
 Create a single-file webpage that plays 'Artillery Simulator' exactly the same as the game released for the Apple][e (based on Artillery.png included in the folder). Let a second player control the enemy cannon. This should be a turn based game with textual user input. It should show a flat playing field with a randomly-sized mountain in the middle and have wind effects with random speed and direction.
