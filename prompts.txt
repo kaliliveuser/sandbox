@@ -22,4 +22,4 @@ Write an apps script to write a slide deck in Google Slides. Include icons from 
 
 List the top 50 games of the 1980s in a 1980s style web page. When the name of the game is clicked, show a pop-up message that has the publisher, the author, the game description and interesting facts about the game.
 
-Create a WebVR page that shows a randomly-spinning monolith (1.25x5x11) moving very slowly and smoothly from location to location. This will be viewed in a VR headset. Make the monolith dark grey and make the background black with a procedural star field in the distance.
+In the style of '2001 A Space Oddyssey' create a WebVR page that shows a randomly-spinning monolith (1.25x5x11) moving very slowly and smoothly from location to location. This will be viewed in a VR headset. Make the monolith dark grey and make the background black with a procedural star field in the distance.
