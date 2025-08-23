@@ -27,4 +27,4 @@ In the style of '2001 A Space Oddyssey' create a WebVR page that shows a randoml
 
 Create a single-file webpage that draws a spinning dodecahedron. Make each facet shiny and a different colour. Place four light sources spaced evenly in front of the object.
 
-Create a single-file webpage that plays artillery simulator exactly the same as the game released for the apple][+ Let a second player control the enemy cannon. This should be a two player game.
+Create a single-file webpage that plays 'Artillery Simulator' exactly the same as the game released for the apple][+ Let a second player control the enemy cannon. This should be a two player game.
