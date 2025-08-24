@@ -15,11 +15,15 @@ Create a single-file web page that shows a blue 3D animated blob slowly floating
 
 ---
 
-Create a single-file web page that has the game snake. Allow the snake to wrap around the edges.
+Create a single-file web page that has the game Space Invaders. Make the characters look like the aliens in the real game. Make the aliens move at the same speed as the real game.
 
 ---
 
-Create a single-file web page that has the game tetris. Include a look-ahead feature.
+Create a single-file web page that has the game Snake. Allow the snake to wrap around the edges.
+
+---
+
+Create a single-file web page that has the game Tetris. Include a look-ahead feature.
 
 ---
 
