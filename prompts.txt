@@ -82,7 +82,7 @@ michael.carlos@wxyz.com
 Experience
 
 Founder
-AGI Labs Inc. Canada (Formerly CAIIS Inc.)
+AGI Labs Inc. Canada
 Aug 2014 - Present
 Vancouver, Canada Area
 • Developing biologically plausible alternatives to backpropagation and stochastic gradient descent.
