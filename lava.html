@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Animated Blob</title>
+    <title>3D Animated Blobs</title>
     <style>
         body {
             margin: 0;
@@ -34,16 +34,19 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
 
-        const lightBelow = new THREE.PointLight(0x00aaff, 800, 100);
-        lightBelow.position.set(0, -10, -5);
-        scene.add(lightBelow);
+        // Lights from lava.html
+        
+        // Additional lights from blob.html for better illumination
+        const pointLight = new THREE.PointLight(0xffffff, 2, 100);
+        pointLight.position.set(0, -5, 3); // Adjusted z for front lighting
+        scene.add(pointLight);
+        
+        const ambientLight = new THREE.AmbientLight(0x404040, 30); // Increased intensity slightly
+        scene.add(ambientLight);
 
-        const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x00aaff, 2);
-        scene.add(hemisphereLight);
-
-        // Blob
-        const geometry = new THREE.IcosahedronGeometry(2, 64);
-        const material = new THREE.MeshPhysicalMaterial({
+        // Lava Blob (from lava.html) - This is in the background
+        const lavaGeometry = new THREE.IcosahedronGeometry(2, 64); // This has a radius of 2
+        const lavaMaterial = new THREE.MeshPhysicalMaterial({
             color: 0x0000ff, // Blue color
             metalness: 0.8,   // High metalness for a metallic, reflective look
             roughness: 0.2,   // Low roughness for clearer reflections
@@ -51,15 +54,12 @@
             clearcoatRoughness: 0.1, // Smooth clear coat
         });
 
-        const blob = new THREE.Mesh(geometry, material);
-        scene.add(blob);
-
-        camera.position.z = 7;
-
-        const clock = new THREE.Clock();
+        const lavaBlob = new THREE.Mesh(lavaGeometry, lavaMaterial);
+        lavaBlob.position.z = 2; 
+        scene.add(lavaBlob);
 
         // Shader modification for lava lamp effect
-        material.onBeforeCompile = (shader) => {
+        lavaMaterial.onBeforeCompile = (shader) => {
             shader.uniforms.uTime = { value: 0 };
 
             shader.vertexShader = 'uniform float uTime;\n' + shader.vertexShader;
@@ -149,8 +149,44 @@
                 transformed += normal * noise * 0.4;
                 `
             );
-            material.userData.shader = shader;
+            lavaMaterial.userData.shader = shader;
         };
+        
+        // Floating Blob (from blob.html) - This is in the foreground
+        const floatingBlobGeometry = new THREE.SphereGeometry(1, 128, 128); // Base radius is 1
+        const floatingBlobMaterial = new THREE.MeshStandardMaterial({
+            color: 0x0000ff,
+            metalness: 0.9,
+            roughness: 0.05,
+            onBeforeCompile: shader => {
+                shader.uniforms.time = { value: 0 };
+                shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+                 shader.vertexShader = shader.vertexShader.replace(
+                    '#include <begin_vertex>',
+                    `
+                    #include <begin_vertex>
+                    float freq = 2.0;
+                    float amp = 0.15;
+                    float noise = sin(freq * position.y + time) * amp;
+                    noise += cos(freq * position.x + time) * amp;
+                    noise += sin(freq * position.z + time) * amp;
+                    transformed += normal * noise;
+                    `
+                );
+                floatingBlobMaterial.userData.shader = shader;
+            }
+        });
+        const floatingBlob = new THREE.Mesh(floatingBlobGeometry, floatingBlobMaterial);
+        
+        // Scale the floatingBlob to have a radius of 2, same as lavaBlob
+        floatingBlob.scale.set(2, 2, 2);
+
+        // Position the floatingBlob in front of the lavaBlob (z=0 is default)
+        scene.add(floatingBlob);
+
+        camera.position.z = 10;
+
+        const clock = new THREE.Clock();
 
         // Animation loop
         function animate() {
@@ -158,17 +194,21 @@
 
             const elapsedTime = clock.getElapsedTime();
 
-            // Update blob position (up and down)
-            blob.position.y = Math.sin(elapsedTime * 0.2) * 1.5;
-
-            // Update shader time for deformation
-            if (material.userData.shader) {
-                material.userData.shader.uniforms.uTime.value = elapsedTime;
+            // Animate lavaBlob (background)
+            lavaBlob.position.y = Math.sin(elapsedTime * 0.2) * 1.5;
+            if (lavaMaterial.userData.shader) {
+                lavaMaterial.userData.shader.uniforms.uTime.value = elapsedTime;
             }
+            lavaBlob.rotation.x += 0.001;
+            lavaBlob.rotation.y += 0.001;
 
-            // Rotate blob for more dynamic look
-            blob.rotation.x += 0.001;
-            blob.rotation.y += 0.001;
+            // Animate floatingBlob (foreground)
+            if (floatingBlob.material.userData.shader) {
+                // Slow down the surface deformation by multiplying elapsed time
+                floatingBlob.material.userData.shader.uniforms.time.value = elapsedTime * 0.4;
+            }
+            // Slow down the vertical movement by multiplying elapsed time
+            floatingBlob.position.y = Math.sin(elapsedTime * 0.15) * 2;
 
             renderer.render(scene, camera);
         }
@@ -181,6 +221,5 @@
         });
 
         animate();
-    </script>
-</body>
+    </script></body>
 </html>
