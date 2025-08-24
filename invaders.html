@@ -124,6 +124,27 @@
         [1,0,1,0,1,1,0,1,0,1],
         [0,0,1,1,0,0,1,1,0,0]
     ];
+    const playerExplosion_frame1 = [
+        [0,0,1,0,0,1,0,1,1,0,0,1,0,0],
+        [0,1,0,1,0,0,1,0,0,1,0,1,0,1,0],
+        [0,0,1,0,1,0,0,0,0,0,1,0,1,0,0],
+        [1,0,0,0,0,1,1,0,1,1,0,0,0,0,1],
+        [0,1,1,0,0,0,0,0,0,0,0,1,1,0,0],
+        [0,0,0,1,0,1,0,1,0,1,0,1,0,0,0],
+        [0,0,1,0,0,0,1,0,0,0,1,0,0,0,0],
+        [0,1,0,0,1,0,0,0,0,1,0,0,1,0,0]
+    ];
+    const playerExplosion_frame2 = [
+        [0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+        [1,0,0,1,0,0,0,1,0,0,0,1,0,0,1],
+        [0,0,1,0,0,1,0,1,0,1,0,0,1,0,0],
+        [0,0,0,0,1,0,1,0,1,0,1,0,0,0,0],
+        [0,0,1,1,0,0,0,0,0,0,0,1,1,0,0],
+        [1,0,0,1,0,0,1,0,1,0,0,1,0,0,1],
+        [0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+        [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0]
+    ];
+    const playerExplosionSprites = [playerExplosion_frame1, playerExplosion_frame2];
 
     // --- Audio Context & Sounds ---
     let audioCtx;
@@ -174,6 +195,9 @@
     // --- Game State Variables ---
     let player, barriers, bullets, invaders, invaderBullets;
     let score, lives, gameOver, invaderDirection, invaderFrame, invaderMoveTicker, moveSoundIndex;
+    let playerIsExploding = false;
+    let playerExplosionTimer = 0;
+    let explosionLocation = { x: 0, y: 0 };
 
     const PLAYER_SPEED = 7;
     const BULLET_SPEED = 10;
@@ -294,6 +318,7 @@
         invaderDirection = 1;
         invaderFrame = 0;
         moveSoundIndex = 0;
+        playerIsExploding = false;
         
         player = new Player();
         bullets = [];
@@ -329,18 +354,43 @@
     function update() {
         if (gameOver) return;
         
+        if (playerIsExploding) {
+            playerExplosionTimer++;
+            if (playerExplosionTimer >= 60) {
+                playerIsExploding = false;
+                if (lives <= 0) {
+                    endGame(false);
+                } else {
+                    player.reset();
+                }
+            }
+            return; 
+        }
+        
         if (keys['ArrowLeft'] && player.x > 0) player.x -= PLAYER_SPEED;
         if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += PLAYER_SPEED;
         
-        bullets.forEach((b, i) => { b.update(); if (b.y < 0) bullets.splice(i, 1); });
-        invaderBullets.forEach((b, i) => { b.update(); if (b.y > canvas.height) invaderBullets.splice(i, 1); });
+        // Update and remove off-screen player bullets safely
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            bullets[i].update();
+            if (bullets[i].y < 0) {
+                bullets.splice(i, 1);
+            }
+        }
+
+        // Update and remove off-screen invader bullets safely
+        for (let i = invaderBullets.length - 1; i >= 0; i--) {
+            invaderBullets[i].update();
+            if (invaderBullets[i].y > canvas.height) {
+                invaderBullets.splice(i, 1);
+            }
+        }
         
         invaderMoveTicker--;
         if (invaderMoveTicker <= 0) {
             let edgeReached = false;
             invaders.forEach(inv => {
-                // *** SPEED INCREASED HERE ***
-                inv.x += 12 * invaderDirection; 
+                inv.x += 10 * invaderDirection; 
                 if (inv.x <= 0 || inv.x + inv.width >= canvas.width) {
                     edgeReached = true;
                 }
@@ -352,10 +402,9 @@
             }
             
             invaderFrame = 1 - invaderFrame; 
-            // *** SPEED INCREASED HERE ***
-            invaderMoveTicker = Math.max(4, invaders.length * 0.5);
+            invaderMoveTicker = Math.max(5, invaders.length);
             
-            sounds.invaderMove[moveSoundIndex]();
+            //sounds.invaderMove[moveSoundIndex]();
             moveSoundIndex = (moveSoundIndex + 1) % 4;
 
             invaders.forEach(inv => {
@@ -382,27 +431,35 @@
     }
     
     function handleCollisions() {
-        bullets.forEach((bullet, bIndex) => {
-            invaders.forEach((invader, iIndex) => {
+        // Player bullets vs invaders
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            const bullet = bullets[i];
+            for (let j = invaders.length - 1; j >= 0; j--) {
+                const invader = invaders[j];
                 if (isColliding(bullet, invader)) {
-                    bullets.splice(bIndex, 1);
-                    invaders.splice(iIndex, 1);
+                    bullets.splice(i, 1);
+                    invaders.splice(j, 1);
                     score += 10;
                     sounds.invaderExplode();
                     updateUI();
+                    break; 
                 }
-            });
-        });
+            }
+        }
 
-        invaderBullets.forEach((bullet, i) => {
+        // Invader bullets vs player
+        for (let i = invaderBullets.length - 1; i >= 0; i--) {
+            const bullet = invaderBullets[i];
             if (isColliding(bullet, player)) {
                 invaderBullets.splice(i, 1);
                 handlePlayerHit();
             }
-        });
-
-        [...bullets, ...invaderBullets].forEach((bullet) => {
-            barriers.forEach(barrier => {
+        }
+        
+        const allBullets = [...bullets, ...invaderBullets];
+        for (let i = allBullets.length - 1; i >= 0; i--) {
+            const bullet = allBullets[i];
+            for (const barrier of barriers) {
                 if (barrier.checkCollision(bullet)) {
                     if (bullet.isPlayer) {
                         const index = bullets.indexOf(bullet);
@@ -411,9 +468,10 @@
                         const index = invaderBullets.indexOf(bullet);
                         if (index > -1) invaderBullets.splice(index, 1);
                     }
+                    break;
                 }
-            });
-        });
+            }
+        }
         
         if (invaders.length === 0) {
             endGame(true);
@@ -428,13 +486,13 @@
     }
 
     function handlePlayerHit() {
+        if (playerIsExploding) return; 
+
         lives--;
         sounds.playerExplode();
-        if (lives <= 0) {
-            endGame(false);
-        } else {
-            player.reset();
-        }
+        playerIsExploding = true;
+        playerExplosionTimer = 0;
+        explosionLocation = { x: player.x, y: player.y }; 
         updateUI();
     }
 
@@ -454,10 +512,35 @@
         livesElement.textContent = `LIVES: ${lives}`;
     }
 
+    function drawPlayerExplosion() {
+        const frameIndex = Math.floor(playerExplosionTimer / 15) % playerExplosionSprites.length;
+        const currentSprite = playerExplosionSprites[frameIndex];
+        const explosionPixelScale = 4;
+
+        ctx.fillStyle = '#0f0';
+        for (let r = 0; r < currentSprite.length; r++) {
+            for (let c = 0; c < currentSprite[r].length; c++) {
+                if (currentSprite[r][c] === 1) {
+                    ctx.fillRect(
+                        explosionLocation.x + c * explosionPixelScale,
+                        explosionLocation.y + r * explosionPixelScale,
+                        explosionPixelScale,
+                        explosionPixelScale
+                    );
+                }
+            }
+        }
+    }
+
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        player.draw();
+        if (playerIsExploding) {
+            drawPlayerExplosion();
+        } else if (!gameOver) {
+            player.draw();
+        }
+        
         bullets.forEach(b => b.draw());
         invaderBullets.forEach(b => b.draw());
         invaders.forEach(i => i.draw());
@@ -465,9 +548,7 @@
     }
 
     function gameLoop() {
-        if (!gameOver) {
-            update();
-        }
+        update();
         draw();
         requestAnimationFrame(gameLoop);
     }
@@ -476,12 +557,15 @@
     const keys = {};
     window.addEventListener('keydown', (e) => {
         keys[e.code] = true;
-        if (e.code === 'Space' && !gameOver) {
-            if (bullets.length === 0) {
+        if (e.code === 'Space' && !gameOver && !playerIsExploding) {
+            // --- START OF MODIFIED CODE ---
+            // Only allow firing if no other player bullet is on screen
+            if (bullets.length === 0) { 
                 initAudio(); 
                 bullets.push(new Bullet(player.x + player.width / 2 - 2.5, player.y, true));
                 sounds.shoot();
             }
+            // --- END OF MODIFIED CODE ---
         }
     });
     window.addEventListener('keyup', (e) => { keys[e.code] = false; });
