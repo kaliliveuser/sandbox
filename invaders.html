@@ -159,17 +159,37 @@
         if (audioCtx) return;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        sounds.shoot = createSound(880, 0, 0.1, "triangle");
-        sounds.invaderExplode = createSound(16, 0.1, 0.4, "sawtooth", 1);
-        sounds.playerExplode = createSound(110, 0.5, 0.8, "sawtooth", 1);
-        
-        sounds.invaderMove[0] = createSound(440, 0, 0.1, "square");
-        sounds.invaderMove[1] = createSound(330, 0, 0.1, "square");
-        sounds.invaderMove[2] = createSound(220, 0, 0.1, "square");
-        sounds.invaderMove[3] = createSound(110, 0, 0.1, "square");
+        sounds.shoot = createSound({
+            type: "triangle",
+            startFreq: 1200,
+            endFreq: 100,
+            duration: 0.15,
+            volume: 0.2
+        });
+
+        sounds.invaderExplode = createSound({
+            type: "sawtooth",
+            startFreq: 800,
+            endFreq: 50,
+            duration: 0.2,
+            volume: 0.3
+        });
+
+        sounds.playerExplode = createSound({
+            type: "sawtooth",
+            startFreq: 400,
+            endFreq: 20,
+            duration: 0.8,
+            volume: 0.5
+        });
+
+        sounds.invaderMove[0] = createSound({ type: "square", startFreq: 40, duration: 0.1 });
+        sounds.invaderMove[1] = createSound({ type: "square", startFreq: 35, duration: 0.1 });
+        sounds.invaderMove[2] = createSound({ type: "square", startFreq: 30, duration: 0.1 });
+        sounds.invaderMove[3] = createSound({ type: "square", startFreq: 25, duration: 0.1 });
     }
 
-    function createSound(freq, start, duration, type, endFreq = null) {
+    function createSound(config) {
         return () => {
             if (!audioCtx) return;
             const oscillator = audioCtx.createOscillator();
@@ -178,17 +198,23 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
-            oscillator.type = type;
-            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
-            if (endFreq) {
-                oscillator.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + start + duration);
+            const now = audioCtx.currentTime;
+            const duration = config.duration || 0.1;
+            const volume = config.volume || 0.3;
+
+            oscillator.type = config.type || "square";
+            
+            oscillator.frequency.setValueAtTime(config.startFreq || 440, now);
+            
+            if (config.endFreq) {
+                oscillator.frequency.exponentialRampToValueAtTime(config.endFreq, now + duration);
             }
             
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            gainNode.gain.setValueAtTime(volume, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
             
-            oscillator.start(audioCtx.currentTime + start);
-            oscillator.stop(audioCtx.currentTime + start + duration);
+            oscillator.start(now);
+            oscillator.stop(now + duration);
         };
     }
     
@@ -370,7 +396,6 @@
         if (keys['ArrowLeft'] && player.x > 0) player.x -= PLAYER_SPEED;
         if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += PLAYER_SPEED;
         
-        // Update and remove off-screen player bullets safely
         for (let i = bullets.length - 1; i >= 0; i--) {
             bullets[i].update();
             if (bullets[i].y < 0) {
@@ -378,7 +403,6 @@
             }
         }
 
-        // Update and remove off-screen invader bullets safely
         for (let i = invaderBullets.length - 1; i >= 0; i--) {
             invaderBullets[i].update();
             if (invaderBullets[i].y > canvas.height) {
@@ -404,7 +428,12 @@
             invaderFrame = 1 - invaderFrame; 
             invaderMoveTicker = Math.max(5, invaders.length);
             
-            //sounds.invaderMove[moveSoundIndex]();
+            // --- START OF MODIFIED CODE ---
+            // Guard the call to prevent an error before the audio context is initialized by user interaction.
+            if (sounds.invaderMove[moveSoundIndex]) {
+                sounds.invaderMove[moveSoundIndex]();
+            }
+            // --- END OF MODIFIED CODE ---
             moveSoundIndex = (moveSoundIndex + 1) % 4;
 
             invaders.forEach(inv => {
@@ -431,7 +460,6 @@
     }
     
     function handleCollisions() {
-        // Player bullets vs invaders
         for (let i = bullets.length - 1; i >= 0; i--) {
             const bullet = bullets[i];
             for (let j = invaders.length - 1; j >= 0; j--) {
@@ -447,7 +475,6 @@
             }
         }
 
-        // Invader bullets vs player
         for (let i = invaderBullets.length - 1; i >= 0; i--) {
             const bullet = invaderBullets[i];
             if (isColliding(bullet, player)) {
@@ -556,17 +583,19 @@
     // --- Keyboard Input ---
     const keys = {};
     window.addEventListener('keydown', (e) => {
+        // --- START OF MODIFIED CODE ---
+        // Initialize audio on the first interaction from the player.
+        // The function has a guard to ensure it only runs once.
+        initAudio();
+
         keys[e.code] = true;
         if (e.code === 'Space' && !gameOver && !playerIsExploding) {
-            // --- START OF MODIFIED CODE ---
-            // Only allow firing if no other player bullet is on screen
             if (bullets.length === 0) { 
-                initAudio(); 
                 bullets.push(new Bullet(player.x + player.width / 2 - 2.5, player.y, true));
                 sounds.shoot();
             }
-            // --- END OF MODIFIED CODE ---
         }
+        // --- END OF MODIFIED CODE ---
     });
     window.addEventListener('keyup', (e) => { keys[e.code] = false; });
     restartButton.addEventListener('click', () => {
