@@ -15,7 +15,7 @@ Create a single-file web page that shows a blue 3D animated blob slowly floating
 
 ---
 
-Create a single-file web page that has the game Space Invaders. Make the characters look like the aliens in the real game. Make the aliens move at the same speed as the real game.
+Create a single-file web page that has the game Space Invaders. Make the characters look like the aliens in the real game. Make the aliens move at the same speed as the real game. When the cannon at the bottom gets hit, animate it blowing up like in the real Space Invaders game before continuing the game.
 
 ---
 
