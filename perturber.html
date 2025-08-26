@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perturber</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #container {
+            width: 95%;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #target-phrase-container {
+            margin-bottom: 20px;
+        }
+        #similarity-grid {
+            font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            display: grid;
+            gap: 5px;
+            text-align: center;
+        }
+        .grid-cell {
+            padding: 5px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            min-width: 20px; /* Ensure cells have a minimum width */
+        }
+        label {
+            font-size: 0.9em;
+            color: #555;
+        }
+        #target-phrase {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+        }
+        #total-error {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="target-phrase-container">
+            <label for="target-phrase">Target Phrase</label>
+            <input type="text" id="target-phrase" value="The quick brown fox jumps over the lazy dog">
+        </div>
+        <div id="similarity-grid"></div>
+        <div id="total-error"></div>
+    </div>
+
+    <script>
+        const similarityGridElement = document.getElementById('similarity-grid');
+        const targetPhraseElement = document.getElementById('target-phrase');
+        const totalErrorElement = document.getElementById('total-error');
+
+        let optimizationInterval = null;
+        let currentString = '';
+        let currentIndex = 0;
+
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function displayState(stringToShow, targetPhrase) {
+            similarityGridElement.innerHTML = '';
+            similarityGridElement.style.gridTemplateColumns = `repeat(${targetPhrase.length}, minmax(20px, 1fr))`;
+
+            let totalError = 0;
+
+            // Row for the current (evolving) string
+            for (let i = 0; i < targetPhrase.length; i++) {
+                const char = stringToShow[i] || '';
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.textContent = char;
+                similarityGridElement.appendChild(cell);
+            }
+
+            // Row for the target phrase
+            for (let i = 0; i < targetPhrase.length; i++) {
+                const char = targetPhrase[i] || '';
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.textContent = char;
+                similarityGridElement.appendChild(cell);
+            }
+
+            // Row for the distance
+            for (let i = 0; i < targetPhrase.length; i++) {
+                const currentCode = (stringToShow[i] || '').charCodeAt(0) || 0;
+                const targetCode = (targetPhrase[i] || '').charCodeAt(0) || 0;
+                const distance = Math.abs(currentCode - targetCode);
+                totalError += distance;
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.textContent = distance;
+                similarityGridElement.appendChild(cell);
+            }
+
+            totalErrorElement.textContent = `Total Error: ${totalError}`;
+        }
+
+        function optimizationStep() {
+            const targetPhrase = targetPhraseElement.value;
+            if (currentString.length !== targetPhrase.length || !targetPhrase) return;
+
+            const originalChar = currentString[currentIndex];
+            const targetChar = targetPhrase[currentIndex];
+            const currentError = Math.abs(originalChar.charCodeAt(0) - targetChar.charCodeAt(0));
+
+            const randomAmountPlus = Math.floor(Math.random() * 10) + 1;
+            const charCodePlus = originalChar.charCodeAt(0) + randomAmountPlus;
+            const errorPlus = Math.abs(charCodePlus - targetChar.charCodeAt(0));
+
+            const randomAmountMinus = Math.floor(Math.random() * 10) + 1;
+            const charCodeMinus = originalChar.charCodeAt(0) - randomAmountMinus;
+            const errorMinus = Math.abs(charCodeMinus - targetChar.charCodeAt(0));
+
+            let bestCharCode = originalChar.charCodeAt(0);
+            if (errorPlus < currentError) {
+                bestCharCode = charCodePlus;
+            }
+            if (errorMinus < currentError && errorMinus < errorPlus) {
+                bestCharCode = charCodeMinus;
+            }
+
+            const stringChars = currentString.split('');
+            stringChars[currentIndex] = String.fromCharCode(bestCharCode);
+            currentString = stringChars.join('');
+
+            displayState(currentString, targetPhrase);
+
+            currentIndex = (currentIndex + 1) % targetPhrase.length;
+        }
+
+        function startOptimization() {
+            if (optimizationInterval) {
+                clearInterval(optimizationInterval);
+            }
+            optimizationInterval = setInterval(optimizationStep, 10);
+        }
+
+        function handleTargetChange() {
+            const targetPhrase = targetPhraseElement.value;
+            const newLength = targetPhrase.length;
+            const oldLength = currentString.length;
+
+            if (newLength > oldLength) {
+                currentString += generateRandomString(newLength - oldLength);
+            } else if (newLength < oldLength) {
+                currentString = currentString.substring(0, newLength);
+            }
+
+            currentIndex = 0;
+            displayState(currentString, targetPhrase);
+        }
+
+        function initialize() {
+            const targetPhrase = targetPhraseElement.value;
+            currentString = generateRandomString(targetPhrase.length);
+            displayState(currentString, targetPhrase);
+            startOptimization();
+        }
+
+        // Event Listeners
+        targetPhraseElement.addEventListener('input', handleTargetChange);
+
+        // Initial display
+        initialize();
+
+    </script>
+
+</body>
+</html>
