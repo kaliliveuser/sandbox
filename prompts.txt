@@ -19,6 +19,10 @@ Create a single-file web page that has the game "Flappy Bird." Make it look exac
 
 ---
 
+Create a single-file web page that has the game Asteroids. Make it look exactly like the original by simulating vector graphics.
+
+---
+
 Create a single-file web page that has the game "Lunar Lander".   
 
 ---
