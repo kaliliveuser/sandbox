@@ -15,6 +15,10 @@ Create a single-file web page that shows a blue 3D animated blob slowly floating
 
 ---
 
+Create a single-file web page that has the game "Flappy Bird." Make it look exactly the same as the original.
+
+---
+
 Create a single-file web page that has the game "Lunar Lander".   
 
 ---
