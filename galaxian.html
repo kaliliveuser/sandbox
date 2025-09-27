@@ -1,324 +1,503 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxian</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        canvas {
-            background-color: #000;
-            border: 1px solid #fff;
-        }
-        #start-screen, #game-over-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-        }
-        button {
-            font-size: 1.5rem;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #fff;
-        }
-    </style>
+<title>Galaxian</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  body {
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Press Start 2P', cursive;
+  }
+  canvas {
+    background-color: #000;
+    border: 1px solid #fff;
+  }
+</style>
 </head>
 <body>
-    <div id="start-screen">
-        <h1>GALAXIAN</h1>
-        <p>Press START to begin</p>
-        <button id="start-button">START</button>
-    </div>
-    <div id="game-over-screen" style="display: none;">
-        <h1>GAME OVER</h1>
-        <p>Your score: <span id="final-score">0</span></p>
-        <button id="restart-button">RESTART</button>
-    </div>
-    <canvas id="game-canvas" width="600" height="800" style="display: none;"></canvas>
-    <script>
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
+<canvas id="gameCanvas" width="600" height="600"></canvas>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
 
-        const startScreen = document.getElementById('start-screen');
-        const gameOverScreen = document.getElementById('game-over-screen');
-        const startButton = document.getElementById('start-button');
-        const restartButton = document.getElementById('restart-button');
-        const finalScoreElement = document.getElementById('final-score');
+  // Game state
+  let score = 0;
+  let gameState = 'start'; // 'start', 'playing', 'gameOver'
+  let lives = 3;
 
-        let score = 0;
-        let lives = 3;
-        let player;
-        let bullets;
-        let enemyBullets;
-        let enemies;
-        let gameLoopId;
-        let keys = {};
-        let lastShotTime = 0;
-        const shotCooldown = 300; // milliseconds
+  // Player
+  const player = {
+    x: canvas.width / 2 - 25,
+    y: canvas.height - 50,
+    width: 50,
+    height: 30,
+    speed: 5,
+    dx: 0,
+    canShoot: true
+  };
 
-        const playerWidth = 40;
-        const playerHeight = 20;
-        const bulletWidth = 5;
-        const bulletHeight = 10;
-        const enemyWidth = 30;
-        const enemyHeight = 20;
-        const enemyRows = 5;
-        const enemyCols = 10;
+  // Bullets
+  const bullets = [];
+  const bulletSpeed = 7;
+  const enemyBullets = [];
+  const enemyBulletSpeed = 5;
 
-        class Player {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = playerWidth;
-                this.height = playerHeight;
-                this.speed = 5;
+  // Enemies
+  const enemies = [];
+  const enemyRows = 4;
+  const enemyCols = 8;
+  const enemyWidth = 40;
+  const enemyHeight = 30;
+  const enemyPadding = 10;
+  const enemyOffsetTop = 30;
+  const enemyOffsetLeft = 30;
+  let enemyDirection = 1;
+  let enemySpeed = 0.5;
+
+  const enemyTypes = {
+    1: { color: 'red', points: 10 },
+    2: { color: 'purple', points: 20 },
+    3: { color: 'cyan', points: 30 },
+    4: { color: 'orange', points: 40 }
+  };
+
+  function createEnemies() {
+    for (let c = 0; c < enemyCols; c++) {
+        enemies[c] = [];
+        for (let r = 0; r < enemyRows; r++) {
+            const x = c * (enemyWidth + enemyPadding) + enemyOffsetLeft;
+            const y = r * (enemyHeight + enemyPadding) + enemyOffsetTop;
+            const type = r + 1;
+            enemies[c][r] = { x, y, width: enemyWidth, height: enemyHeight, status: 1, type: type, swooping: false, angle: 0 };
+        }
+    }
+  }
+
+
+  // --- Drawing functions ---
+
+  function drawPlayer() {
+    const x = player.x;
+    const y = player.y;
+    const width = player.width;
+    const height = player.height;
+
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.moveTo(x + width / 2, y);
+    ctx.lineTo(x, y + height * 0.8);
+    ctx.lineTo(x + width / 2, y + height);
+    ctx.lineTo(x + width, y + height * 0.8);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.moveTo(x + width / 2, y + height * 0.5);
+    ctx.lineTo(x + width * 0.3, y + height);
+    ctx.lineTo(x + width * 0.7, y + height);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  const enemySprites = {
+    1: (x, y, width, height) => { // Drone (Blue)
+        ctx.fillStyle = '#00A8F8';
+        ctx.beginPath();
+        ctx.moveTo(x + width / 2, y);
+        ctx.lineTo(x, y + height * 0.8);
+        ctx.lineTo(x + width / 2, y + height);
+        ctx.lineTo(x + width, y + height * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#9800F8';
+        ctx.fillRect(x + width * 0.2, y + height * 0.4, width * 0.6, height * 0.4);
+    },
+    2: (x, y, width, height) => { // Escort (Red)
+        ctx.fillStyle = '#F80000';
+        ctx.beginPath();
+        ctx.moveTo(x + width / 2, y);
+        ctx.lineTo(x, y + height * 0.8);
+        ctx.lineTo(x + width / 2, y + height);
+        ctx.lineTo(x + width, y + height * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#9800F8';
+        ctx.fillRect(x + width * 0.2, y + height * 0.4, width * 0.6, height * 0.4);
+    },
+    3: (x, y, width, height) => { // Flagship (Yellow)
+        ctx.fillStyle = '#F8F800';
+        ctx.beginPath();
+        ctx.moveTo(x + width / 2, y);
+        ctx.lineTo(x, y + height * 0.8);
+        ctx.lineTo(x + width / 2, y + height);
+        ctx.lineTo(x + width, y + height * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#F80000';
+        ctx.fillRect(x + width * 0.2, y + height * 0.4, width * 0.6, height * 0.4);
+    },
+    4: (x, y, width, height) => { // Flagship (Yellow) - same as 3
+        ctx.fillStyle = '#F8F800';
+        ctx.beginPath();
+        ctx.moveTo(x + width / 2, y);
+        ctx.lineTo(x, y + height * 0.8);
+        ctx.lineTo(x + width / 2, y + height);
+        ctx.lineTo(x + width, y + height * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#F80000';
+        ctx.fillRect(x + width * 0.2, y + height * 0.4, width * 0.6, height * 0.4);
+    }
+  };
+
+  function drawEnemies() {
+    enemies.forEach(column => {
+      column.forEach(enemy => {
+        if (enemy.status === 1) {
+            if (enemy.swooping) {
+                ctx.save();
+                ctx.translate(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
+                ctx.rotate(enemy.angle + Math.PI / 2);
+                ctx.translate(-(enemy.x + enemy.width / 2), -(enemy.y + enemy.height / 2));
+                enemySprites[enemy.type](enemy.x, enemy.y, enemy.width, enemy.height);
+                ctx.restore();
+            } else {
+                enemySprites[enemy.type](enemy.x, enemy.y, enemy.width, enemy.height);
             }
+        }
+      });
+    });
+  }
 
-            draw() {
-                ctx.fillStyle = 'cyan';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            }
+  function drawBullets() {
+    bullets.forEach(bullet => {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(bullet.x, bullet.y, 2, 10);
+    });
+  }
 
-            move() {
-                if (keys['ArrowLeft'] && this.x > 0) {
-                    this.x -= this.speed;
+  function drawEnemyBullets() {
+    enemyBullets.forEach(bullet => {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(bullet.x, bullet.y, 2, 10);
+    });
+  }
+
+  function drawScore() {
+    ctx.font = '16px "Press Start 2P"';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Score: ${score}`, 10, 30);
+  }
+
+  function drawLives() {
+    ctx.font = '16px "Press Start 2P"';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'right';
+    ctx.fillText(`Lives: ${lives}`, canvas.width - 10, 30);
+  }
+
+  // --- Movement and logic ---
+
+  function movePlayer() {
+    player.x += player.dx;
+
+    // Wall detection
+    if (player.x < 0) {
+      player.x = 0;
+    }
+    if (player.x + player.width > canvas.width) {
+      player.x = canvas.width - player.width;
+    }
+  }
+
+  function moveEnemies() {
+    let changeDirection = false;
+    enemies.forEach(column => {
+        column.forEach(enemy => {
+            if (enemy.status === 1 && !enemy.swooping) {
+                enemy.x += enemySpeed * enemyDirection;
+                if (enemy.x + enemy.width > canvas.width || enemy.x < 0) {
+                    changeDirection = true;
                 }
-                if (keys['ArrowRight'] && this.x < canvas.width - this.width) {
-                    this.x += this.speed;
-                }
             }
-        }
+        });
+    });
 
-        class Bullet {
-            constructor(x, y, speed, direction, color) {
-                this.x = x;
-                this.y = y;
-                this.width = bulletWidth;
-                this.height = bulletHeight;
-                this.speed = speed;
-                this.direction = direction;
-                this.color = color;
-            }
-
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            }
-
-            update() {
-                this.y += this.speed * this.direction;
-            }
-        }
-
-        class Enemy {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = enemyWidth;
-                this.height = enemyHeight;
-                this.isAttacking = false;
-                this.attackTargetX = 0;
-                this.attackTargetY = 0;
-                this.attackSpeed = 3;
-            }
-
-            draw() {
-                ctx.fillStyle = 'yellow';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            }
-        }
-
-        function createEnemies() {
-            enemies = [];
-            for (let row = 0; row < enemyRows; row++) {
-                for (let col = 0; col < enemyCols; col++) {
-                    const x = col * (enemyWidth + 10) + 50;
-                    const y = row * (enemyHeight + 10) + 50;
-                    enemies.push(new Enemy(x, y));
-                }
-            }
-        }
-
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameOverScreen.style.display = 'none';
-            canvas.style.display = 'block';
-
-            score = 0;
-            lives = 3;
-            player = new Player(canvas.width / 2 - playerWidth / 2, canvas.height - playerHeight - 10);
-            bullets = [];
-            enemyBullets = [];
-            createEnemies();
-
-            document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('keyup', handleKeyUp);
-            gameLoop();
-        }
-
-        function gameOver() {
-            finalScoreElement.textContent = score;
-            gameOverScreen.style.display = 'block';
-            canvas.style.display = 'none';
-            document.removeEventListener('keydown', handleKeyDown);
-            document.removeEventListener('keyup', handleKeyUp);
-            cancelAnimationFrame(gameLoopId);
-        }
-
-        function handleKeyDown(e) {
-            keys[e.key] = true;
-            if (e.key === ' ') {
-                const now = Date.now();
-                if (now - lastShotTime > shotCooldown) {
-                    bullets.push(new Bullet(player.x + player.width / 2 - bulletWidth / 2, player.y, 10, -1, 'red'));
-                    lastShotTime = now;
-                }
-            }
-        }
-
-        function handleKeyUp(e) {
-            keys[e.key] = false;
-        }
-
-        function update() {
-            player.move();
-
-            // Update bullets
-            bullets.forEach((bullet, index) => {
-                bullet.update();
-                if (bullet.y < 0 || bullet.y > canvas.height) {
-                    bullets.splice(index, 1);
+    if (changeDirection) {
+        enemyDirection *= -1;
+        enemies.forEach(column => {
+            column.forEach(enemy => {
+                if(!enemy.swooping){
+                    enemy.y += enemyHeight;
                 }
             });
+        });
+    }
 
-            enemyBullets.forEach((bullet, index) => {
-                bullet.update();
-                if (bullet.y < 0 || bullet.y > canvas.height) {
-                    enemyBullets.splice(index, 1);
+    // Swooping logic
+    if (Math.random() < 0.01) {
+        let availableEnemies = [];
+        enemies.forEach(column => {
+            column.forEach(enemy => {
+                if (enemy.status === 1 && !enemy.swooping) {
+                    availableEnemies.push(enemy);
                 }
             });
+        });
 
-            // Enemy attack logic
-            enemies.forEach(enemy => {
-                if (!enemy.isAttacking && Math.random() < 0.001) {
-                    enemy.isAttacking = true;
-                    enemy.attackTargetX = Math.random() * canvas.width;
-                    enemy.attackTargetY = canvas.height;
+        if (availableEnemies.length > 0) {
+            const randomEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+            randomEnemy.swooping = true;
+            randomEnemy.swoopTargetX = player.x;
+            randomEnemy.swoopTargetY = player.y;
+            randomEnemy.swoopInitialX = randomEnemy.x;
+            randomEnemy.swoopInitialY = randomEnemy.y;
+            randomEnemy.swoopTime = 0;
+        }
+    }
+
+    enemies.forEach(column => {
+        column.forEach(enemy => {
+            if (enemy.swooping) {
+                const prevX = enemy.x;
+                const prevY = enemy.y;
+
+                enemy.swoopTime += 0.02;
+                enemy.x += (enemy.swoopTargetX - enemy.x) * 0.01;
+                enemy.y += 3;
+
+                const dx = enemy.x - prevX;
+                const dy = enemy.y - prevY;
+                enemy.angle = Math.atan2(dy, dx);
+
+                if (enemy.y > canvas.height) {
+                    enemy.swooping = false;
+                    enemy.x = enemy.swoopInitialX;
+                    enemy.y = enemy.swoopInitialY;
+                    enemy.angle = 0;
                 }
+            }
+        });
+    });
+  }
 
-                if (enemy.isAttacking) {
-                    const dx = enemy.attackTargetX - enemy.x;
-                    const dy = enemy.attackTargetY - enemy.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    enemy.x += (dx / dist) * enemy.attackSpeed;
-                    enemy.y += (dy / dist) * enemy.attackSpeed;
+  function moveBullets() {
+    bullets.forEach((bullet, index) => {
+      bullet.y -= bulletSpeed;
+      if (bullet.y < 0) {
+        bullets.splice(index, 1);
+      }
+    });
+  }
 
-                    if (enemy.y > canvas.height) {
-                        enemy.isAttacking = false;
-                        // Reset to original position for simplicity
-                        const originalIndex = enemies.indexOf(enemy);
-                        const row = Math.floor(originalIndex / enemyCols);
-                        const col = originalIndex % enemyCols;
-                        enemy.x = col * (enemyWidth + 10) + 50;
-                        enemy.y = row * (enemyHeight + 10) + 50;
-                    }
-                }
+  function moveEnemyBullets() {
+    enemyBullets.forEach((bullet, index) => {
+        bullet.y += enemyBulletSpeed;
+        if (bullet.y > canvas.height) {
+            enemyBullets.splice(index, 1);
+        }
+    });
+  }
 
-                if (Math.random() < 0.002) {
-                    enemyBullets.push(new Bullet(enemy.x + enemy.width / 2 - bulletWidth / 2, enemy.y, 5, 1, 'orange'));
+  function enemyShoot() {
+    if (Math.random() < 0.02) {
+        let availableEnemies = [];
+        enemies.forEach(column => {
+            column.forEach(enemy => {
+                if (enemy.status === 1) {
+                    availableEnemies.push(enemy);
                 }
             });
+        });
 
-            // Collision detection
-            bullets.forEach((bullet, bulletIndex) => {
-                enemies.forEach((enemy, enemyIndex) => {
-                    if (
-                        bullet.x < enemy.x + enemy.width &&
-                        bullet.x + bullet.width > enemy.x &&
-                        bullet.y < enemy.y + enemy.height &&
-                        bullet.y + bullet.height > enemy.y
-                    ) {
-                        bullets.splice(bulletIndex, 1);
-                        enemies.splice(enemyIndex, 1);
-                        score += 100;
-                    }
+        if (availableEnemies.length > 0) {
+            const randomEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+            enemyBullets.push({ x: randomEnemy.x + randomEnemy.width / 2 - 2.5, y: randomEnemy.y + randomEnemy.height });
+        }
+    }
+  }
+
+  function collisionDetection() {
+    // Player bullets with enemies
+    bullets.forEach((bullet, bulletIndex) => {
+      enemies.forEach(column => {
+        column.forEach(enemy => {
+          if (enemy.status === 1) {
+            if (
+              bullet.x > enemy.x &&
+              bullet.x < enemy.x + enemy.width &&
+              bullet.y > enemy.y &&
+              bullet.y < enemy.y + enemy.height
+            ) {
+              enemy.status = 0;
+              bullets.splice(bulletIndex, 1);
+              score += enemyTypes[enemy.type].points;
+
+              let allEnemiesDestroyed = true;
+                enemies.forEach(c => {
+                    c.forEach(e => {
+                        if (e.status === 1) {
+                            allEnemiesDestroyed = false;
+                        }
+                    });
                 });
-            });
 
-            enemyBullets.forEach((bullet, bulletIndex) => {
-                if (
-                    bullet.x < player.x + player.width &&
-                    bullet.x + bullet.width > player.x &&
-                    bullet.y < player.y + player.height &&
-                    bullet.y + bullet.height > player.y
-                ) {
-                    enemyBullets.splice(bulletIndex, 1);
-                    lives--;
-                    if (lives <= 0) {
-                        gameOver();
-                    }
+                if (allEnemiesDestroyed) {
+                    createEnemies();
+                    enemySpeed += 0.2;
                 }
-            });
-            
-            enemies.forEach((enemy) => {
-                 if (
+            }
+          }
+        });
+      });
+    });
+
+    // Enemy bullets with player
+    enemyBullets.forEach((bullet, bulletIndex) => {
+        if (
+            bullet.x > player.x &&
+            bullet.x < player.x + player.width &&
+            bullet.y > player.y &&
+            bullet.y < player.y + player.height
+        ) {
+            enemyBullets.splice(bulletIndex, 1);
+            lives--;
+            if (lives === 0) {
+                gameState = 'gameOver';
+            } else {
+                // reset player position
+                player.x = canvas.width / 2 - 25;
+                player.y = canvas.height - 50;
+            }
+        }
+    });
+
+    // Enemies with player
+    enemies.forEach(column => {
+        column.forEach(enemy => {
+            if (enemy.status === 1) {
+                if (
                     player.x < enemy.x + enemy.width &&
                     player.x + player.width > enemy.x &&
                     player.y < enemy.y + enemy.height &&
                     player.y + player.height > enemy.y
                 ) {
                     lives--;
-                    if (lives <= 0) {
-                        gameOver();
+                    if (lives === 0) {
+                        gameState = 'gameOver';
+                    } else {
+                        // reset player position
+                        player.x = canvas.width / 2 - 25;
+                        player.y = canvas.height - 50;
+                        enemy.status = 0; // destroy enemy on collision
                     }
                 }
-            });
+            }
+        });
+    });
+  }
+
+  function resetGame() {
+    score = 0;
+    lives = 3;
+    enemies.length = 0;
+    bullets.length = 0;
+    enemyBullets.length = 0;
+    createEnemies();
+  }
+
+  // --- Game loop ---
+
+  function update() {
+    if (gameState === 'playing') {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawPlayer();
+        drawEnemies();
+        drawBullets();
+        drawEnemyBullets();
+        drawScore();
+        drawLives();
+
+        movePlayer();
+        moveEnemies();
+        moveBullets();
+        moveEnemyBullets();
+        enemyShoot();
+        collisionDetection();
+
+    } else if (gameState === 'start') {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '30px "Press Start 2P"';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText('GALAXIAN', canvas.width / 2, canvas.height / 2 - 40);
+        ctx.font = '16px "Press Start 2P"';
+        ctx.fillText('Press Enter to Start', canvas.width / 2, canvas.height / 2);
+    } else if (gameState === 'gameOver') {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '30px "Press Start 2P"';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
+        ctx.font = '16px "Press Start 2P"';
+        ctx.fillText(`Final Score: ${score}`, canvas.width/2, canvas.height/2);
+        ctx.fillText('Press Enter to Play Again', canvas.width / 2, canvas.height / 2 + 40);
+    }
+
+
+    requestAnimationFrame(update);
+  }
+
+  // --- Input handling ---
+
+  function keyDown(e) {
+    if (gameState === 'playing') {
+        if (e.key === 'ArrowRight' || e.key === 'Right') {
+            player.dx = player.speed;
+        } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+            player.dx = -player.speed;
+        } else if ((e.key === ' ' || e.key === 'Spacebar') && player.canShoot) {
+            bullets.push({ x: player.x + player.width / 2 - 2.5, y: player.y });
+            player.canShoot = false;
+            setTimeout(() => {
+                player.canShoot = true;
+            }, 500); // 500ms cooldown
         }
+    } else if ((gameState === 'start' || gameState === 'gameOver') && e.key === 'Enter') {
+        resetGame();
+        gameState = 'playing';
+    }
+  }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function keyUp(e) {
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'Right' ||
+      e.key === 'ArrowLeft' ||
+      e.key === 'Left'
+    ) {
+      player.dx = 0;
+    }
+  }
 
-            player.draw();
-            bullets.forEach(bullet => bullet.draw());
-            enemyBullets.forEach(bullet => bullet.draw());
-            enemies.forEach(enemy => enemy.draw());
+  document.addEventListener('keydown', keyDown);
+  document.addEventListener('keyup', keyUp);
 
-            ctx.fillStyle = 'white';
-            ctx.font = '20px Courier New';
-            ctx.fillText('Score: ' + score, 10, 20);
-            ctx.fillText('Lives: ' + lives, canvas.width - 100, 20);
-        }
-
-        function gameLoop() {
-            update();
-            draw();
-            gameLoopId = requestAnimationFrame(gameLoop);
-        }
-
-        startButton.addEventListener('click', startGame);
-        restartButton.addEventListener('click', startGame);
-    </script>
+  createEnemies();
+  update();
+</script>
 </body>
 </html>
