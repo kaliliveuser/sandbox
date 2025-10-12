@@ -62,6 +62,10 @@ Create a single-file webpage that plays 'Artillery Simulator' exactly the same a
 
 ---
 
+Create a single-file webpage that has 2 identically sized drawing areas that are side-by-side on the screen. Make the rectangles dynamically fit the size of the browser window. Draw a sin curve on the left square and copy that square pixel by pixel to the right square when a user presses a button.
+
+---
+
 Create a landing page (index.html) that has professionally styled links for the following items in the same folder: arcade.html, artillery.html, blob.html, dodecahedron.html, lava.html, monolith.html, prompts.txt, snake.html, survival.html, tetris.html, webcam.html. Add a section for the following documents in the same folder: QuantumForSWEng.pptx, SurvivalMCC250819.pdf. List the projects vertically with one link to the code and one to the preview. Use placeholder links for now.
 
 ---
