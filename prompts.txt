@@ -105,7 +105,7 @@ Skills: Artificial Intelligence
 
 CTO and Head of AI R&D
 DataSolve Inc · Full-time
-Feb 2024 - May 2025
+Feb 2024 - Present
 Manila, National Capital Region, Philippines · Hybrid
 • Developed and applied AI technology in the Philippines.
 • Solutions included analytics, cybersecurity and voice/vision interfaces
@@ -206,9 +206,9 @@ Voyus Ltd. / GT Networks Inc.
 • Created Palm applications for e.g. the hospitality industry and construction industry.
 
 Volunteer work
-• Cloud Summit
-• AI Summit
-• Imaging the World
+• Cloud Summit 
+• CENGN, a non-profit organization that helps Canadian technology companies commercialize new solutions.
+• Imaging the World, a non-profit organization that provides diagnostic imaging, primarily portable ultrasound, to underserved rural communities in countries like those in sub-Saharan Africa.
 
 Attended
 • Data science reading group
@@ -222,3 +222,10 @@ Attended
 
 
 </jd>
+
+---
+
+Job Fair Variant
+
+Using my current resume, write a modern one-page ATS-compatible resume that generalizes for the following list of companies. Provide a short professional summary at the top. List relevant positions in full then summarize the remaining companies in one entry. Do not add skills that aren't already listed in the original resume. Collect relevant skills in their own section. Then, write a matching cover letter. Finally list 30 interview questions relevant to this role and potential answers. Provide no explanation or preamble. Make no comments after.
+
