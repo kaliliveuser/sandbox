@@ -62,7 +62,7 @@ Create a single-file webpage that plays 'Artillery Simulator' exactly the same a
 
 ---
 
-Create a single-file webpage that has 2 identically sized drawing areas that are side-by-side on the screen. Make the rectangles dynamically fit the size of the browser window. Draw a sin curve on the left canvas and copy that canvas pixel by pixel to the right canvas when a user presses a button. Copying at a pixel-by-pixel level is a hard requirement.
+Create a single-file webpage that has 2 identically sized drawing areas that are side-by-side on the screen. Make the rectangles dynamically fit the size of the browser window. Draw a sin curve on the left canvas and copy that canvas pixel by pixel to the right canvas when a user presses a button. You must copy the pixels one-by-one starting at the top-left and ending at the bottom-right.
 
 ---
 
