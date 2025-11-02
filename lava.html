@@ -227,7 +227,10 @@
 	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
 	createChat({
-		webhookUrl: 'https://rinteldev.app.n8n.cloud/webhook/4fe39aea-0618-411d-8668-8786de9ab55f/chat'
+		webhookUrl: 'https://rinteldev.app.n8n.cloud/webhook/4fe39aea-0618-411d-8668-8786de9ab55f/chat', 
+		initialMessages: ['Hi there! 👋', 'My name is Rado. How can I assist you today?', ],
+		enableStreaming: true,
+	],
 	});
 </script>
 </body>
