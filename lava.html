@@ -221,5 +221,14 @@
         });
 
         animate();
-    </script></body>
+    </script>
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+	createChat({
+		webhookUrl: 'https://rinteldev.app.n8n.cloud/webhook/4fe39aea-0618-411d-8668-8786de9ab55f/chat'
+	});
+</script>
+</body>
 </html>
