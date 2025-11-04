@@ -1,5 +1,5 @@
 (function() {
-    // Embedding code: <script src="https://cdn.jsdelivr.net/gh/kaliliveuser/sandbox/chatbot.js"></script>
+    // Embedding code: <script src="chatbot.js"></script>
 
     // 1. CONFIGURATION
     const API_KEY = "YOUR_OPENAI_API_KEY";
