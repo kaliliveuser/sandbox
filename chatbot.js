@@ -7,6 +7,7 @@
     const CHATBOT_NAME = "My Chatbot";
     const CHAT_BUTTON_COLOR = "#007bff";
     const CHAT_HEADER_COLOR = "#007bff";
+    const disclaimerText = 'You are interacting with an AI Chatbot. The information provided here is for general informational purposes only and is not a substitute for professional advice. We do not guarantee the accuracy or completeness of the information provided. Any reliance you place on such information is strictly at your own risk. We are not liable for any losses or damages arising from your use of this chatbot. For specific advice, please consult with a qualified professional. All conversations may be recorded to improve our services. By using this chatbot, you agree to these terms.';
 
     // 2. CREATE AND INJECT CSS
     const style = document.createElement('style');
@@ -48,7 +49,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            /* overflow: hidden; <--- THIS LINE IS REMOVED */
             background-color: white;
         }
 
@@ -143,6 +144,62 @@
             0%, 80%, 100% { transform: scale(0); } 
             40% { transform: scale(1.0); }
         }
+        
+                /* --- Tooltip CSS (Positioning Corrected) --- */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip-icon {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 20px;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1001;
+            bottom: 140%;
+            /* --- MODIFIED --- */
+            right: 0; /* Align to the right of the container */
+            /* transform: translateX(50%); <-- REMOVED */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            /* --- MODIFIED --- */
+            right: 8px; /* Position arrow on the right side */
+            /* left: 50%; <-- REMOVED */
+            /* margin-left: -5px; <-- REMOVED */
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
     `;
     document.head.appendChild(style);
 
@@ -161,7 +218,12 @@
     chatbotPopup.style.display = 'none';
 
     chatbotPopup.innerHTML = `
-        <div id="chatbot-header">${CHATBOT_NAME}</div>
+        <div id="chatbot-header">${CHATBOT_NAME}
+            <div class="tooltip-container">
+                <span class="tooltip-icon">i</span>
+                <div class="tooltip-text">${disclaimerText}</div>
+            </div>
+        </div>
         <div id="chatbot-messages"></div>
         <div id="chatbot-input-container">
             <input type="text" id="chatbot-input" placeholder="Type a message...">
