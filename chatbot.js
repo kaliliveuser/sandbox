@@ -317,6 +317,11 @@
                     if (line.startsWith('data:')) {
                         const data = line.substring(5).trim();
                         if (data === '[DONE]') {
+                            console.log('done');
+                            break;
+                        }
+                        if (data.includes("---")) {
+                            console.log('ad');
                             break;
                         }
                         try {
