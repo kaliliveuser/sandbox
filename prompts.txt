@@ -11,7 +11,7 @@ Merge all the information above with the attached html file.
 
 ---
 
-Create javascript code that has chatbot functionality through the OpenAI API. Make it easy to embed into any webpage and show up on the bottom right of the page as a pop-up. Stream the completion and format it correctly. Combine the javascript and css so that the embedding code is just one line. Add an indicator that shows the chatbot thinking while the user waits for a response. Include a system message that can be replaced as required. Do not add extra features.
+Create javascript code that has chatbot functionality through the OpenAI API. Make it easy to embed into any webpage and show up on the bottom right of the page as a pop-up. Stream the completion and format it correctly. Combine the javascript and css so that the embedding code is just one line. Add an indicator that shows the chatbot thinking while the user waits for a response. Include a system message that can be replaced as required. Parse the json stream carefully. Do not add extra features.
 
 ---
 
