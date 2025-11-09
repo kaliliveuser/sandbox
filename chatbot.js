@@ -3,11 +3,12 @@
 
     // 1. CONFIGURATION
     const API_KEY = "YOUR_OPENAI_API_KEY";
-    const SYSTEM_MESSAGE = "You are a helpful assistant.";
+    const SYSTEM_MESSAGE = `You are a helpful assistant.`;
+
     const CHATBOT_NAME = "My Chatbot";
-    const CHAT_BUTTON_COLOR = "#007bff";
-    const CHAT_HEADER_COLOR = "#007bff";
-    const disclaimerText = 'You are interacting with an AI Chatbot. The information provided here is for general informational purposes only and is not a substitute for professional advice. We do not guarantee the accuracy or completeness of the information provided. Any reliance you place on such information is strictly at your own risk. We are not liable for any losses or damages arising from your use of this chatbot. For specific advice, please consult with a qualified professional. All conversations may be recorded to improve our services. By using this chatbot, you agree to these terms.';
+    const CHAT_BUTTON_COLOR = "#00aaff";
+    const CHAT_HEADER_COLOR = "#00aaff";
+    const disclaimerText = 'You are interacting with an AI Chatbot. The information provided here is for general informational purposes only and is not a substitute for professional advice. We do not guarantee the accuracy or completeness of the information provided. Any reliance you place on such information is strictly at your own risk. We are not liable for any losses or damages arising from your use of this chatbot. For specific advice, please consult with a qualified professional. All conversations may be recorded to improve our services. By using this chatbot, you agree to these terms. AI inference graciously provided by pollinations.ai';
 
     // 2. CREATE AND INJECT CSS
     const style = document.createElement('style');
@@ -51,7 +52,7 @@
             flex-direction: column;
             /* overflow: hidden; <--- THIS LINE IS REMOVED */
             background-color: white;
-            z-index: 1001;
+            z-index: 1001; 
         }
 
         #chatbot-header {
@@ -60,6 +61,7 @@
             padding: 10px;
             text-align: center;
             font-weight: bold;
+            position: relative; 
         }
 
         #chatbot-messages {
@@ -121,6 +123,17 @@
         #chatbot-send:disabled {
             background-color: #a0a0a0;
         }
+        
+        #chatbot-exit {
+            display: none; /* Hidden by default */
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
 
         .thinking-indicator {
             display: flex;
@@ -175,8 +188,8 @@
             border-radius: 6px;
             padding: 8px;
             position: absolute;
-            z-index: 1001;
-            bottom: 140%;
+            z-index: 1002;
+            top: 120%;
             /* --- MODIFIED --- */
             right: 0; /* Align to the right of the container */
             /* transform: translateX(50%); <-- REMOVED */
@@ -188,18 +201,84 @@
         .tooltip-text::after {
             content: "";
             position: absolute;
-            top: 100%;
+            bottom: 100%;
             /* --- MODIFIED --- */
             right: 8px; /* Position arrow on the right side */
             /* left: 50%; <-- REMOVED */
             /* margin-left: -5px; <-- REMOVED */
             border-width: 5px;
             border-style: solid;
-            border-color: #555 transparent transparent transparent;
+            border-color: transparent transparent #555 transparent;
         }
         .tooltip-container:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
+        }
+        
+        /* --- Mobile Responsive Styles --- */
+        @media (max-width: 600px) {
+            #chatbot-popup {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+            }
+
+            #chatbot-container {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            #chatbot-button {
+                width: 55px;
+                height: 55px;
+            }
+
+             /* Make header elements relatively positioned to the header itself */
+            #chatbot-header {
+                position: relative;
+            }
+
+            /* Adjust tooltip positioning for mobile */
+            .tooltip-container {
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                transform: translateY(-50%);
+            }
+            
+            #chatbot-header {
+                position: relative;
+            }
+
+            .tooltip-container {
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                transform: translateY(-50%);
+            }
+
+            /* --- ADD THESE STYLES BELOW --- */
+
+            .tooltip-text {
+                /* Position the tooltip below the icon */
+                top: 120%; 
+                bottom: auto; /* Unset the bottom property to avoid conflicts */
+            }
+
+            .tooltip-text::after {
+                /* Flip the arrow to point upwards */
+                bottom: 100%;
+                top: auto; /* Unset the top property to avoid conflicts */
+                border-color: transparent transparent #555 transparent;
+            }
+            
+            #chatbot-exit {
+                display: inline-block; /* Show the exit button on mobile */
+            }
         }
     `;
     document.head.appendChild(style);
@@ -229,6 +308,7 @@
         <div id="chatbot-input-container">
             <input type="text" id="chatbot-input" placeholder="Type a message...">
             <button id="chatbot-send">Send</button>
+            <button id="chatbot-exit">Exit</button>
         </div>
     `;
 
@@ -240,6 +320,7 @@
     const chatbotMessages = document.getElementById('chatbot-messages');
     const chatbotInput = document.getElementById('chatbot-input');
     const chatbotSend = document.getElementById('chatbot-send');
+    const chatbotExit = document.getElementById('chatbot-exit');
     let conversationHistory = [{ role: "system", content: SYSTEM_MESSAGE }];
 
     const toggleChatbot = () => {
@@ -361,6 +442,7 @@
 
     chatbotButton.addEventListener('click', toggleChatbot);
     chatbotSend.addEventListener('click', sendMessage);
+    chatbotExit.addEventListener('click', toggleChatbot);
     chatbotInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
