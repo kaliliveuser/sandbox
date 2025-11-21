@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Card Barcode Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        input {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            width: 300px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button.generate-btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button.generate-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Grid Layout for Results */
+        #results-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .barcode-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .barcode-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .barcode-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background-color: #fff;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        .error-msg {
+            grid-column: 1 / -1;
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Library Card Generator</h1>
+        <p class="subtitle">Enter your card number to generate downloadable barcodes in all compatible formats.</p>
+
+        <div class="input-group">
+            <input type="text" id="inputData" placeholder="e.g., 2123456789012" onkeypress="handleEnter(event)">
+            <button class="generate-btn" onclick="generateAll()">Generate Barcodes</button>
+        </div>
+
+        <div id="error-display" class="error-msg"></div>
+        <div id="results-area"></div>
+    </div>
+
+    <script>
+        // List of standard formats supported by JsBarcode
+        // Note: Standard library cards usually use CODE128, CODE39, or CODABAR.
+        const formats = [
+            { format: "CODE128", name: "Code 128 (Auto)" },
+            { format: "CODE39", name: "Code 39" },
+            { format: "codabar", name: "Codabar" },
+            { format: "EAN13", name: "EAN-13" },
+            { format: "UPC", name: "UPC-A" },
+            { format: "ITF", name: "ITF (Interleaved 2 of 5)" },
+            { format: "MSI", name: "MSI" },
+            { format: "pharmacode", name: "Pharmacode" }
+        ];
+
+        function handleEnter(e) {
+            if(e.key === 'Enter') generateAll();
+        }
+
+        function generateAll() {
+            const input = document.getElementById('inputData').value.trim();
+            const resultsArea = document.getElementById('results-area');
+            const errorDisplay = document.getElementById('error-display');
+            
+            // Reset UI
+            resultsArea.innerHTML = '';
+            errorDisplay.style.display = 'none';
+
+            if (!input) {
+                errorDisplay.textContent = "Please enter a card number.";
+                errorDisplay.style.display = 'block';
+                return;
+            }
+
+            let generatedCount = 0;
+
+            formats.forEach(type => {
+                // Create container elements
+                const card = document.createElement('div');
+                card.className = 'barcode-card';
+
+                const title = document.createElement('div');
+                title.className = 'barcode-title';
+                title.innerText = type.name;
+
+                const canvas = document.createElement('canvas');
+                
+                // Attempt to generate barcode
+                try {
+                    JsBarcode(canvas, input, {
+                        format: type.format,
+                        lineColor: "#000",
+                        width: 2,
+                        height: 100,
+                        displayValue: true
+                    });
+
+                    // If successful, append UI elements
+                    const btn = document.createElement('button');
+                    btn.className = 'download-btn';
+                    btn.innerText = 'Download PNG';
+                    btn.onclick = () => downloadBarcode(canvas, type.name, input);
+
+                    card.appendChild(title);
+                    card.appendChild(canvas);
+                    card.appendChild(btn);
+                    resultsArea.appendChild(card);
+                    
+                    generatedCount++;
+                } catch (e) {
+                    // If generation fails (e.g., letters in a numeric-only format),
+                    // we simply don't render this card.
+                    // Console log for debugging if needed: console.log(`${type.name} failed for input.`);
+                }
+            });
+
+            if (generatedCount === 0) {
+                errorDisplay.textContent = "Could not generate any valid barcodes with this input. Please check for invalid characters.";
+                errorDisplay.style.display = 'block';
+            }
+        }
+
+        function downloadBarcode(canvas, formatName, inputValue) {
+            const link = document.createElement('a');
+            link.download = `barcode-${formatName}-${inputValue}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
