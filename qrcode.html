@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vCard QR Generator (with Download)</title>
+    <!-- Importing the QRCode.js library from a CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .qr-section {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Start content from top to keep QR code stable */
+            justify-content: flex-start; 
+            border-left: 1px solid #eee;
+            padding-left: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.3rem;
+            margin-top: 0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        /* General Button Styles */
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Generate Button (Blue) */
+        .btn-generate {
+            background-color: #007BFF;
+            color: white;
+        }
+        .btn-generate:hover {
+            background-color: #0056b3;
+        }
+
+        /* Download Button (Green) */
+        .btn-download {
+            background-color: #28a745;
+            color: white;
+            margin-top: 20px;
+            max-width: 220px; /* Limit width on the QR side */
+        }
+        .btn-download:hover {
+            background-color: #218838;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: white;
+            /* Minimum height to prevent jumping layout */
+            min-height: 230px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .qr-section {
+                border-left: none;
+                border-top: 1px solid #eee;
+                padding-top: 30px;
+                padding-left: 0;
+            }
+            .container {
+                flex-direction: column;
+            }
+            .btn-download {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Input Form -->
+    <div class="form-section">
+        <h1>Contact Information</h1>
+        
+        <div class="input-group">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" placeholder="e.g. Jane">
+        </div>
+
+        <div class="input-group">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" placeholder="e.g. Doe">
+        </div>
+
+        <div class="input-group">
+            <label for="company">Company Name</label>
+            <input type="text" id="company" placeholder="e.g. Acme Corp">
+        </div>
+
+        <div class="input-group">
+            <label for="title">Job Title</label>
+            <input type="text" id="title" placeholder="e.g. CEO">
+        </div>
+
+        <div class="input-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="jane@example.com">
+        </div>
+
+        <div class="input-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="+1 555 0199">
+        </div>
+
+        <div class="input-group">
+            <label for="website">Website</label>
+            <input type="url" id="website" placeholder="https://www.example.com">
+        </div>
+
+        <div class="input-group">
+            <label for="linkedin">LinkedIn Profile</label>
+            <input type="url" id="linkedin" placeholder="https://linkedin.com/in/janedoe">
+        </div>
+
+        <button class="btn-generate" onclick="generateQR()">Generate QR Code</button>
+    </div>
+
+    <!-- QR Display -->
+    <div class="qr-section">
+        <h2>Your QR Code</h2>
+        <div id="qrcode"></div>
+        <p class="instructions">Scan with your phone camera to add contact.</p>
+        
+        <!-- Download Button -->
+        <button class="btn-download" onclick="downloadQR()">Download QR Code</button>
+    </div>
+</div>
+
+<script>
+    // Initialize the QR code instance
+    let qrcodeContainer = document.getElementById("qrcode");
+    let qrcode = new QRCode(qrcodeContainer, {
+        width: 200,
+        height: 200
+    });
+
+    function generateQR() {
+        const fname = document.getElementById('fname').value.trim();
+        const lname = document.getElementById('lname').value.trim();
+        const company = document.getElementById('company').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const website = document.getElementById('website').value.trim();
+        const linkedin = document.getElementById('linkedin').value.trim();
+
+        if(!fname && !lname && !email && !company) {
+            alert("Please fill in some details first.");
+            return;
+        }
+
+        // Build vCard string
+        let vCardData = "BEGIN:VCARD\nVERSION:3.0\n";
+        vCardData += `N:${lname};${fname}\n`;
+        vCardData += `FN:${fname} ${lname}\n`;
+        if(company) vCardData += `ORG:${company}\n`;
+        if(title) vCardData += `TITLE:${title}\n`;
+        if(phone) vCardData += `TEL:${phone}\n`;
+        if(email) vCardData += `EMAIL:${email}\n`;
+        if(website) vCardData += `URL:${website}\n`;
+        if(linkedin) vCardData += `URL:${linkedin}\n`;
+        vCardData += "END:VCARD";
+
+        // Generate Code
+        qrcode.clear(); 
+        qrcode.makeCode(vCardData);
+    }
+
+    function downloadQR() {
+        // The library renders an <img> tag inside the #qrcode div
+        const img = qrcodeContainer.querySelector("img");
+
+        if (img && img.src) {
+            // Create a temporary link to trigger download
+            const link = document.createElement("a");
+            link.href = img.src;
+            
+            // Construct filename from inputs or default
+            const fname = document.getElementById('fname').value.trim();
+            const lname = document.getElementById('lname').value.trim();
+            let filename = "contact_qr.png";
+            
+            if(fname || lname) {
+                // Clean up filename (replace spaces with underscores)
+                filename = `${fname}_${lname}_QR.png`.replace(/\s+/g, '_');
+            }
+            
+            link.download = filename;
+            
+            // Append to body, click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert("Please generate a QR code first.");
+        }
+    }
+
+    // Initial placeholder
+    window.onload = function() {
+        qrcode.makeCode("Enter details to generate");
+    };
+</script>
+
+</body>
+</html>
