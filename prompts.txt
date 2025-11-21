@@ -80,6 +80,14 @@ Write out the full visual descriptions of each character. Do not number the imag
 
 ---
 
+Write a single-file webpage that creates a QR code from your first name, last name, company name, title, email address, phone number, website and linkedin field. Give the user a button to download the QR Code.
+
+---
+
+Write a single-file webpage that generates library card barcodes from a number supplied by the user. Generate all variants available and give the user the ability to download them.
+
+---
+
 Create a responsive, aesthetically-pleasing, one-file website based on the following company information. Re-write and expand on the descriptions below to make the company interesting. Do not just list out the information verbatum.
 
 Use {image link} for the graphic and the favicon. Keep the size of graphics small and surround it with a subtle, glowing, circular border consistent with the site accent colour. Use embedded boxes where aesthetically pleasing. Use embedded boxes with glowing borders for each section. Use relevant icons for bullets lists. Keep widths consistent. Keep fonts consistent in size and color. Be consistent with the accent for the overall site. Add a copyright at the bottom using the company name for the year 2025.
