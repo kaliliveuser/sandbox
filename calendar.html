@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Countdown Calendar</title>
+    <title>2026 3D Calendar</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -27,7 +27,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevents body scroll, grid handles it */
+            overflow: hidden; 
         }
 
         header {
@@ -43,11 +43,11 @@
         
         #grid-container {
             display: grid;
-            /* Auto-fit creates as many columns as fit */
+            /* Creates as many columns as fit */
             grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
             gap: 8px;
             overflow-y: auto;
-            padding-right: 5px; /* Space for scrollbar */
+            padding-right: 5px; 
             flex-grow: 1;
             perspective: 1000px;
         }
@@ -61,7 +61,7 @@
             position: relative;
             background-color: var(--box-future);
             border-radius: 4px;
-            height: 60px; /* Aspect ratio control */
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -139,7 +139,7 @@
 <body>
 
     <header>
-        <h1 id="year-title">202X Grid</h1>
+        <h1 id="year-title">2026 Grid</h1>
         <div style="font-size: 0.9rem; opacity: 0.8;">Hover blocks for details</div>
     </header>
 
@@ -152,10 +152,6 @@
 <script>
     /**
      * CONFIGURATION
-     * Add or remove events here. 
-     * Use 'MM-DD' format for fixed dates.
-     * Variable holidays (like Thanksgiving) are calculated in the script, 
-     * but you can override them here if needed.
      */
     const fixedHolidays = [
         { date: '01-01', name: "New Year's Day" },
@@ -172,7 +168,7 @@
     const tooltip = document.getElementById('tooltip');
     const title = document.getElementById('year-title');
 
-    // Helper: Get nth Monday of a month (for Labour Day, Thanksgiving, etc)
+    // Helper: Get nth Monday of a month
     function getNthDayOfMonth(year, month, dayOfWeek, n) {
         const date = new Date(year, month, 1);
         let count = 0;
@@ -186,17 +182,16 @@
         return null;
     }
 
-    // Helper: Get Monday before a date (for Victoria Day)
+    // Helper: Get Monday before a date
     function getMondayBefore(year, month, day) {
         const date = new Date(year, month, day);
         const dayOfWeek = date.getDay(); // 0 is Sunday, 1 is Monday
-        const diff = (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + 7; // Go back to previous Monday
+        const diff = (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + 7;
         date.setDate(date.getDate() - diff);
         return date;
     }
 
-    // Helper: Calculate Good Friday (Easter - 2 days)
-    // Simple Gaussian algorithm for Easter
+    // Helper: Calculate Good Friday
     function getGoodFriday(year) {
         const a = year % 19;
         const b = Math.floor(year / 100);
@@ -214,92 +209,85 @@
         const day = ((h + l - 7 * m + 114) % 31) + 1;
         
         const easter = new Date(year, month, day);
-        easter.setDate(easter.getDate() - 2); // Good Friday is 2 days before
+        easter.setDate(easter.getDate() - 2); 
         return easter;
     }
 
     function generateCalendar() {
         const today = new Date();
-        const currentYear = today.getFullYear();
-        title.innerText = `${currentYear} Countdown`;
+        
+        // --- SETTING YEAR TO 2026 ---
+        const targetYear = 2026; 
+        
+        title.innerText = `${targetYear} Countdown`;
 
-        // 1. Compile all holidays for the current year
+        // 1. Compile all holidays for the target year
         let allEvents = [...fixedHolidays];
 
-        // Format Date to MM-DD
         const fmt = (d) => {
             let mm = (d.getMonth() + 1).toString().padStart(2, '0');
             let dd = d.getDate().toString().padStart(2, '0');
             return `${mm}-${dd}`;
         };
 
-        // Add variable Canadian holidays
-        const goodFriday = getGoodFriday(currentYear);
-        const victoriaDay = getMondayBefore(currentYear, 4, 25); // Monday before May 25
-        const labourDay = getNthDayOfMonth(currentYear, 8, 1, 1); // 1st Mon in Sept
-        const thanksgiving = getNthDayOfMonth(currentYear, 9, 1, 2); // 2nd Mon in Oct
+        // Add variable Canadian holidays based on targetYear
+        const goodFriday = getGoodFriday(targetYear);
+        const victoriaDay = getMondayBefore(targetYear, 4, 25);
+        const labourDay = getNthDayOfMonth(targetYear, 8, 1, 1);
+        const thanksgiving = getNthDayOfMonth(targetYear, 9, 1, 2);
         
         allEvents.push({ date: fmt(goodFriday), name: "Good Friday" });
         allEvents.push({ date: fmt(victoriaDay), name: "Victoria Day" });
         allEvents.push({ date: fmt(labourDay), name: "Labour Day" });
         allEvents.push({ date: fmt(thanksgiving), name: "Thanksgiving" });
 
-        // Convert events array to a Map for O(1) lookup
         const eventMap = {};
         allEvents.forEach(e => eventMap[e.date] = e.name);
 
         // 2. Generate Grid
-        const startOfYear = new Date(currentYear, 0, 1);
-        const endOfYear = new Date(currentYear, 11, 31);
+        const startOfYear = new Date(targetYear, 0, 1);
+        const endOfYear = new Date(targetYear, 11, 31);
         
-        // Calculate total days for countdown logic
         const msPerDay = 1000 * 60 * 60 * 24;
         const totalDays = Math.round((endOfYear - startOfYear) / msPerDay) + 1;
 
         let currentDateLoop = new Date(startOfYear);
         let dayCount = 0;
 
-        // Clean container
         container.innerHTML = '';
 
         while (currentDateLoop <= endOfYear) {
             dayCount++;
             
-            // Basic data
             const dateStr = fmt(currentDateLoop);
             const fullDateStr = currentDateLoop.toDateString();
             const daysRemaining = totalDays - dayCount;
             const eventName = eventMap[dateStr];
             
-            // Compare dates (strip time for comparison)
+            // Check logic for visual styling
+            // We compare the loop date (2026) against "today" (real time)
             const isToday = currentDateLoop.toDateString() === today.toDateString();
             const isPast = currentDateLoop < today && !isToday;
             
-            // Create Element
             const box = document.createElement('div');
             box.classList.add('day-box');
             
-            // Add Classes
             if (isPast) box.classList.add('past');
             if (isToday) box.classList.add('today');
             if (eventName) box.classList.add('holiday');
 
-            // Visual Content: Show Days Remaining (Countdown)
-            // If it's the last day, show 0
+            // Show Countdown number
             box.innerText = daysRemaining;
 
-            // Store data for tooltip
             box.dataset.date = fullDateStr;
             box.dataset.remaining = daysRemaining;
             if (eventName) box.dataset.event = eventName;
 
-            // Add Interaction
             box.addEventListener('mousemove', (e) => showTooltip(e, box));
             box.addEventListener('mouseleave', hideTooltip);
 
             container.appendChild(box);
 
-            // Increment loop
             currentDateLoop.setDate(currentDateLoop.getDate() + 1);
         }
     }
@@ -314,22 +302,16 @@
             html += `<span class="tooltip-event">${event}</span>`;
         }
         
-        if (remaining > 0) {
-            html += `<div class="tooltip-countdown">${remaining} days left</div>`;
-        } else {
-            html += `<div class="tooltip-countdown">Happy New Year!</div>`;
-        }
+        html += `<div class="tooltip-countdown">${remaining} days to year end</div>`;
 
         tooltip.innerHTML = html;
         tooltip.style.display = 'block';
 
-        // Positioning logic to keep tooltip on screen
         const xOffset = 15;
         const yOffset = 15;
         let x = e.clientX + xOffset;
         let y = e.clientY + yOffset;
 
-        // Prevent overflow right/bottom
         if (x + tooltip.offsetWidth > window.innerWidth) {
             x = e.clientX - tooltip.offsetWidth - xOffset;
         }
@@ -345,11 +327,7 @@
         tooltip.style.display = 'none';
     }
 
-    // Initialize
     generateCalendar();
-    
-    // Re-generate if window is resized significantly (optional, CSS grid handles layout usually)
-    // window.onresize = generateCalendar; 
 </script>
 </body>
 </html>
