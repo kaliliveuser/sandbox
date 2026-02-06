@@ -148,7 +148,7 @@ DDS Wireless · Contract Full-time
 Feb 2020 - Feb 2021 · 1 yr 1 mo
 Richmond, British Columbia, Canada
 • Managed a team that developed a booking, scheduling and dispatch system for paratransit.
-• Successfully delivered to NYCT in January 2021
+• Successfully delivered key components of the New York project ahead of my promise date.
 Skills: SQL · Amazon Web Services (AWS) · Database Development
 
 Software Development Manager
