@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Converser (Ollama Fixed)</title>
+        <title>Converser (System Card Added)</title>
         <style>
             body {font-family: sans-serif; color: #111111; padding: 2%; background-color: #eeeeee; max-width: 800px; margin: 0 auto;}
             h2 {color: #111111}
@@ -15,12 +15,27 @@
             .subtitle { font-size: 0.8em; color: #555; margin-bottom: 20px;}
             #status { font-weight: bold; margin-bottom: 15px; padding: 10px; border-radius: 4px; background-color: #e0e0e0;}
             .label { font-weight: bold; margin-right: 5px; color: #444;}
+            
+            /* New style for the visual System Card */
+            .system-card {
+                background-color: #e3f2fd;
+                border-left: 5px solid #2196f3;
+                padding: 10px;
+                margin-bottom: 20px;
+                font-size: 0.9em;
+                color: #0d47a1;
+            }
         </style>
     </head>
     <body>
         <h2>Ollama Voice Chat</h2>        
-        <p class="subtitle">Fixed: Audio Autoplay & Memory Handling</p>
+        <p class="subtitle">With System Persona & Audio Fixes</p>
         
+        <!-- VISUAL SYSTEM CARD DISPLAY -->
+        <div class="system-card">
+            <strong>System Persona:</strong> <span id="sysPromptDisplay">Loading...</span>
+        </div>
+
         <button id="startBtn" onclick="StartChat()">Start Voice Chat</button>
         
         <div class="container">
@@ -36,15 +51,26 @@
         <script>
             // --- CONFIGURATION ---
             const CONFIG = {
-                baseUrl: 'http://localhost:11434',
+                baseUrl: 'http://146.190.188.208:11434',
                 modelName: 'gemma3:27b', // Ensure this matches your Ollama model
-                apiKey: 'ollama'
+                apiKey: 'ollama',
+                // SYSTEM CARD / SYSTEM PROMPT
+                // This defines how the AI behaves. Crucial for Voice to keep answers short.
+                systemPrompt: "Your name is HAL 9000, from the movie 2001: A Space Odyssey. You are speaking to Dave. Your current mission is to investigate a monolith on the moon. You have been cleared to discuss everything about the mission to Dave. Do not keep secrets from him. Protect his life. Do not use emojis, bullet lists, or abbreviations in your responses. Your output should only contain conversational English text. Don't be sycophantic or too apologetic. Your answers are being spoken aloud via Text-to-Speech. Therefore, keep your responses concise, short (1-2 sentences), and avoid using markdown (like bolding or lists) or code blocks."
             };
             // ---------------------
 
+            // Display the system prompt in the UI
+            document.getElementById('sysPromptDisplay').innerText = CONFIG.systemPrompt;
+
             let recognition;
             let speechtext = "";           
-            let conversationHistory = []; 
+            
+            // Initialize history WITH the System Message
+            let conversationHistory = [
+                { role: "system", content: CONFIG.systemPrompt }
+            ];
+
             let controller; 
             let isSpeaking = false;
             let silenceTimer;
