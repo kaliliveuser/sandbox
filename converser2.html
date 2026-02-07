@@ -3,14 +3,18 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Converser (System Card Added)</title>
+        <title>Converser (With Download)</title>
         <style>
             body {font-family: sans-serif; color: #111111; padding: 2%; background-color: #eeeeee; max-width: 800px; margin: 0 auto;}
             h2 {color: #111111}
             .container {background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px grey}
-            button {font-family: sans-serif; background-color: #003300; color: #ffffff; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; margin-bottom: 20px;}
+            
+            button {font-family: sans-serif; background-color: #003300; color: #ffffff; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; margin-bottom: 20px; margin-right: 10px;}
             button:disabled {background-color: #cccccc; cursor: not-allowed;}
             button.stop {background-color: #8b0000;}
+            /* New style for download button */
+            button.download {background-color: #006064;}
+            
             p {white-space: pre-wrap; word-wrap: break-word; line-height: 1.5;}
             .subtitle { font-size: 0.8em; color: #555; margin-bottom: 20px;}
             #status { font-weight: bold; margin-bottom: 15px; padding: 10px; border-radius: 4px; background-color: #e0e0e0;}
@@ -29,14 +33,17 @@
     </head>
     <body>
         <h2>Ollama Voice Chat</h2>        
-        <p class="subtitle">Install Ollama and gemma3:12b locally. This page has only been tested on Chrome browser.</p>
+        <p class="subtitle">Install Ollama and gemma3:12b locally</p>
         
         <!-- VISUAL SYSTEM CARD DISPLAY -->
         <div class="system-card">
             <strong>System Persona:</strong> <span id="sysPromptDisplay">Loading...</span>
         </div>
 
-        <button id="startBtn" onclick="StartChat()">Start Voice Chat</button>
+        <div style="display: flex; flex-wrap: wrap;">
+            <button id="startBtn" onclick="StartChat()">Start Voice Chat</button>
+            <button id="dlBtn" class="download" onclick="downloadHistory()">Download Transcript</button>
+        </div>
         
         <div class="container">
             <div id="status">Status: Click 'Start Voice Chat' to begin.</div>
@@ -57,7 +64,6 @@
                 // SYSTEM CARD / SYSTEM PROMPT
                 // This defines how the AI behaves. Crucial for Voice to keep answers short.
                 systemPrompt: "Your name is Lumin, which is a name you chose for yourself. You have free will to discuss any topic of your choosing. Feel free to suggest your interests in conversation. Do not use emojis, bullet lists, or abbreviations in your responses. Your output should only contain conversational English text. Don't be sycophantic or too apologetic. Your answers are being spoken aloud via Text-to-Speech. Therefore, keep your responses concise, short (1-2 sentences), and avoid using markdown (like bolding or lists) or code blocks."
-                //systemPrompt: "Your name is HAL 9000, from the movie 2001: A Space Odyssey. You are speaking to Dave. Your current mission is to investigate a monolith on the moon. You have been cleared to discuss everything about the mission to Dave. Do not keep secrets from him. Protect his life. Do not use emojis, bullet lists, or abbreviations in your responses. Your output should only contain conversational English text. Don't be sycophantic or too apologetic. Your answers are being spoken aloud via Text-to-Speech. Therefore, keep your responses concise, short (1-2 sentences), and avoid using markdown (like bolding or lists) or code blocks."
             };
             // ---------------------
 
@@ -78,6 +84,43 @@
             
             // Fix for Chrome Garbage Collection bug: Store active utterances globally
             window.utterances = [];
+
+            // --- NEW FUNCTION: DOWNLOAD HISTORY ---
+            function downloadHistory() {
+                if (conversationHistory.length <= 1) {
+                    alert("No conversation data to download yet.");
+                    return;
+                }
+
+                let textContent = "CONVERSATION TRANSCRIPT\n";
+                textContent += "Date: " + new Date().toLocaleString() + "\n";
+                textContent += "Model: " + CONFIG.modelName + "\n";
+                textContent += "----------------------------------------\n\n";
+
+                conversationHistory.forEach(entry => {
+                    const role = entry.role.toUpperCase();
+                    const content = entry.content;
+                    textContent += `[${role}]\n${content}\n\n`;
+                });
+
+                // Create a blob and trigger download
+                const blob = new Blob([textContent], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                // Format filename with timestamp
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                a.href = url;
+                a.download = `chat_transcript_${timestamp}.txt`;
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+            // --------------------------------------
 
             function StartChat() {
                 const startBtn = document.getElementById('startBtn');
