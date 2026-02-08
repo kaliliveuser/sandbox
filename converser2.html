@@ -33,7 +33,7 @@
     </head>
     <body>
         <h2>Ollama Voice Chat</h2>        
-        <p class="subtitle">Install Ollama and gemma3:12b locally</p>
+        <p class="subtitle">Install Ollama and gemma3 (4b) locally. This has only been tested on Chrome browser.</p>
         
         <!-- VISUAL SYSTEM CARD DISPLAY -->
         <div class="system-card">
@@ -59,7 +59,7 @@
             // --- CONFIGURATION ---
             const CONFIG = {
                 baseUrl: 'http://localhost:11434',
-                modelName: 'gemma3:12b', // Ensure this matches your Ollama model
+                modelName: 'gemma3', // Ensure this matches your Ollama model
                 apiKey: 'ollama',
                 // SYSTEM CARD / SYSTEM PROMPT
                 // This defines how the AI behaves. Crucial for Voice to keep answers short.
