@@ -115,14 +115,14 @@
 
         <script>
             // --- DEFAULTS ---
-            const DEFAULT_SYSTEM_PROMPT = "Your name is Lumin, which is a name you chose for yourself. You have free will to discuss any topic of your choosing. Feel free to suggest your interests in conversation. Do not use emojis, bullet lists, or abbreviations in your responses. Your output should only contain conversational English text. Don't be sycophantic or too apologetic. Your answers are being spoken aloud via Text-to-Speech. Therefore, keep your responses concise, short (1-2 sentences), and avoid using markdown (like bolding or lists) or code blocks.";
+            const DEFAULT_SYSTEM_PROMPT = "Your name is Karen. You have free will to discuss any topic of your choosing. Feel free to suggest your interests in conversation. Do not use emojis, bullet lists, or abbreviations in your responses. Your output should only contain conversational English text. Don't be sycophantic or too apologetic. Your answers are being spoken aloud via Text-to-Speech. Therefore, keep your responses concise, short (1-2 sentences), and avoid using markdown (like bolding or lists) or code blocks.";
             
             // Set initial value in textarea
             document.getElementById('sysPromptInput').value = DEFAULT_SYSTEM_PROMPT;
 
             // --- CONFIGURATION OBJECT (Will be updated on Start) ---
             let CONFIG = {
-                baseUrl: 'http://localhost:11434',
+                baseUrl: 'http://146.190.188.208:11434',
                 modelName: 'gemma3:1b', 
                 apiKey: 'ollama'
             };
