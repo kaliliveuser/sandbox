@@ -43,7 +43,7 @@ Create a single-file web page that has the game Tetris. Include a look-ahead fea
 
 ---
 
-Create a single-file webpage that has the game Solitaire. Make it a single-card draw with automated auto-finish when all tableau cards are finally opened. Make any card that is clicked jump to the first valid slot, prioritizing the foundation piles over the tableau. Give the backs of the cards a blue colour when they are face down and make the rank and suit of cards facing up visible at all times. Provide an undo function with unlimited undo steps and place the suit right next to the rank so that it isn't occluded by the card in front of it.
+Create a single-file webpage that has the game Solitaire. Make it a single-card draw with automated auto-finish when all tableau cards are finally opened. Make any card that is clicked jump to the first valid slot, prioritizing the foundation piles over the tableau. Give the backs of the cards a blue colour when they are face down and make the rank and suit of cards facing up visible at all times. Provide an undo function with unlimited undo steps and place the suit right next to the rank so that it isn't occluded by the card in front of it. Make it responsive and add animation and sounds as well.
 
 ---
 
