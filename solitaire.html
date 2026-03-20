@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport settings prevent pinch-zoom and double-tap zoom on mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Responsive Solitaire</title>
     <style>
         body {
-            background-color: #076324; /* Classic green felt */
+            background-color: #076324;
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 15px;
             color: white;
             user-select: none;
-            touch-action: manipulation; /* Improves touch responsiveness */
-            padding-bottom: 50vh; /* Gives space to scroll down for long tableau stacks */
+            touch-action: manipulation;
+            padding-bottom: 50vh;
+            overflow-x: hidden;
         }
         
         #game-wrapper {
             width: 100%;
-            max-width: 800px; /* Caps the size on large desktop screens */
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -44,10 +44,7 @@
             transition: background-color 0.2s;
         }
 
-        button:hover:not(:disabled) {
-            background-color: #e0e0e0;
-        }
-
+        button:hover:not(:disabled) { background-color: #e0e0e0; }
         button:disabled {
             background-color: #a0c4a8;
             color: #555;
@@ -61,21 +58,17 @@
             gap: 1.5vw;
         }
 
-        /* Cap the maximum gap for large screens */
-        @media (min-width: 800px) {
-            #board { gap: 12px; }
-        }
+        @media (min-width: 800px) { #board { gap: 12px; } }
 
         .pile {
             width: 100%;
-            aspect-ratio: 5 / 7; /* Standard playing card ratio */
+            aspect-ratio: 5 / 7;
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: clamp(3px, 1vw, 6px);
             position: relative;
             box-sizing: border-box;
         }
 
-        /* Grid Placements */
         #stock { grid-column: 1; grid-row: 1; cursor: pointer; }
         #waste { grid-column: 2; grid-row: 1; }
         .spacer { grid-column: 3; grid-row: 1; border: none; }
@@ -106,23 +99,18 @@
             box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
             cursor: pointer;
             border: 1px solid #ccc;
+            transform-origin: center;
         }
 
         .card.back {
-            background-color: #1a53ff; /* Blue card back */
+            background-color: #1a53ff;
             background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.1) 5px, rgba(255,255,255,0.1) 10px);
             border: 2px solid white;
             cursor: default;
         }
 
-        #stock .card.back {
-            cursor: pointer;
-        }
-
-        /* Hide content for face down */
-        .card.back > * {
-            display: none;
-        }
+        #stock .card.back { cursor: pointer; }
+        .card.back > * { display: none; }
 
         .red { color: #d00; }
         .black { color: #000; }
@@ -161,8 +149,8 @@
 
 <div id="game-wrapper">
     <div class="controls">
-        <button onclick="initGame()">New Game</button>
-        <button id="undo-btn" onclick="undo()" disabled>Undo</button>
+        <button onclick="handleNewGame()">New Game</button>
+        <button id="undo-btn" onclick="handleUndo()" disabled>Undo</button>
     </div>
     
     <div id="board">
@@ -185,6 +173,113 @@
 </div>
 
 <script>
+    // --- AUDIO SYSTEM ---
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const now = audioCtx.currentTime;
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'move') {
+            // Soft slide/thud
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'flip') {
+            // Sharp snap
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'error') {
+            // Dull blip
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'win') {
+            // Victory Chime Arpeggio
+            const notes = [300, 400, 500, 600, 800, 1000];
+            notes.forEach((freq, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'sine';
+                o.frequency.value = freq;
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                g.gain.setValueAtTime(0, now + i * 0.1);
+                g.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+                g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+                o.start(now + i * 0.1);
+                o.stop(now + i * 0.1 + 0.3);
+            });
+        }
+    }
+
+    // --- ANIMATION SYSTEM ---
+    function capturePositions() {
+        let pos = {};
+        document.querySelectorAll('.card').forEach(el => {
+            pos[el.dataset.id] = {
+                rect: el.getBoundingClientRect(),
+                isFaceUp: !el.classList.contains('back')
+            };
+        });
+        return pos;
+    }
+
+    function playAnimations(oldPos, duration = 200) {
+        document.querySelectorAll('.card').forEach(el => {
+            let id = el.dataset.id;
+            let newRect = el.getBoundingClientRect();
+            let old = oldPos[id];
+            
+            if (old) {
+                let dx = old.rect.left - newRect.left;
+                let dy = old.rect.top - newRect.top;
+                let flipped = old.isFaceUp !== !el.classList.contains('back');
+                
+                if (dx !== 0 || dy !== 0 || flipped) {
+                    let startTransform = `translate(${dx}px, ${dy}px)`;
+                    if (flipped) startTransform += ' scaleX(0)'; // Creates a 3D flip effect
+
+                    el.style.zIndex = 1000; // Bring to front while moving
+                    let anim = el.animate([
+                        { transform: startTransform },
+                        { transform: 'translate(0px, 0px) scaleX(1)' }
+                    ], {
+                        duration: duration,
+                        easing: 'ease-out'
+                    });
+                    
+                    anim.onfinish = () => { el.style.zIndex = ''; };
+                }
+            }
+        });
+    }
+
+    // --- GAME LOGIC ---
     const SUITS = ['♠', '♥', '♣', '♦'];
     const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
     const COLORS = {'♠': 'black', '♥': 'red', '♣': 'black', '♦': 'red'};
@@ -193,9 +288,27 @@
     let foundations = [[], [], [], []];
     let tableau = [[], [], [], [], [], [], []];
     
-    let historyStack = []; // Unlimited undo history
+    let historyStack = [];
     let autoFinishing = false;
     let autoFinishInterval = null;
+
+    function handleNewGame() {
+        initAudio();
+        
+        // Faking old positions to make cards "fly" out of the stock pile
+        let stockRect = document.getElementById('stock').getBoundingClientRect();
+        let fakeOldPos = {};
+        
+        SUITS.forEach(suit => {
+            RANKS.forEach(r => {
+                fakeOldPos[`${r}-${suit}`] = { rect: stockRect, isFaceUp: false };
+            });
+        });
+
+        initGame();
+        playSound('move');
+        requestAnimationFrame(() => playAnimations(fakeOldPos, 400));
+    }
 
     function initGame() {
         autoFinishing = false;
@@ -209,17 +322,22 @@
         let deck = [];
         for (let suit of SUITS) {
             for (let r = 0; r < RANKS.length; r++) {
-                deck.push({ suit: suit, rank: RANKS[r], rankVal: r + 1, color: COLORS[suit], faceUp: false });
+                deck.push({ 
+                    id: `${RANKS[r]}-${suit}`, 
+                    suit: suit, 
+                    rank: RANKS[r], 
+                    rankVal: r + 1, 
+                    color: COLORS[suit], 
+                    faceUp: false 
+                });
             }
         }
 
-        // Shuffle
         for (let i = deck.length - 1; i > 0; i--) {
             let j = Math.floor(Math.random() * (i + 1));
             [deck[i], deck[j]] = [deck[j], deck[i]];
         }
 
-        // Deal to Tableau
         for (let i = 0; i < 7; i++) {
             for (let j = i; j < 7; j++) {
                 let card = deck.pop();
@@ -228,10 +346,9 @@
             }
         }
         stock = deck;
-        updateGame();
+        render();
     }
 
-    // --- UNDO LOGIC ---
     function cloneState() {
         return {
             stock: stock.map(c => ({...c})),
@@ -245,23 +362,28 @@
         historyStack.push(cloneState());
     }
 
-    function undo() {
+    function handleUndo() {
+        initAudio();
         if (autoFinishing || historyStack.length === 0) return;
         
+        let oldPos = capturePositions();
         let prevState = historyStack.pop();
+        
         stock = prevState.stock;
         waste = prevState.waste;
         foundations = prevState.foundations;
         tableau = prevState.tableau;
         
-        render(); // Render restores without triggering auto-flips or auto-finish
+        playSound('move');
+        render();
+        requestAnimationFrame(() => playAnimations(oldPos));
     }
-    // ------------------
 
     function createCardDOM(card, index, pileId) {
         let div = document.createElement('div');
         div.className = 'card ' + (card.faceUp ? card.color : 'back');
         div.dataset.index = index;
+        div.dataset.id = card.id;
 
         if (card.faceUp) {
             let tl = document.createElement('div');
@@ -286,7 +408,6 @@
     function render() {
         document.querySelectorAll('.pile').forEach(p => p.innerHTML = '');
 
-        // Render Stock
         let stockEl = document.getElementById('stock');
         if (stock.length > 0) {
             stockEl.style.backgroundColor = 'transparent';
@@ -295,12 +416,10 @@
             stockEl.innerHTML = '<div class="reset-icon">↻</div>';
         }
 
-        // Render Waste
         if (waste.length > 0) {
             document.getElementById('waste').appendChild(createCardDOM(waste[waste.length - 1], waste.length - 1, 'waste'));
         }
 
-        // Render Foundations
         for (let i = 0; i < 4; i++) {
             let fPile = foundations[i];
             if (fPile.length > 0) {
@@ -308,7 +427,6 @@
             }
         }
 
-        // Render Tableau
         for (let i = 0; i < 7; i++) {
             let tEl = document.getElementById('t' + i);
             let tPile = tableau[i];
@@ -316,30 +434,15 @@
             for (let j = 0; j < tPile.length; j++) {
                 let c = tPile[j];
                 let cardDOM = createCardDOM(c, j, 't' + i);
-                // Use percentages for positioning so it scales perfectly on mobile
                 cardDOM.style.top = currentTop + '%';
                 tEl.appendChild(cardDOM);
-                currentTop += c.faceUp ? 23 : 13; // Percentage offset
+                currentTop += c.faceUp ? 23 : 13;
             }
         }
 
-        // Update Undo button state
         document.getElementById('undo-btn').disabled = historyStack.length === 0 || autoFinishing;
     }
 
-    function updateGame() {
-        // Auto-flip bottom of tableau
-        for (let i = 0; i < 7; i++) {
-            let t = tableau[i];
-            if (t.length > 0 && !t[t.length - 1].faceUp) {
-                t[t.length - 1].faceUp = true;
-            }
-        }
-        render();
-        setTimeout(checkAutoFinish, 100);
-    }
-
-    // Rules
     function canMoveToFoundation(card, fPile) {
         if (fPile.length === 0) return card.rankVal === 1;
         let top = fPile[fPile.length - 1];
@@ -347,21 +450,22 @@
     }
 
     function canMoveToTableau(card, tPile) {
-        if (tPile.length === 0) return card.rankVal === 13; // King limits
+        if (tPile.length === 0) return card.rankVal === 13;
         let top = tPile[tPile.length - 1];
         return top.faceUp && card.color !== top.color && card.rankVal === top.rankVal - 1;
     }
 
-    // Interaction Handler
     document.getElementById('board').addEventListener('click', function(e) {
+        initAudio();
         if (autoFinishing) return;
         
         let cardEl = e.target.closest('.card');
         let pileEl = e.target.closest('.pile');
         
-        // Handle empty stock click
+        let oldPos = capturePositions();
+
         if (pileEl && pileEl.id === 'stock' && !cardEl) {
-            handleStockClick();
+            if(handleStockClick()) finalizeMove(oldPos);
             return;
         }
         
@@ -369,35 +473,56 @@
         
         let pileId = pileEl.id;
         let cardIdx = parseInt(cardEl.dataset.index);
+        let moved = false;
         
         if (pileId === 'stock') {
-            handleStockClick();
+            moved = handleStockClick();
         } else if (pileId === 'waste') {
-            handleCardClick('waste', 0, cardIdx);
+            moved = handleCardClick('waste', 0, cardIdx);
         } else if (pileId.startsWith('t')) {
-            handleCardClick('tableau', parseInt(pileId.substring(1)), cardIdx);
+            moved = handleCardClick('tableau', parseInt(pileId.substring(1)), cardIdx);
         } else if (pileId.startsWith('f')) {
-            handleCardClick('foundation', parseInt(pileId.substring(1)), cardIdx);
+            moved = handleCardClick('foundation', parseInt(pileId.substring(1)), cardIdx);
         }
+
+        if (moved) finalizeMove(oldPos);
+        else playSound('error'); // Play dull blip if clicked card can't move
     });
 
-    function handleStockClick() {
-        if (stock.length === 0 && waste.length === 0) return; // Nothing happens
+    function finalizeMove(oldPos) {
+        // Auto-flip bottom of tableau
+        let flipped = false;
+        for (let i = 0; i < 7; i++) {
+            let t = tableau[i];
+            if (t.length > 0 && !t[t.length - 1].faceUp) {
+                t[t.length - 1].faceUp = true;
+                flipped = true;
+            }
+        }
         
-        saveState(); // Save state before action
+        render();
+        requestAnimationFrame(() => playAnimations(oldPos));
+        setTimeout(checkAutoFinish, 200);
+    }
 
+    function handleStockClick() {
+        if (stock.length === 0 && waste.length === 0) return false;
+        
+        saveState();
         if (stock.length > 0) {
             let c = stock.pop();
             c.faceUp = true;
             waste.push(c);
+            playSound('flip');
         } else {
             while (waste.length > 0) {
                 let c = waste.pop();
                 c.faceUp = false;
                 stock.push(c);
             }
+            playSound('move');
         }
-        updateGame();
+        return true;
     }
 
     function handleCardClick(source, pileIdx, cardIdx) {
@@ -405,13 +530,12 @@
                          source === 'tableau' ? tableau[pileIdx] : foundations[pileIdx];
         
         let card = sourcePile[cardIdx];
-        if (!card.faceUp) return;
+        if (!card.faceUp) return false;
 
         let isTopCard = (cardIdx === sourcePile.length - 1);
         let movingCards = sourcePile.slice(cardIdx);
         let moved = false;
 
-        // 1. Prioritize Foundation
         if (isTopCard) {
             for (let i = 0; i < 4; i++) {
                 if (canMoveToFoundation(card, foundations[i])) {
@@ -423,10 +547,9 @@
             }
         }
 
-        // 2. Fallback to Tableau
         if (!moved) {
             for (let i = 0; i < 7; i++) {
-                if (source === 'tableau' && pileIdx === i) continue; // Skip same pile
+                if (source === 'tableau' && pileIdx === i) continue;
                 if (canMoveToTableau(card, tableau[i])) {
                     saveState();
                     tableau[i].push(...movingCards);
@@ -437,16 +560,16 @@
             }
         }
 
-        if (moved) updateGame();
+        if (moved) playSound('move');
+        return moved;
     }
 
-    // Auto Finish Logic
     function checkAutoFinish() {
         if (autoFinishing) return;
         
-        let win = foundations.every(f => f.length === 13);
-        if (win) {
-            setTimeout(() => alert("Congratulations! You've Won!"), 200);
+        if (foundations.every(f => f.length === 13)) {
+            playSound('win');
+            setTimeout(() => alert("Congratulations! You've Won!"), 500);
             return;
         }
         
@@ -460,15 +583,15 @@
         if (allOpen) {
             autoFinishing = true;
             document.getElementById('undo-btn').disabled = true;
-            autoFinishInterval = setInterval(doAutoFinishStep, 100);
+            autoFinishInterval = setInterval(doAutoFinishStep, 150); // Slightly slower to enjoy the animation
         }
     }
 
     let movesSinceLastFoundation = 0;
     function doAutoFinishStep() {
+        let oldPos = capturePositions();
         let movedToFoundation = false;
         
-        // Try Waste to Foundation
         if (waste.length > 0) {
             let c = waste[waste.length - 1];
             for (let i = 0; i < 4; i++) {
@@ -480,7 +603,6 @@
             }
         }
         
-        // Try Tableau to Foundation
         if (!movedToFoundation) {
             for (let i = 0; i < 7; i++) {
                 if (tableau[i].length > 0) {
@@ -499,37 +621,39 @@
         
         if (movedToFoundation) {
             movesSinceLastFoundation = 0;
+            playSound('flip');
         } else {
             movesSinceLastFoundation++;
-            // Rapid cycle Stock/Waste
             if (stock.length > 0) {
                 let c = stock.pop();
                 c.faceUp = true;
                 waste.push(c);
+                playSound('move');
             } else if (waste.length > 0) {
                 while(waste.length > 0) {
                     let c = waste.pop();
                     c.faceUp = false;
                     stock.push(c);
                 }
+                playSound('move');
             }
         }
         
         render();
+        requestAnimationFrame(() => playAnimations(oldPos, 100)); // Faster animation for auto-finish
         
-        let win = foundations.every(f => f.length === 13);
-        if (win) {
+        if (foundations.every(f => f.length === 13)) {
             clearInterval(autoFinishInterval);
-            setTimeout(() => alert("Congratulations! You've Won!"), 200);
+            playSound('win');
+            setTimeout(() => alert("Congratulations! You've Won!"), 1000);
         } else if (movesSinceLastFoundation > 150) {
-            // Failsafe exit to prevent infinite loop
             clearInterval(autoFinishInterval);
             autoFinishing = false;
         }
     }
 
-    // Start game on load
-    window.onload = initGame;
+    // Load instantly without sound (waits for user input to start audio)
+    window.onload = () => { initGame(); };
 </script>
 
 </body>
