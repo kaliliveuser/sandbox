@@ -69,13 +69,14 @@
             box-sizing: border-box;
         }
 
-        #stock { grid-column: 1; grid-row: 1; cursor: pointer; }
-        #waste { grid-column: 2; grid-row: 1; }
-        .spacer { grid-column: 3; grid-row: 1; border: none; }
-        #f0 { grid-column: 4; grid-row: 1; }
-        #f1 { grid-column: 5; grid-row: 1; }
-        #f2 { grid-column: 6; grid-row: 1; }
-        #f3 { grid-column: 7; grid-row: 1; }
+        /* Top Row Grid Positioning (Waste next to Stock, Spacer in between Foundations) */
+        #f0 { grid-column: 1; grid-row: 1; }
+        #f1 { grid-column: 2; grid-row: 1; }
+        #f2 { grid-column: 3; grid-row: 1; }
+        #f3 { grid-column: 4; grid-row: 1; }
+        .spacer { grid-column: 5; grid-row: 1; border: none; }
+        #waste { grid-column: 6; grid-row: 1; }
+        #stock { grid-column: 7; grid-row: 1; cursor: pointer; }
         
         #t0 { grid-column: 1; grid-row: 2; margin-top: 1.5vw; }
         #t1 { grid-column: 2; grid-row: 2; margin-top: 1.5vw; }
@@ -154,13 +155,13 @@
     </div>
     
     <div id="board">
-        <div id="stock" class="pile"></div>
-        <div id="waste" class="pile"></div>
-        <div class="spacer pile"></div>
         <div id="f0" class="pile foundation"></div>
         <div id="f1" class="pile foundation"></div>
         <div id="f2" class="pile foundation"></div>
         <div id="f3" class="pile foundation"></div>
+        <div class="spacer pile"></div>
+        <div id="waste" class="pile"></div>
+        <div id="stock" class="pile"></div>
         
         <div id="t0" class="pile tableau"></div>
         <div id="t1" class="pile tableau"></div>
@@ -194,7 +195,6 @@
         gain.connect(audioCtx.destination);
 
         if (type === 'move') {
-            // Soft slide/thud
             osc.type = 'sine';
             osc.frequency.setValueAtTime(150, now);
             osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
@@ -203,7 +203,6 @@
             osc.start(now);
             osc.stop(now + 0.1);
         } else if (type === 'flip') {
-            // Sharp snap
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(300, now);
             gain.gain.setValueAtTime(0.2, now);
@@ -211,7 +210,6 @@
             osc.start(now);
             osc.stop(now + 0.05);
         } else if (type === 'error') {
-            // Dull blip
             osc.type = 'square';
             osc.frequency.setValueAtTime(100, now);
             gain.gain.setValueAtTime(0.1, now);
@@ -219,7 +217,6 @@
             osc.start(now);
             osc.stop(now + 0.1);
         } else if (type === 'win') {
-            // Victory Chime Arpeggio
             const notes = [300, 400, 500, 600, 800, 1000];
             notes.forEach((freq, i) => {
                 const o = audioCtx.createOscillator();
@@ -262,9 +259,9 @@
                 
                 if (dx !== 0 || dy !== 0 || flipped) {
                     let startTransform = `translate(${dx}px, ${dy}px)`;
-                    if (flipped) startTransform += ' scaleX(0)'; // Creates a 3D flip effect
+                    if (flipped) startTransform += ' scaleX(0)'; 
 
-                    el.style.zIndex = 1000; // Bring to front while moving
+                    el.style.zIndex = 1000; 
                     let anim = el.animate([
                         { transform: startTransform },
                         { transform: 'translate(0px, 0px) scaleX(1)' }
@@ -295,7 +292,6 @@
     function handleNewGame() {
         initAudio();
         
-        // Faking old positions to make cards "fly" out of the stock pile
         let stockRect = document.getElementById('stock').getBoundingClientRect();
         let fakeOldPos = {};
         
@@ -416,8 +412,22 @@
             stockEl.innerHTML = '<div class="reset-icon">↻</div>';
         }
 
+        let wasteEl = document.getElementById('waste');
         if (waste.length > 0) {
-            document.getElementById('waste').appendChild(createCardDOM(waste[waste.length - 1], waste.length - 1, 'waste'));
+            // Fanning the last 3 cards leftwards into the spacer column
+            let startIdx = Math.max(0, waste.length - 3);
+            let maxOffset = waste.length - 1 - startIdx;
+            
+            for (let i = startIdx; i < waste.length; i++) {
+                let c = waste[i];
+                let cardDOM = createCardDOM(c, i, 'waste');
+                
+                // Oldest cards push left (higher right percentage), latest stays on the waste pile bounds (right: 0%)
+                let currentOffset = maxOffset - (i - startIdx);
+                cardDOM.style.right = (currentOffset * 30) + '%'; 
+                
+                wasteEl.appendChild(cardDOM);
+            }
         }
 
         for (let i = 0; i < 4; i++) {
@@ -486,11 +496,10 @@
         }
 
         if (moved) finalizeMove(oldPos);
-        else playSound('error'); // Play dull blip if clicked card can't move
+        else playSound('error'); 
     });
 
     function finalizeMove(oldPos) {
-        // Auto-flip bottom of tableau
         let flipped = false;
         for (let i = 0; i < 7; i++) {
             let t = tableau[i];
@@ -533,6 +542,10 @@
         if (!card.faceUp) return false;
 
         let isTopCard = (cardIdx === sourcePile.length - 1);
+        
+        // Prevent moving underlying cards from waste or foundation
+        if ((source === 'waste' || source === 'foundation') && !isTopCard) return false;
+
         let movingCards = sourcePile.slice(cardIdx);
         let moved = false;
 
@@ -569,7 +582,10 @@
         
         if (foundations.every(f => f.length === 13)) {
             playSound('win');
-            setTimeout(() => alert("Congratulations! You've Won!"), 500);
+            setTimeout(() => {
+                alert("Congratulations! You've Won!");
+                handleNewGame(); // Start new game automatically after OK is clicked
+            }, 500);
             return;
         }
         
@@ -583,7 +599,7 @@
         if (allOpen) {
             autoFinishing = true;
             document.getElementById('undo-btn').disabled = true;
-            autoFinishInterval = setInterval(doAutoFinishStep, 150); // Slightly slower to enjoy the animation
+            autoFinishInterval = setInterval(doAutoFinishStep, 150); 
         }
     }
 
@@ -640,19 +656,21 @@
         }
         
         render();
-        requestAnimationFrame(() => playAnimations(oldPos, 100)); // Faster animation for auto-finish
+        requestAnimationFrame(() => playAnimations(oldPos, 100)); 
         
         if (foundations.every(f => f.length === 13)) {
             clearInterval(autoFinishInterval);
             playSound('win');
-            setTimeout(() => alert("Congratulations! You've Won!"), 1000);
+            setTimeout(() => {
+                alert("Congratulations! You've Won!");
+                handleNewGame(); // Start new game automatically after OK is clicked
+            }, 1000);
         } else if (movesSinceLastFoundation > 150) {
             clearInterval(autoFinishInterval);
             autoFinishing = false;
         }
     }
 
-    // Load instantly without sound (waits for user input to start audio)
     window.onload = () => { initGame(); };
 </script>
 
