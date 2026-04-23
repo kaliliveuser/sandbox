@@ -221,17 +221,22 @@ Voyus Ltd. / GT Networks Inc.
 • Contracted by law firms to customize their databases.
 • Created Palm applications for e.g. the hospitality industry and construction industry.
 
+Technician
+Wainbee Ltd.
+1994 - 1997 · 3 yrs
+• Designed industrial systems controlling hydraulic, pneumatic and electrical actuators
+
+Education
+
+• University of British Columbia - Mechanical Engineering 1989-1992
+• British Columbia Institute of Technology - Graduated with Honours in Mechanical Systems 1992-1994
+
 Volunteer work
-• Cloud Summit Vancouver 2024 & 2026 (Volunteer Committee Member - Speakers and Community)
+
+• Cloud Summit Vancouver 2026 (Volunteer Committee Member - Speakers and Community)
 • CENGN, a non-profit organization that helps Canadian technology companies commercialize new solutions.
 • Imaging the World, a non-profit organization that provides diagnostic imaging, primarily portable ultrasound, to underserved rural communities in countries like those in sub-Saharan Africa.
 
-Attended
-• Data science reading group
-• IP / Legal / entrepreneurial seminars
-• AI related events
-• Google, Amazon, Microsoft events
-• Hacker events
 </resume>
 
 <jd>
