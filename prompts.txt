@@ -250,3 +250,10 @@ Job Fair Variant
 
 Using my current resume, write a modern one-page ATS-compatible resume that generalizes for the following list of companies. Provide a short professional summary at the top. List relevant positions in full then summarize the remaining companies in one entry. Do not add skills that aren't already listed in the original resume. Collect relevant skills in their own section. Then, write a matching cover letter. Finally list 30 interview questions relevant to this role and potential answers. Provide no explanation or preamble. Make no comments after.
 
+---
+
+Resume webpage
+
+Create a single-file webpage that emulates a Linux terminal that displays my current resume. Give it a military style (i.e. military green text on black background) with scan lines and CRT flckering effects. Allow the user to enter common commands, but return humorous, snarky comments embedded in realistic outputs.
+<resume>
+</resume>
