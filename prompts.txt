@@ -254,7 +254,7 @@ Using my current resume, write a modern one-page ATS-compatible resume that gene
 
 Resume webpage
 
-Create a single-file responsive webpage that emulates a Linux terminal that displays my current resume in a professional, easy-to-read format. Give it a military style (i.e. military green text on black background) with scan lines and CRT effects (not too distracting). Allow the user to enter many typical commands, but return humorous, wickedly snarky comments embedded in realistic outputs. Add many (i.e. 20) funny files to the current directory. Implement filename autocomplete with the tab key. Also implement the up and down arrows for command history. The audience of this is Michael's friends, new contacts. This is not meant for recruiters, business partners or investors, so be as snarky as you possibly can be.
+Create a single-file responsive webpage that emulates a Linux terminal that displays my current resume in a professional, easy-to-read format. Give it a military style (i.e. military green text on black background) with scan lines and CRT effects (not too distracting). Allow the user to enter many typical commands, but return humorous, wickedly snarky comments embedded in realistic outputs. Add many (i.e. 20) funny files to the current directory. Implement filename autocomplete with the tab key. Also implement the up and down arrows for command history. The audience of this is Michael's friends and new contacts. This is not meant for recruiters, business partners or investors, so be as snarky as you possibly can be.
 
 <resume>
 </resume>
