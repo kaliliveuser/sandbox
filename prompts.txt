@@ -119,11 +119,10 @@ Vancouver, Canada Area
 • Developing real-time, reinforcement-learning architectures that dynamically models its environment internally and self-organizes through evolutionary algorithms.
 Skills: Artificial Intelligence
 
-CTO and Head of AI R&D
+Head of AI R&D
 DataSolve Inc · Full-time
 Feb 2024 - Apr 2026
-Manila, National Capital Region, Philippines · Hybrid
-• Developed and applied AI technology in the Philippines.
+• I create custom workflows specializing in air-gapped, secure, local LLMs.
 • Solutions included analytics, cybersecurity and voice/vision interfaces
 Skills: Artificial Intelligence (AI) · Python (Programming Language) · C++ · JavaScript
 
