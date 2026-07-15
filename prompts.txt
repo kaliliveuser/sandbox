@@ -27,6 +27,10 @@ Create a single-file web page that has the game Asteroids. Make it look exactly 
 
 ---
 
+Create a single-file webpage with the game breakout. Make it in the style of a 80s arcade game.
+
+---
+
 Create a single-file web page that has the game "Lunar Lander".   
 
 ---
