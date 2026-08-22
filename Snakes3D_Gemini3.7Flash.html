@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>3D Snakes - Nokia N-Gage Retro Edition</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    font-family: 'Share Tech Mono', monospace;
+    color: #fff;
+    touch-action: none;
+  }
+
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+  }
+
+  canvas.webgl-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* HUD LAYER */
+  .hud-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* TOP LEFT: LIVES & SECTOR */
+  .hud-lives {
+    position: absolute;
+    top: 18px;
+    left: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 15, 30, 0.85);
+    border: 2px solid #00ffff;
+    padding: 6px 14px;
+    border-radius: 4px;
+    box-shadow: 0 0 14px rgba(0, 255, 255, 0.4);
+  }
+
+  .hud-lives .s-badge {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #ff3333;
+    background: #2a0000;
+    border: 1.5px solid #ff4444;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-shadow: 0 0 6px #ff0000;
+  }
+
+  .hud-lives .lives-count {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+
+  .hud-lives .lives-label {
+    font-size: 11px;
+    color: #88c0d0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* TOP CENTER: SCORE & EVOLUTION PROGRESS */
+  .hud-top-center {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 340px;
+    max-width: 90vw;
+  }
+
+  .score-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 10, 25, 0.85);
+    border: 2px solid #4080ff;
+    padding: 4px 12px;
+    box-shadow: 0 0 12px rgba(64, 128, 255, 0.4);
+  }
+
+  .digit-slot {
+    font-family: 'Orbitron', monospace;
+    font-size: 26px;
+    font-weight: 900;
+    color: #ffffff;
+    width: 22px;
+    text-align: center;
+    text-shadow: 0 0 8px #ffffff;
+  }
+
+  .mult-slot {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #00ffff;
+    margin-left: 8px;
+    text-shadow: 0 0 8px #00ffff;
+  }
+
+  .evo-bar-container {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background: #00122e;
+    border: 2px solid #204588;
+    margin-top: 6px;
+    box-shadow: 0 0 10px rgba(0, 100, 255, 0.5);
+  }
+
+  .evo-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #1b5fe0, #40a0ff, #00f0ff);
+    box-shadow: 0 0 10px #2b7fff;
+    transition: width 0.15s ease-out;
+  }
+
+  .target-indicator {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 11px solid #00ff66;
+    filter: drop-shadow(0 0 6px #00ff66);
+    animation: bounce 0.8s infinite alternate ease-in-out;
+  }
+
+  @keyframes bounce {
+    from { transform: translateX(-50%) translateY(0); }
+    to { transform: translateX(-50%) translateY(4px); }
+  }
+
+  /* CRASH & SHIELD NOTIFICATIONS */
+  .crash-alert {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(180, 0, 0, 0.92);
+    border: 3px solid #ff4444;
+    padding: 16px 36px;
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-align: center;
+    box-shadow: 0 0 30px #ff0000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 60;
+  }
+
+  .crash-alert.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .shield-indicator {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #00ffea;
+    text-shadow: 0 0 8px #00ffea;
+    background: rgba(0, 40, 60, 0.8);
+    border: 1px solid #00ffea;
+    padding: 3px 12px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .shield-indicator.active { opacity: 1; }
+
+  /* SOUND TOGGLE */
+  .audio-toggle {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 12px;
+    background: rgba(0, 20, 40, 0.85);
+    border: 1.5px solid #00aaff;
+    color: #a0e0ff;
+    padding: 6px 14px;
+    cursor: pointer;
+    pointer-events: auto;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    box-shadow: 0 0 8px rgba(0, 170, 255, 0.3);
+    outline: none;
+    z-index: 55;
+    touch-action: manipulation;
+  }
+
+  /* BOTTOM LEFT: RADAR */
+  .hud-radar {
+    position: absolute;
+    bottom: 24px;
+    left: 22px;
+    width: 86px;
+    height: 86px;
+    background: radial-gradient(circle, #091f2c 0%, #000913 85%);
+    border: 3px solid #66b3dd;
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(100, 200, 255, 0.45);
+    overflow: hidden;
+  }
+
+  #radar-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* BOTTOM RIGHT: BOOST GAUGE */
+  .hud-boost {
+    position: absolute;
+    bottom: 24px;
+    right: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .boost-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffaa00;
+    letter-spacing: 2px;
+    text-shadow: 0 0 6px #ff8800;
+  }
+
+  .boost-gauge-frame {
+    width: 150px;
+    height: 22px;
+    background: #000000;
+    border: 2px solid #e09f2d;
+    transform: skewX(-20deg);
+    padding: 2px;
+    box-shadow: 0 0 12px rgba(224, 159, 45, 0.6);
+    overflow: hidden;
+  }
+
+  .boost-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff6600, #ffaa00 50%, #00f0ff);
+    box-shadow: 0 0 10px #00aaff;
+    transition: width 0.1s linear;
+  }
+
+  /* FULLSCREEN MENUS */
+  .screen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    backdrop-filter: blur(6px);
+    transition: opacity 0.25s ease;
+    touch-action: auto;
+  }
+
+  .screen-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .game-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 54px;
+    font-weight: 900;
+    color: #ff2020;
+    text-shadow: 0 0 25px #ff0000, 0 0 45px #ff3300, 4px 4px 0 #fff;
+    margin-bottom: 6px;
+    text-align: center;
+    letter-spacing: 6px;
+  }
+
+  .game-subtitle {
+    font-size: 15px;
+    color: #00ffff;
+    letter-spacing: 5px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px #00ffff;
+  }
+
+  .menu-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(180deg, #ff2222, #990000);
+    color: #fff;
+    border: 2px solid #ffffff;
+    padding: 14px 38px;
+    margin: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+    outline: none;
+    touch-action: manipulation;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .menu-btn .key-hint {
+    font-size: 12px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #00ffff;
+  }
+
+  .menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 50, 50, 0.9);
+  }
+  .menu-btn:active {
+    transform: scale(0.96);
+    background: linear-gradient(180deg, #bb0000, #550000);
+  }
+
+  .instructions {
+    margin-top: 25px;
+    font-size: 14px;
+    color: #a0d8ef;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 460px;
+    background: rgba(0, 20, 40, 0.75);
+    border: 1px solid #1e5577;
+    padding: 14px 22px;
+    border-radius: 4px;
+  }
+
+  .instructions kbd {
+    background: #1a3045;
+    border: 1px solid #4a8ca5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* ON-SCREEN MOBILE CONTROLS */
+  .mobile-controls {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    width: 100%;
+    display: none;
+    justify-content: space-between;
+    padding: 0 24px;
+    pointer-events: none;
+    z-index: 150;
+  }
+
+  @media (pointer: coarse), (max-width: 800px) {
+    .mobile-controls {
+      display: flex;
+    }
+    .hud-radar {
+      bottom: 120px;
+    }
+    .hud-boost {
+      bottom: 120px;
+    }
+  }
+
+  .touch-group {
+    display: flex;
+    gap: 14px;
+    pointer-events: auto;
+  }
+
+  .touch-btn {
+    width: 68px;
+    height: 68px;
+    background: rgba(10, 30, 50, 0.85);
+    border: 2px solid #00ffff;
+    border-radius: 50%;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0,255,255,0.4);
+    cursor: pointer;
+    outline: none;
+    touch-action: manipulation;
+  }
+
+  .touch-btn:active {
+    background: rgba(0, 255, 255, 0.4);
+    transform: scale(0.92);
+  }
+
+  .touch-btn.boost {
+    border-color: #ffaa00;
+    color: #ffaa00;
+    box-shadow: 0 0 10px rgba(255,170,0,0.4);
+    font-size: 15px;
+  }
+  .touch-btn.boost:active {
+    background: rgba(255, 170, 0, 0.4);
+  }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+  <!-- HUD LAYER -->
+  <div class="hud-layer">
+    <!-- Top-Left: LIVES Counter & Sector -->
+    <div class="hud-lives">
+      <span class="s-badge">S</span>
+      <div>
+        <div class="lives-count" id="lives-display">5</div>
+        <div class="lives-label" id="sector-label">SECTOR 1</div>
+      </div>
+    </div>
+
+    <!-- Top-Center: Score & Evolution Progress -->
+    <div class="hud-top-center">
+      <div class="score-box">
+        <span class="digit-slot" id="d0">0</span>
+        <span class="digit-slot" id="d1">0</span>
+        <span class="digit-slot" id="d2">0</span>
+        <span class="digit-slot" id="d3">0</span>
+        <span class="digit-slot" id="d4">0</span>
+        <span class="digit-slot" id="d5">0</span>
+        <span class="mult-slot" id="mult-text">&times;1</span>
+      </div>
+      <div class="evo-bar-container">
+        <div class="evo-bar-fill" id="evo-bar"></div>
+        <div class="target-indicator"></div>
+      </div>
+      <div class="shield-indicator" id="shield-indicator">SPAWN SHIELD ACTIVE</div>
+    </div>
+
+    <!-- Crash Banner Notification -->
+    <div class="crash-alert" id="crash-alert">CRASHED! -1 LIFE</div>
+
+    <!-- Top-Right: Sound -->
+    <button class="audio-toggle" id="audio-toggle">SOUND: ON</button>
+
+    <!-- Bottom-Left: Mini Radar -->
+    <div class="hud-radar">
+      <canvas id="radar-canvas" width="86" height="86"></canvas>
+    </div>
+
+    <!-- Bottom-Right: Boost Meter -->
+    <div class="hud-boost">
+      <div class="boost-label">TURBO BOOST</div>
+      <div class="boost-gauge-frame">
+        <div class="boost-fill" id="boost-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile / Touch Controls -->
+  <div class="mobile-controls">
+    <div class="touch-group">
+      <div class="touch-btn" id="btn-left">&ltrif;</div>
+      <div class="touch-btn" id="btn-right">&rtrif;</div>
+    </div>
+    <div class="touch-group">
+      <div class="touch-btn boost" id="btn-boost">BOOST</div>
+    </div>
+  </div>
+
+  <!-- Fullscreen UI Menus -->
+  <div class="screen-overlay" id="menu-screen">
+    <h1 class="game-title">SNAKES</h1>
+    <div class="game-subtitle">N-GAGE 3D CLASSIC</div>
+    <button class="menu-btn" id="start-btn">
+      START MISSION <span class="key-hint">[ENTER]</span>
+    </button>
+    <div class="instructions">
+      <p><b>[ &larr; / &rarr; ]</b> or <b>[ A / D ]</b> : Steer Left / Right</p>
+      <p><b>[ &uarr; ]</b> or <b>[ SPACE / W ]</b> : Turbo Boost</p>
+      <p><b>[ ENTER / SPACE ]</b> : Advance / Retry / Start</p>
+      <p><b>[ C ]</b> : Toggle Camera Angle</p>
+      <p style="margin-top:8px; color:#00ffaa;">Collect green gems & power trails to complete each sector!</p>
+    </div>
+  </div>
+
+  <div class="screen-overlay hidden" id="gameover-screen">
+    <h1 class="game-title" style="color: #ff3333; text-shadow: 0 0 25px #ff0000;">TERMINATED</h1>
+    <div class="game-subtitle" id="final-stats">SCORE: 000000</div>
+    <button class="menu-btn" id="retry-btn">
+      RETRY SECTOR <span class="key-hint">[ENTER / R]</span>
+    </button>
+    <button class="menu-btn" id="restart-btn" style="background: linear-gradient(180deg, #444, #222); border-color:#888; font-size:15px; margin-top:4px;">
+      RESTART FROM SECTOR 1
+    </button>
+  </div>
+
+  <div class="screen-overlay hidden" id="victory-screen">
+    <h1 class="game-title" style="color: #00ffaa; text-shadow: 0 0 25px #00ffaa;">STAGE CLEARED</h1>
+    <div class="game-subtitle" id="clear-stats">NEXT SECTOR READY</div>
+    <button class="menu-btn" id="next-btn">
+      NEXT LEVEL <span class="key-hint">[ENTER / SPACE]</span>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   AUDIO SYNTHESIZER
+========================================================================== */
+class SoundSystem {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+  }
+
+  playTone(freq, type = 'square', duration = 0.08, gainVal = 0.12) {
+    if (!this.enabled || !this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  playTurn() {
+    this.playTone(480, 'triangle', 0.04, 0.06);
+  }
+
+  playPickup() {
+    if (!this.enabled || !this.ctx) return;
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+      setTimeout(() => this.playTone(freq, 'sawtooth', 0.08, 0.1), i * 35);
+    });
+  }
+
+  playPathStep() {
+    this.playTone(880 + Math.random() * 200, 'sine', 0.05, 0.08);
+  }
+
+  playBoost() {
+    this.playTone(160, 'sawtooth', 0.08, 0.04);
+  }
+
+  playCrash() {
+    if (!this.enabled || !this.ctx) return;
+    this.playTone(110, 'sawtooth', 0.35, 0.3);
+    this.playTone(60, 'square', 0.45, 0.35);
+  }
+
+  playWin() {
+    if (!this.enabled || !this.ctx) return;
+    [440, 554, 659, 880, 1108].forEach((freq, i) => {
+      setTimeout(() => this.playTone(freq, 'square', 0.15, 0.15), i * 90);
+    });
+  }
+}
+
+const audio = new SoundSystem();
+
+/* ==========================================================================
+   GAME ENGINE & 3D GRAPHICS (Three.js)
+========================================================================== */
+const GRID_SIZE = 36;
+const TILE_SIZE = 2.0;
+
+let scene, camera, renderer;
+let snakeMeshes = [];
+let gridTiles = [];
+let obstacleMeshes = [];
+let itemMeshes = [];
+let pathGemMeshes = [];
+
+// Game state
+let level = 1;
+let score = 0;
+let multiplier = 1;
+let lives = 5;
+let evoPower = 100;
+let boostEnergy = 100;
+let isBoosting = false;
+let isGameOver = false;
+let isPlaying = false;
+let isRespawning = false;
+let isInvulnerable = false;
+let respawnTimeout = null;
+let cameraMode = 0;
+
+// Snake logic state
+let snake = [];
+let currentDir = { x: 0, z: -1 };
+let nextTurn = null;
+let moveSpeed = 5.6;
+let boostMultiplier = 1.75;
+let snakeHeadPos = { x: 0, z: 0 };
+let currentTargetItem = null;
+
+const LEVELS = [
+  {
+    name: "Sector 1 - Inception",
+    obstacles: [
+      { x: -10, z: -6, w: 2, l: 12, type: 'pyramid_wall' },
+      { x: 8, z: -6, w: 2, l: 12, type: 'pyramid_wall' },
+      { x: -6, z: -10, w: 12, l: 2, type: 'pyramid_wall' },
+      { x: -10, z: 8, w: 5, l: 4, type: 'pyramid_block' },
+      { x: 5, z: 8, w: 5, l: 4, type: 'pyramid_block' }
+    ]
+  },
+  {
+    name: "Sector 2 - Matrix Labyrinth",
+    obstacles: [
+      { x: -12, z: -12, w: 24, l: 2, type: 'pyramid_wall' },
+      { x: -12, z: -4, w: 7, l: 2, type: 'pyramid_wall' },
+      { x: 5, z: -4, w: 7, l: 2, type: 'pyramid_wall' },
+      { x: -12, z: 2, w: 7, l: 2, type: 'pyramid_wall' },
+      { x: 5, z: 2, w: 7, l: 2, type: 'pyramid_wall' },
+      { x: -10, z: 7, w: 5, l: 5, type: 'pyramid_block' },
+      { x: 5, z: 7, w: 5, l: 5, type: 'pyramid_block' }
+    ]
+  },
+  {
+    name: "Sector 3 - Subsonic Hex",
+    obstacles: [
+      { x: -14, z: -10, w: 8, l: 2, type: 'pyramid_wall' },
+      { x: 6, z: -10, w: 8, l: 2, type: 'pyramid_wall' },
+      { x: -14, z: -2, w: 8, l: 2, type: 'pyramid_wall' },
+      { x: 6, z: -2, w: 8, l: 2, type: 'pyramid_wall' },
+      { x: -10, z: -8, w: 4, l: 4, type: 'pyramid_block' },
+      { x: 6, z: -8, w: 4, l: 4, type: 'pyramid_block' },
+      { x: -12, z: 6, w: 6, l: 5, type: 'pyramid_block' },
+      { x: 6, z: 6, w: 6, l: 5, type: 'pyramid_block' }
+    ]
+  }
+];
+
+function initThree() {
+  const container = document.getElementById('game-container');
+  
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+  scene.fog = new THREE.FogExp2(0x000208, 0.015);
+
+  camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
+  
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.domElement.className = "webgl-canvas";
+  container.appendChild(renderer.domElement);
+
+  const ambientLight = new THREE.AmbientLight(0x223344, 1.4);
+  scene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(20, 40, 20);
+  scene.add(dirLight);
+
+  const snakePointLight = new THREE.PointLight(0xff3333, 2.5, 20);
+  snakePointLight.position.set(0, 3, 0);
+  scene.add(snakePointLight);
+  scene.snakeLight = snakePointLight;
+
+  buildFloorGrid();
+  buildBoundaryWalls();
+  loadLevel(level);
+
+  window.addEventListener('resize', onWindowResize);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function buildFloorGrid() {
+  const group = new THREE.Group();
+  const tileGeo = new THREE.BoxGeometry(TILE_SIZE * 0.90, 0.2, TILE_SIZE * 0.90);
+  
+  for (let gx = 0; gx < GRID_SIZE; gx++) {
+    for (let gz = 0; gz < GRID_SIZE; gz++) {
+      const worldX = (gx - GRID_SIZE / 2 + 0.5) * TILE_SIZE;
+      const worldZ = (gz - GRID_SIZE / 2 + 0.5) * TILE_SIZE;
+
+      const u = gx / GRID_SIZE;
+      const v = gz / GRID_SIZE;
+      
+      const r = Math.sin(u * Math.PI) * 0.05;
+      const g = 0.22 + 0.68 * (1.0 - Math.abs(u - 0.5) * 1.4) * (1.0 - Math.abs(v - 0.5) * 1.2);
+      const b = 0.3 + 0.65 * (1.0 - u);
+
+      const tileMat = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(r, g, b),
+        specular: 0x224433,
+        shininess: 30,
+        flatShading: true
+      });
+
+      const mesh = new THREE.Mesh(tileGeo, tileMat);
+      mesh.position.set(worldX, -0.1, worldZ);
+
+      const wireGeo = new THREE.EdgesGeometry(tileGeo);
+      const wireMat = new THREE.LineBasicMaterial({ color: 0x051a14, linewidth: 1 });
+      mesh.add(new THREE.LineSegments(wireGeo, wireMat));
+
+      mesh.userData = { gx, gz, originalColor: new THREE.Color(r, g, b), activeTimer: 0 };
+      group.add(mesh);
+      gridTiles.push(mesh);
+    }
+  }
+
+  const basinGeo = new THREE.BoxGeometry(GRID_SIZE * TILE_SIZE + 4, 1, GRID_SIZE * TILE_SIZE + 4);
+  const basinMat = new THREE.MeshBasicMaterial({ color: 0x000810 });
+  const basin = new THREE.Mesh(basinGeo, basinMat);
+  basin.position.set(0, -0.7, 0);
+  group.add(basin);
+
+  scene.add(group);
+}
+
+function buildBoundaryWalls() {
+  const wallGroup = new THREE.Group();
+  const half = (GRID_SIZE / 2) * TILE_SIZE;
+  const wallHeight = 1.8;
+  const wallThick = 0.6;
+  const len = GRID_SIZE * TILE_SIZE;
+
+  const wallMat = new THREE.MeshPhongMaterial({
+    color: 0x003366,
+    emissive: 0x001133,
+    specular: 0x00ffff,
+    shininess: 60,
+    transparent: true,
+    opacity: 0.8
+  });
+
+  const edgeLineMat = new THREE.LineBasicMaterial({ color: 0x00f0ff, linewidth: 2 });
+
+  const configs = [
+    { x: 0, z: -half, w: len, d: wallThick },
+    { x: 0, z: half, w: len, d: wallThick },
+    { x: -half, z: 0, w: wallThick, d: len },
+    { x: half, z: 0, w: wallThick, d: len }
+  ];
+
+  configs.forEach(c => {
+    const geo = new THREE.BoxGeometry(c.w, wallHeight, c.d);
+    const wall = new THREE.Mesh(geo, wallMat);
+    wall.position.set(c.x, wallHeight / 2, c.z);
+
+    const edges = new THREE.EdgesGeometry(geo);
+    wall.add(new THREE.LineSegments(edges, edgeLineMat));
+
+    wallGroup.add(wall);
+  });
+
+  scene.add(wallGroup);
+}
+
+function createSnakeHeadGeometry() {
+  const geo = new THREE.ConeGeometry(0.85, 1.9, 6);
+  geo.rotateX(Math.PI / 2);
+  return geo;
+}
+
+function createSnakeBodyGeometry(scale = 1.0) {
+  const geo = new THREE.OctahedronGeometry(0.8 * scale, 0);
+  geo.scale(1, 0.75, 1.25);
+  return geo;
+}
+
+function createSegmentMesh(isHead = false, scale = 1.0) {
+  const group = new THREE.Group();
+  
+  const geo = isHead ? createSnakeHeadGeometry() : createSnakeBodyGeometry(scale);
+  const mat = new THREE.MeshPhongMaterial({
+    color: 0xee1515,
+    emissive: 0x440000,
+    specular: 0xffffff,
+    shininess: 85,
+    flatShading: true
+  });
+
+  const mesh = new THREE.Mesh(geo, mat);
+  group.add(mesh);
+
+  const edges = new THREE.EdgesGeometry(geo);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  group.add(new THREE.LineSegments(edges, lineMat));
+
+  return group;
+}
+
+function loadLevel(lvlIndex) {
+  obstacleMeshes.forEach(o => scene.remove(o));
+  obstacleMeshes = [];
+
+  const lvlData = LEVELS[(lvlIndex - 1) % LEVELS.length];
+  evoPower = 100;
+  updateHUD();
+
+  const purpleMat = new THREE.MeshPhongMaterial({
+    color: 0x8a1c99,
+    emissive: 0x22002b,
+    specular: 0xd866ff,
+    shininess: 50,
+    flatShading: true
+  });
+
+  lvlData.obstacles.forEach(obs => {
+    for (let ix = 0; ix < obs.w; ix++) {
+      for (let iz = 0; iz < obs.l; iz++) {
+        const gx = obs.x + ix;
+        const gz = obs.z + iz;
+        const wx = gx * TILE_SIZE;
+        const wz = gz * TILE_SIZE;
+
+        let geo;
+        if (obs.type === 'pyramid_wall') {
+          geo = new THREE.ConeGeometry(TILE_SIZE * 0.55, 1.8, 4);
+          geo.rotateY(Math.PI / 4);
+        } else {
+          geo = new THREE.CylinderGeometry(0.5, TILE_SIZE * 0.5, 2.0, 4);
+          geo.rotateY(Math.PI / 4);
+        }
+
+        const mesh = new THREE.Mesh(geo, purpleMat);
+        mesh.position.set(wx, 0.9, wz);
+
+        const edges = new THREE.EdgesGeometry(geo);
+        mesh.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xff88ff, linewidth: 1.5 })));
+
+        mesh.userData = { gx, gz };
+        scene.add(mesh);
+        obstacleMeshes.push(mesh);
+      }
+    }
+  });
+
+  resetSnake();
+  grantInvulnerability(2000);
+  spawnNextItem();
+}
+
+function grantInvulnerability(durationMs = 2000) {
+  isInvulnerable = true;
+  const shieldEl = document.getElementById('shield-indicator');
+  shieldEl.classList.add('active');
+  
+  setTimeout(() => {
+    isInvulnerable = false;
+    shieldEl.classList.remove('active');
+  }, durationMs);
+}
+
+function resetSnake() {
+  snakeMeshes.forEach(m => scene.remove(m));
+  snakeMeshes = [];
+
+  snake = [];
+  currentDir = { x: 0, z: -1 };
+  nextTurn = null;
+  snakeHeadPos = { x: 0, z: 6 };
+
+  const initialLength = 7;
+  for (let i = 0; i < initialLength; i++) {
+    const pos = { x: snakeHeadPos.x, z: snakeHeadPos.z + i };
+    snake.push(pos);
+
+    const isHead = (i === 0);
+    const scale = THREE.MathUtils.lerp(1.0, 0.45, i / initialLength);
+    const mesh = createSegmentMesh(isHead, scale);
+    mesh.position.set(pos.x * TILE_SIZE, 0.5, pos.z * TILE_SIZE);
+    scene.add(mesh);
+    snakeMeshes.push(mesh);
+  }
+}
+
+function spawnNextItem() {
+  itemMeshes.forEach(m => scene.remove(m));
+  itemMeshes = [];
+  pathGemMeshes.forEach(m => scene.remove(m));
+  pathGemMeshes = [];
+
+  let valid = false;
+  let targetGX = 0, targetGZ = 0;
+  let attempts = 0;
+
+  while (!valid && attempts < 100) {
+    attempts++;
+    targetGX = Math.floor(Math.random() * (GRID_SIZE - 10)) - Math.floor((GRID_SIZE - 10)/2);
+    targetGZ = Math.floor(Math.random() * (GRID_SIZE - 10)) - Math.floor((GRID_SIZE - 10)/2);
+
+    const hitObstacle = obstacleMeshes.some(o => o.userData.gx === targetGX && o.userData.gz === targetGZ);
+    const hitSnake = snake.some(s => Math.round(s.x) === targetGX && Math.round(s.z) === targetGZ);
+    const inSpawnRunway = (Math.abs(targetGX) <= 3 && targetGZ >= 0 && targetGZ <= 10);
+
+    if (!hitObstacle && !hitSnake && !inSpawnRunway) {
+      valid = true;
+    }
+  }
+
+  currentTargetItem = { gx: targetGX, gz: targetGZ };
+
+  const gemGeo = new THREE.OctahedronGeometry(0.85, 0);
+  gemGeo.scale(0.8, 1.4, 0.8);
+  const gemMat = new THREE.MeshPhongMaterial({
+    color: 0x00ff66,
+    emissive: 0x008822,
+    specular: 0xffffff,
+    shininess: 90,
+    flatShading: true
+  });
+  const gemMesh = new THREE.Mesh(gemGeo, gemMat);
+  gemMesh.position.set(targetGX * TILE_SIZE, 1.2, targetGZ * TILE_SIZE);
+
+  const edgeGeo = new THREE.EdgesGeometry(gemGeo);
+  gemMesh.add(new THREE.LineSegments(edgeGeo, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 })));
+
+  scene.add(gemMesh);
+  itemMeshes.push(gemMesh);
+
+  generatePowerPath(targetGX, targetGZ);
+}
+
+function generatePowerPath(startX, startZ) {
+  let curX = startX;
+  let curZ = startZ;
+  const pathDirs = [{x:1,z:0}, {x:-1,z:0}, {x:0,z:1}, {x:0,z:-1}];
+  let dir = pathDirs[Math.floor(Math.random() * pathDirs.length)];
+
+  const pathGeo = new THREE.OctahedronGeometry(0.4, 0);
+  const pathMat = new THREE.MeshPhongMaterial({
+    color: 0x00aaff,
+    emissive: 0x0044aa,
+    specular: 0xffffff,
+    shininess: 80,
+    flatShading: true
+  });
+
+  const pathSteps = 5;
+  for (let i = 1; i <= pathSteps; i++) {
+    curX += dir.x;
+    curZ += dir.z;
+
+    const hitObs = obstacleMeshes.some(o => o.userData.gx === curX && o.userData.gz === curZ);
+    if (Math.abs(curX) > GRID_SIZE/2 - 2 || Math.abs(curZ) > GRID_SIZE/2 - 2 || hitObs) {
+      break;
+    }
+
+    const pMesh = new THREE.Mesh(pathGeo, pathMat);
+    pMesh.position.set(curX * TILE_SIZE, 0.6, curZ * TILE_SIZE);
+    pMesh.userData = { gx: curX, gz: curZ, collected: false };
+    
+    const edges = new THREE.EdgesGeometry(pathGeo);
+    pMesh.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 })));
+
+    scene.add(pMesh);
+    pathGemMeshes.push(pMesh);
+  }
+}
+
+/* ==========================================================================
+   INPUT HANDLING (With keyboard menu navigation)
+========================================================================== */
+window.addEventListener('keydown', (e) => {
+  const menuScreen = document.getElementById('menu-screen');
+  const gameoverScreen = document.getElementById('gameover-screen');
+  const victoryScreen = document.getElementById('victory-screen');
+
+  const isMenuVisible = !menuScreen.classList.contains('hidden');
+  const isGameOverVisible = !gameoverScreen.classList.contains('hidden');
+  const isVictoryVisible = !victoryScreen.classList.contains('hidden');
+
+  // Keyboard Menu Navigation (ENTER / SPACE / R)
+  if (isVictoryVisible && (e.key === 'Enter' || e.key === ' ' || e.code === 'Space')) {
+    e.preventDefault();
+    nextLevel(e);
+    return;
+  }
+
+  if (isGameOverVisible) {
+    if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space' || e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      retryCurrentSector(e);
+      return;
+    }
+  }
+
+  if (isMenuVisible && (e.key === 'Enter' || e.key === ' ' || e.code === 'Space')) {
+    e.preventDefault();
+    startNewGame(e);
+    return;
+  }
+
+  if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.key) || e.code === 'Space') {
+    e.preventDefault();
+  }
+
+  if (!isPlaying || isRespawning) return;
+  audio.init();
+
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    queueTurn('left');
+  } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    queueTurn('right');
+  } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ' || e.code === 'Space') {
+    isBoosting = true;
+  } else if (e.key === 'c' || e.key === 'C') {
+    cameraMode = (cameraMode + 1) % 3;
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.key) || e.code === 'Space') {
+    e.preventDefault();
+  }
+
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ' || e.code === 'Space') {
+    isBoosting = false;
+  }
+});
+
+function bindButton(elemId, onStart, onEnd) {
+  const el = document.getElementById(elemId);
+  if (!el) return;
+
+  const startAction = (e) => {
+    e.preventDefault();
+    if (document.activeElement) document.activeElement.blur();
+    if (isPlaying && !isRespawning) {
+      audio.init();
+      onStart();
+    }
+  };
+
+  const endAction = (e) => {
+    e.preventDefault();
+    if (onEnd) onEnd();
+  };
+
+  el.addEventListener('touchstart', startAction, { passive: false });
+  el.addEventListener('touchend', endAction, { passive: false });
+  el.addEventListener('mousedown', startAction);
+  el.addEventListener('mouseup', endAction);
+  el.addEventListener('mouseleave', endAction);
+}
+
+bindButton('btn-left', () => queueTurn('left'));
+bindButton('btn-right', () => queueTurn('right'));
+bindButton('btn-boost', () => { isBoosting = true; }, () => { isBoosting = false; });
+
+document.getElementById('audio-toggle').addEventListener('click', (e) => {
+  e.target.blur();
+  audio.init();
+  audio.enabled = !audio.enabled;
+  document.getElementById('audio-toggle').textContent = `SOUND: ${audio.enabled ? 'ON' : 'OFF'}`;
+});
+
+function queueTurn(dirStr) {
+  let newDir;
+  if (dirStr === 'left') {
+    newDir = { x: currentDir.z, z: -currentDir.x };
+  } else {
+    newDir = { x: -currentDir.z, z: currentDir.x };
+  }
+  nextTurn = newDir;
+  audio.playTurn();
+}
+
+/* ==========================================================================
+   GAME LOOP & UPDATES
+========================================================================== */
+let lastTime = performance.now();
+let moveProgress = 0.0;
+let fromGridPos = { x: 0, z: 6 };
+let toGridPos = { x: 0, z: 5 };
+
+function updateGame(dt) {
+  if (!isPlaying || isGameOver || isRespawning) return;
+
+  if (isBoosting && boostEnergy > 5) {
+    boostEnergy = Math.max(0, boostEnergy - dt * 38);
+    if (Math.random() < 0.2) audio.playBoost();
+  } else {
+    isBoosting = false;
+    boostEnergy = Math.min(100, boostEnergy + dt * 20);
+  }
+  document.getElementById('boost-bar').style.width = `${boostEnergy}%`;
+
+  const speed = moveSpeed * (isBoosting ? boostMultiplier : 1.0);
+  moveProgress += speed * dt;
+
+  while (moveProgress >= 1.0) {
+    moveProgress -= 1.0;
+    stepSnakeGrid();
+    if (isRespawning || isGameOver) return;
+  }
+
+  const headCurX = THREE.MathUtils.lerp(fromGridPos.x, toGridPos.x, moveProgress);
+  const headCurZ = THREE.MathUtils.lerp(fromGridPos.z, toGridPos.z, moveProgress);
+  snakeHeadPos = { x: headCurX, z: headCurZ };
+
+  if (snakeMeshes.length > 0) {
+    snakeMeshes[0].position.set(headCurX * TILE_SIZE, 0.5, headCurZ * TILE_SIZE);
+    const angle = Math.atan2(currentDir.x, currentDir.z);
+    snakeMeshes[0].rotation.y = angle + Math.PI;
+
+    for (let i = 1; i < snakeMeshes.length; i++) {
+      const prevSeg = (i === 1) ? fromGridPos : snake[i - 1];
+      const curSeg = snake[i];
+      const segX = THREE.MathUtils.lerp(curSeg.x, prevSeg.x, moveProgress);
+      const segZ = THREE.MathUtils.lerp(curSeg.z, prevSeg.z, moveProgress);
+      
+      snakeMeshes[i].position.set(segX * TILE_SIZE, 0.45, segZ * TILE_SIZE);
+      const segAngle = Math.atan2(prevSeg.x - curSeg.x, prevSeg.z - curSeg.z);
+      if (!isNaN(segAngle)) {
+        snakeMeshes[i].rotation.y = segAngle;
+      }
+    }
+  }
+
+  if (scene.snakeLight) {
+    scene.snakeLight.position.set(headCurX * TILE_SIZE, 2.5, headCurZ * TILE_SIZE);
+  }
+
+  highlightTileUnder(headCurX, headCurZ);
+  checkCollisionsAndPickups(headCurX, headCurZ);
+
+  const time = performance.now() * 0.003;
+  itemMeshes.forEach(mesh => {
+    mesh.rotation.y = time * 2;
+    mesh.position.y = 1.2 + Math.sin(time * 4) * 0.25;
+  });
+
+  pathGemMeshes.forEach(mesh => {
+    mesh.rotation.y = -time * 3;
+    mesh.position.y = 0.6 + Math.sin(time * 5 + mesh.position.x) * 0.15;
+  });
+
+  updateCamera();
+  drawRadar();
+}
+
+function stepSnakeGrid() {
+  if (nextTurn) {
+    currentDir = nextTurn;
+    nextTurn = null;
+  }
+
+  fromGridPos = { x: toGridPos.x, z: toGridPos.z };
+  toGridPos = { x: fromGridPos.x + currentDir.x, z: fromGridPos.z + currentDir.z };
+
+  snake.unshift({ x: fromGridPos.x, z: fromGridPos.z });
+  if (snake.length > snakeMeshes.length) {
+    snake.pop();
+  }
+
+  if (isInvulnerable) return;
+
+  // Check Boundary Collision
+  const maxBound = (GRID_SIZE / 2) - 1;
+  if (Math.abs(toGridPos.x) > maxBound || Math.abs(toGridPos.z) > maxBound) {
+    handleDeath("WALL COLLISION");
+    return;
+  }
+
+  // Check Obstacle Collision
+  const hitObs = obstacleMeshes.some(o => o.userData.gx === toGridPos.x && o.userData.gz === toGridPos.z);
+  if (hitObs) {
+    handleDeath("OBSTACLE HIT");
+    return;
+  }
+
+  // Check Self Collision
+  for (let i = 3; i < snake.length; i++) {
+    if (snake[i].x === toGridPos.x && snake[i].z === toGridPos.z) {
+      handleDeath("SELF CRASH");
+      return;
+    }
+  }
+}
+
+function highlightTileUnder(wx, wz) {
+  const gx = Math.round(wx);
+  const gz = Math.round(wz);
+
+  gridTiles.forEach(tile => {
+    if (tile.userData.gx === gx && tile.userData.gz === gz) {
+      tile.material.color.setHex(0x00ff88);
+      tile.userData.activeTimer = 1.0;
+    } else if (tile.userData.activeTimer > 0) {
+      tile.userData.activeTimer -= 0.04;
+      tile.material.color.lerp(tile.userData.originalColor, 0.1);
+    }
+  });
+}
+
+function checkCollisionsAndPickups(hx, hz) {
+  if (currentTargetItem) {
+    const dist = Math.hypot(hx - currentTargetItem.gx, hz - currentTargetItem.gz);
+    if (dist < 0.85) {
+      collectMainItem();
+    }
+  }
+
+  pathGemMeshes.forEach(mesh => {
+    if (!mesh.userData.collected) {
+      const dist = Math.hypot(hx - mesh.userData.gx, hz - mesh.userData.gz);
+      if (dist < 0.85) {
+        mesh.userData.collected = true;
+        scene.remove(mesh);
+        collectPathGem();
+      }
+    }
+  });
+}
+
+function collectMainItem() {
+  audio.playPickup();
+  score += 100 * multiplier;
+  multiplier++;
+  evoPower = Math.max(0, evoPower - 18);
+  updateHUD();
+  growSnake();
+
+  if (evoPower <= 0) {
+    triggerVictory();
+  } else {
+    spawnNextItem();
+  }
+}
+
+function collectPathGem() {
+  audio.playPathStep();
+  score += 25 * multiplier;
+  evoPower = Math.max(0, evoPower - 4);
+  updateHUD();
+
+  if (evoPower <= 0) {
+    triggerVictory();
+  }
+}
+
+function growSnake() {
+  const lastIndex = snakeMeshes.length;
+  const tailPos = snake[snake.length - 1] || snakeHeadPos;
+  const scale = Math.max(0.4, 1.0 - (lastIndex * 0.035));
+
+  const mesh = createSegmentMesh(false, scale);
+  mesh.position.set(tailPos.x * TILE_SIZE, 0.45, tailPos.z * TILE_SIZE);
+  scene.add(mesh);
+  snakeMeshes.push(mesh);
+}
+
+function handleDeath(reason = "CRASH") {
+  if (isInvulnerable || isRespawning || isGameOver) return;
+
+  audio.playCrash();
+  lives--;
+  multiplier = 1;
+  isBoosting = false;
+  updateHUD();
+
+  const alertBox = document.getElementById('crash-alert');
+  alertBox.textContent = `${reason}! -1 LIFE`;
+  alertBox.classList.add('active');
+
+  if (lives <= 0) {
+    isGameOver = true;
+    isPlaying = false;
+    if (respawnTimeout) clearTimeout(respawnTimeout);
+    alertBox.classList.remove('active');
+    document.getElementById('final-stats').textContent = `FINAL SCORE: ${padScore(score)}`;
+    document.getElementById('gameover-screen').classList.remove('hidden');
+  } else {
+    isRespawning = true;
+    if (respawnTimeout) clearTimeout(respawnTimeout);
+    respawnTimeout = setTimeout(() => {
+      alertBox.classList.remove('active');
+      fromGridPos = { x: 0, z: 6 };
+      toGridPos = { x: 0, z: 5 };
+      moveProgress = 0.0;
+      resetSnake();
+      grantInvulnerability(1800);
+      isRespawning = false;
+    }, 850);
+  }
+}
+
+function triggerVictory() {
+  audio.playWin();
+  isPlaying = false;
+  if (respawnTimeout) clearTimeout(respawnTimeout);
+  document.getElementById('clear-stats').textContent = `SECTOR ${level} COMPLETE • SCORE: ${padScore(score)}`;
+  document.getElementById('victory-screen').classList.remove('hidden');
+}
+
+function updateCamera() {
+  const headPos = snakeMeshes[0] ? snakeMeshes[0].position : new THREE.Vector3(0,0,0);
+
+  if (cameraMode === 0) {
+    const offsetDistance = 12.5;
+    const offsetHeight = 10.0;
+    
+    const camTargetX = headPos.x - (currentDir.x * offsetDistance);
+    const camTargetZ = headPos.z - (currentDir.z * offsetDistance);
+    
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, camTargetX, 0.12);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, offsetHeight, 0.12);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, camTargetZ, 0.12);
+
+    const lookTarget = new THREE.Vector3(
+      headPos.x + currentDir.x * 6,
+      0.5,
+      headPos.z + currentDir.z * 6
+    );
+    camera.lookAt(lookTarget);
+
+  } else if (cameraMode === 1) {
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, headPos.x, 0.1);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 45, 0.1);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, headPos.z + 0.1, 0.1);
+    camera.lookAt(headPos.x, 0, headPos.z);
+
+  } else {
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, headPos.x + 22, 0.1);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 26, 0.1);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, headPos.z + 22, 0.1);
+    camera.lookAt(headPos.x, 0, headPos.z);
+  }
+}
+
+function padScore(num) {
+  return num.toString().padStart(6, '0');
+}
+
+function updateHUD() {
+  const scoreStr = padScore(score);
+  for (let i = 0; i < 6; i++) {
+    document.getElementById(`d${i}`).textContent = scoreStr[i];
+  }
+  document.getElementById('mult-text').textContent = `\u00D7${multiplier}`;
+  document.getElementById('lives-display').textContent = lives;
+  document.getElementById('sector-label').textContent = `SECTOR ${level}`;
+  document.getElementById('evo-bar').style.width = `${evoPower}%`;
+}
+
+function drawRadar() {
+  const canvas = document.getElementById('radar-canvas');
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width;
+  const center = size / 2;
+  const scale = (size * 0.42) / (GRID_SIZE / 2);
+
+  ctx.clearRect(0, 0, size, size);
+
+  ctx.strokeStyle = 'rgba(0, 180, 255, 0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(center, center, size * 0.44, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(center, 6); ctx.lineTo(center, size - 6);
+  ctx.moveTo(6, center); ctx.lineTo(size - 6, center);
+  ctx.stroke();
+
+  ctx.fillStyle = '#cc33ff';
+  obstacleMeshes.forEach(o => {
+    const rx = center + o.userData.gx * scale;
+    const rz = center + o.userData.gz * scale;
+    ctx.fillRect(rx - 1.5, rz - 1.5, 3, 3);
+  });
+
+  if (currentTargetItem) {
+    const gx = center + currentTargetItem.gx * scale;
+    const gz = center + currentTargetItem.gz * scale;
+    ctx.fillStyle = '#00ff66';
+    ctx.beginPath();
+    ctx.arc(gx, gz, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = '#ff2222';
+  snake.forEach((seg, idx) => {
+    const sx = center + seg.x * scale;
+    const sz = center + seg.z * scale;
+    ctx.fillRect(sx - 1.5, sz - 1.5, idx === 0 ? 4 : 3, idx === 0 ? 4 : 3);
+  });
+}
+
+function animate(currentTime) {
+  requestAnimationFrame(animate);
+  const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+  lastTime = currentTime;
+
+  updateGame(dt);
+  renderer.render(scene, camera);
+}
+
+/* ==========================================================================
+   MISSION / RETRY CONTROLLERS
+========================================================================== */
+function startNewGame(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  if (document.activeElement) document.activeElement.blur();
+  
+  if (respawnTimeout) clearTimeout(respawnTimeout);
+  audio.init();
+  score = 0;
+  multiplier = 1;
+  lives = 5;
+  level = 1;
+  isGameOver = false;
+  isPlaying = true;
+  isRespawning = false;
+  fromGridPos = { x: 0, z: 6 };
+  toGridPos = { x: 0, z: 5 };
+  moveProgress = 0.0;
+  
+  loadLevel(level);
+  updateHUD();
+
+  document.getElementById('menu-screen').classList.add('hidden');
+  document.getElementById('gameover-screen').classList.add('hidden');
+  document.getElementById('victory-screen').classList.add('hidden');
+  document.getElementById('crash-alert').classList.remove('active');
+}
+
+function retryCurrentSector(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  if (document.activeElement) document.activeElement.blur();
+
+  if (respawnTimeout) clearTimeout(respawnTimeout);
+  audio.init();
+  lives = 5;
+  multiplier = 1;
+  isGameOver = false;
+  isPlaying = true;
+  isRespawning = false;
+  fromGridPos = { x: 0, z: 6 };
+  toGridPos = { x: 0, z: 5 };
+  moveProgress = 0.0;
+
+  loadLevel(level);
+  updateHUD();
+
+  document.getElementById('gameover-screen').classList.add('hidden');
+  document.getElementById('crash-alert').classList.remove('active');
+}
+
+function nextLevel(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  if (document.activeElement) document.activeElement.blur();
+
+  if (respawnTimeout) clearTimeout(respawnTimeout);
+  audio.init();
+  level++;
+  isPlaying = true;
+  isGameOver = false;
+  isRespawning = false;
+  fromGridPos = { x: 0, z: 6 };
+  toGridPos = { x: 0, z: 5 };
+  moveProgress = 0.0;
+
+  loadLevel(level);
+  document.getElementById('victory-screen').classList.add('hidden');
+  document.getElementById('crash-alert').classList.remove('active');
+}
+
+function attachButtonHandler(id, handler) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.addEventListener('click', handler);
+  btn.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    handler(e);
+  });
+}
+
+attachButtonHandler('start-btn', startNewGame);
+attachButtonHandler('retry-btn', retryCurrentSector);
+attachButtonHandler('restart-btn', startNewGame);
+attachButtonHandler('next-btn', nextLevel);
+
+window.addEventListener('load', () => {
+  initThree();
+  requestAnimationFrame(animate);
+});
+</script>
+</body>
+</html>
