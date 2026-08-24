@@ -1,3 +1,19 @@
+Current setup: Qwen3.8-27B-Q4_K_M.gguf served by dual RTX 5060ti 16GB GPUs on Ubuntu 26.04 32GB RAM via llama.cpp (CUDA)
+Motherboard: ROG STRIX Z370-E Gaming BIOS Ver.3005 with i78700K @3.70GHz and 32GB DDR4 at 3200MHz
+Launch command: LD_LIBRARY_PATH=$PWD/cuda:$LD_LIBRARY_PATH CUDA_VISIBLE_DEVICES=0,1 NCCL_P2P_DISABLE=1 ./cuda/llama-server -m ./models/Qwen3.8-27B-Q4_K_M.gguf --mmproj ./models/mmproj-F16-qwen3.8-27B.gguf --spec-type draft-mtp --spec-draft-n-max 3 --image-min-tokens 1024 -ngl 99 -ts 13.5,16 -sm tensor -c 262144 -b 2048 -ub 1024 --reasoning-preserve -fa on -ctk q4_0 -ctv q4_0 -t 6 -np 1 --host 0.0.0.0 --port 1234
+
+Write helloworld in C++ and show how to unit test it.
+
+Create a self-contained, single-file, responsive webpage that has the game tetris. Give it a look-ahead function. You only have a 64K token context, so minimize your thinking process. Write your code out to file as soon as possible.
+
+Create a self-contained, single-file, responsive webpage that has the game 3D Snakes. Make it show a 3rd-person view behind the snake and make it look like the attached screenshot. The left arrow should steer the snake left and right should go right. Make the snake follow the grid and give it a sleek (i.e. snake-like shaped head). All game elements should look attractive like a professional arcade game.
+
+Create a self-containted single-file responsive website that simulates a classic lava lamp. Make multiple undulating blobs merge and separate realistically.      
+
+Create a webpage that shows a realistic lavalamp just like the attached image. Make the wax blobs undulate and float up and down realistically. Light the blobs from below. Add controls to modify the number of blobs, speed, colours, etc. Make the background feel like the lamp is in a room with no lights.
+
+Re-create agilabs.ca/agi as a self-contained, single-file, responsive webpage in the current directory. Make it handsome and sophisticated. Give it a high-tech style and a professional theme. 
+
 Create a single-file web page that explains details of survival skills. Include how to obtain water, make fire, shelter, weapons, tools, hunting equipment. Make sure to include how to use a stone knife and how to make fishing gear. Include a section about mental care. Expand each section with deep details, and multiple pointers and tips. Include icons from https://fonts.google.com/icons. Add a disclaimer and a table of contents at the beginning. Add a relevant story at the end of each chapter. Make the website in the style of a field manual. I would like this html manual to be at least 30 pages long so make it as detailed as possible. Add printing page-breaks after every chapter. 
 
 [if the chapters are too short, ask Gemini to write each chapter separately then merge them together in the html framework]
