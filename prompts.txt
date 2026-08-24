@@ -1,6 +1,6 @@
 Current setup: Qwen3.8-27B-Q4_K_M.gguf served by dual RTX 5060ti 16GB GPUs on Ubuntu 26.04 32GB RAM via llama.cpp (CUDA)
 Motherboard: ROG STRIX Z370-E Gaming BIOS Ver.3005 with i78700K @3.70GHz and 32GB DDR4 at 3200MHz
-Launch command: LD_LIBRARY_PATH=$PWD/cuda:$LD_LIBRARY_PATH CUDA_VISIBLE_DEVICES=0,1 NCCL_P2P_DISABLE=1 ./cuda/llama-server -m ./models/Qwen3.8-27B-Q4_K_M.gguf --mmproj ./models/mmproj-F16-qwen3.8-27B.gguf --spec-type draft-mtp --spec-draft-n-max 3 --image-min-tokens 1024 -ngl 99 -ts 13.5,16 -sm tensor -c 262144 -b 2048 -ub 1024 --reasoning-preserve -fa on -ctk q4_0 -ctv q4_0 -t 6 -np 1 --host 0.0.0.0 --port 1234
+Launch command: LD_LIBRARY_PATH=$PWD/cuda:$LD_LIBRARY_PATH CUDA_VISIBLE_DEVICES=0,1 NCCL_P2P_DISABLE=1 ./cuda/llama-server -m ./models/Qwen3.8-27B-Q4_K_M.gguf --mmproj ./models/mmproj-F16-qwen3.8-27B.gguf --spec-type draft-mtp --spec-draft-n-max 3 --image-min-tokens 1024 -ngl 99 -ts 13.5,16 -sm tensor -c 262144 -b 2048 -ub 1024 --reasoning-preserve -fa on -ctk q4_0 -ctv q4_0 -t 4 -np 1 --host 0.0.0.0 --port 1234
 
 Write helloworld in C++ and show how to unit test it.
 
