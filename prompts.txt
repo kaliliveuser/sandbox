@@ -1,4 +1,4 @@
-Create a self-contained, single-file, responsive webpage that converts md files into html, epub and mobi formats. Provide a way to customize title, author, and cover image for the epub and mobi conversions. Create a table of contents based on # and ## markdown tags. Make the page handsome, sophisticated and professional. 
+Create a self-contained, single-file, responsive webpage that converts md files into html, epub and mobi formats. Provide a way to customize title, author, and cover image for the epub and mobi conversions. Create a table of contents based on # markdown tags. Make the page handsome, sophisticated and professional. Refer to the attached documents for technical specifications.
 
 MANDATORY: Create a project plan in the current working directory using the filename PROGRESS.md that includes details about time budgets, checkpoints and milestones. At each checkpoint save your research files, update your progress in PROGRESS.md and create a prompt that will help you continue in case there is an interruption.
 
