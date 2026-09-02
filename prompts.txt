@@ -1,3 +1,42 @@
+--- WebPi
+
+Create a self-contained, single-file, responsive webpage called WebPi that has a minimal agent similar to the Pi Coding Agent framework. 
+The Web-UI should have (at minimum) the following elements:
+* Editor to examine and modify the contents of files.
+* Web preview of the selected file. Provide a way for the user to expand the view to a new tab.
+* Files sections
+   * User can add files
+   * Agent can modify contents and folders
+   * Any file can be downloaded individually
+   * The entire project can be downloaded at once (e.g. as a zip file)
+* Local model support
+   * The app should default to the model currently being served at:
+```
+"baseUrl": "http://localhost:1234/v1"
+"api": "openai-completions"
+"apiKey": "apiKey"
+"contextWindow": 262144
+"maxTokens": 98304
+```
+   * Ensure that the contextWindow and maxTokens are respected in the API calls.
+   * This should be configurable through the web interface.
+* Tools should include:
+   * Read file
+   * Edit file
+   * Write file
+   * Delete File
+   * Create folder
+   * Delete folder
+   * Move file(s) to any folder.
+* Chat
+   * Keep reasoning blocks collapsed unless the user clicks on them.
+   * Show all tool calls in the Chat.
+   * The session history should be downloadable at any time. It should include the chat history, files and configuration data.
+   * Downloaded sessions should be restorable so that the user can continue in the future.
+
+---
+
+
 Create a self-contained, single-file, responsive webpage that converts md files into html, epub and mobi formats. Provide a way to customize title, author, and cover image for the epub and mobi conversions. Create a table of contents based on # markdown tags. Make the page handsome, sophisticated and professional. Refer to the attached documents for technical specifications.
 
 MANDATORY: Create a project plan in the current working directory using the filename PROGRESS.md that includes details about time budgets, checkpoints and milestones. At each checkpoint save your research files, update your progress in PROGRESS.md and create a prompt that will help you continue in case there is an interruption.
