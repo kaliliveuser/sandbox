@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebPi - Autonomous Coding Agent</title>
+  <style>
+    /* ==========================================================================
+       AIR-GAPPED EMBEDDED CSS (ZERO EXTERNAL DEPENDENCIES)
+       ========================================================================== */
+    :root {
+      --bg-darkest: #070b14;
+      --bg-dark: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-surface-hover: #334155;
+      --border-color: #243049;
+      --border-focus: #7c3aed;
+      --brand-primary: #7c3aed;
+      --brand-hover: #6d28d9;
+      --brand-light: #ede9fe;
+      --brand-muted: #4c1d95;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-sans); font-size: 13px; }
+    
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* App Shell */
+    .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+    header { height: 52px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; shrink-0; z-index: 20; }
+    
+    .brand-group { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--brand-primary); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+    .brand-title { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 0.5rem; }
+    .badge { font-size: 11px; font-weight: normal; padding: 2px 8px; border-radius: 9999px; background: rgba(76, 29, 149, 0.5); color: var(--brand-light); border: 1px solid rgba(124, 58, 237, 0.4); }
+    
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; background: transparent; color: var(--text-main); }
+    .btn:hover { background: var(--bg-surface-hover); }
+    .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3); }
+    .btn-primary:hover { background: var(--brand-hover); }
+    .btn-outline { background: var(--bg-surface); border-color: var(--border-color); color: var(--text-muted); }
+    .btn-outline:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+
+    /* Workspace */
+    .workspace { flex: 1; display: flex; overflow: hidden; position: relative; }
+    
+    /* Left Chat Pane */
+    .pane-chat { width: 440px; border-right: 1px solid var(--border-color); background: var(--bg-dark); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+    .pane-header { padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.5); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Messages & Reasoning */
+    .msg-wrap { display: flex; flex-direction: column; width: 100%; }
+    .msg-wrap.user { align-items: flex-end; }
+    .msg-wrap.assistant { align-items: flex-start; }
+    .bubble { max-width: 90%; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.5; word-break: break-word; }
+    .bubble.user { background: var(--brand-primary); color: #fff; border-bottom-right-radius: 2px; }
+    .bubble.assistant { background: var(--bg-surface); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--border-color); width: 100%; }
+    .bubble.system { width: 100%; background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); }
+    .bubble.tool { width: 100%; background: #0b1120; border: 1px solid rgba(124, 58, 237, 0.4); color: var(--brand-light); font-family: var(--font-mono); }
+
+    .thought-box { margin-bottom: 8px; border-radius: 8px; background: rgba(7, 11, 20, 0.8); border: 1px solid var(--border-color); overflow: hidden; }
+    .thought-header { width: 100%; padding: 6px 10px; background: rgba(30, 41, 59, 0.5); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: none; color: var(--text-muted); font-size: 11px; }
+    .thought-header:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+    .thought-body { padding: 8px 10px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
+
+    .tool-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; margin-top: 6px; margin-right: 4px; border-radius: 4px; background: #130a2a; border: 1px solid rgba(124, 58, 237, 0.6); color: var(--brand-light); font-family: var(--font-mono); font-size: 10px; }
+
+    /* Chat Input */
+    .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); }
+    .prompt-textarea { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-main); font-size: 12px; font-family: var(--font-sans); resize: none; outline: none; }
+    .prompt-textarea:focus { border-color: var(--brand-primary); }
+
+    /* Right Main Panes */
+    .pane-main { flex: 1; display: flex; min-width: 0; background: var(--bg-darkest); }
+    .pane-files { width: 220px; border-right: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.6); display: flex; flex-direction: column; flex-shrink: 0; }
+    .file-tree { flex: 1; overflow-y: auto; padding: 8px; }
+    .file-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-radius: 5px; cursor: pointer; color: var(--text-muted); font-size: 12px; margin-bottom: 2px; }
+    .file-item:hover { background: var(--bg-surface); color: var(--text-main); }
+    .file-item.active { background: rgba(76, 29, 149, 0.4); color: var(--brand-light); font-weight: 600; border: 1px solid rgba(124, 58, 237, 0.3); }
+
+    .split-editor-preview { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+    .editor-pane { flex: 1; display: flex; flex-direction: column; border-bottom: 1px solid var(--border-color); min-height: 0; }
+    .code-editor { flex: 1; width: 100%; height: 100%; padding: 12px; background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; border: none; outline: none; resize: none; }
+    .preview-pane { flex: 1; display: flex; flex-direction: column; min-height: 0; background: #fff; }
+    .preview-frame { width: 100%; height: 100%; border: none; background: #fff; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(7, 11, 20, 0.85); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-dialog { width: 100%; max-width: 520px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 80vh; overflow-y: auto; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .input-control { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--text-main); font-size: 12px; outline: none; }
+    .input-control:focus { border-color: var(--brand-primary); }
+
+    .status-bar { padding: 6px 12px; background: var(--bg-darkest); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--brand-light); display: none; align-items: center; justify-content: space-between; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- TOP HEADER -->
+    <header>
+      <div class="brand-group">
+        <div class="brand-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            WebPi
+            <span id="modelBadge" class="badge">local-model</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button class="btn btn-outline" onclick="exportSession()" title="Export Session (.json)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Save Session
+        </button>
+        <label class="btn btn-outline" style="cursor:pointer;" title="Restore Session">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Restore
+          <input type="file" id="sessionFileInput" accept=".json" class="hidden" onchange="importSession(event)" />
+        </label>
+        <button class="btn btn-outline" onclick="downloadZip()" title="Export Entire Project as ZIP">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>
+          Export ZIP
+        </button>
+        <button class="btn btn-outline" onclick="openSettings()" title="Configuration">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <main class="workspace">
+      <!-- CHAT PANE -->
+      <section class="pane-chat">
+        <div class="pane-header">
+          <span style="font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">Agent Conversation</span>
+          <button class="btn" onclick="clearChatHistory()" style="padding:2px 6px; font-size:11px; color:var(--text-dim);">Clear</button>
+        </div>
+
+        <div id="messagesContainer" class="chat-messages"></div>
+
+        <div id="agentStatus" class="status-bar">
+          <span id="agentStatusText">WebPi is streaming...</span>
+          <button class="btn" style="color:var(--accent-rose); padding:0;" onclick="abortAgent()">Stop</button>
+        </div>
+
+        <div class="chat-input-area">
+          <form onsubmit="handleSendPrompt(event)" style="display:flex; flex-direction:column; gap:8px;">
+            <textarea
+              id="promptInput"
+              class="prompt-textarea"
+              rows="3"
+              placeholder="Ask WebPi to build, scaffold, or modify your application..."
+              onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendPrompt(event); }"
+            ></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:10px; color:var(--text-dim);">Shift+Enter for newline</span>
+              <button type="submit" class="btn btn-primary">
+                Send
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- FILES + EDITOR + PREVIEW -->
+      <section class="pane-main">
+        <!-- FILES SIDEBAR -->
+        <div class="pane-files">
+          <div class="pane-header">
+            <span style="font-weight:600; font-size:11px; text-transform:uppercase; color:var(--text-muted);">Files</span>
+            <div style="display:flex; gap:2px;">
+              <button class="btn" style="padding:2px 4px;" onclick="promptCreateFile()" title="New File">+</button>
+              <button class="btn" style="padding:2px 4px;" onclick="promptCreateFolder()" title="New Folder">📁+</button>
+              <button class="btn" style="padding:2px 4px;" onclick="promptMoveFile()" title="Move/Rename File">➔</button>
+            </div>
+          </div>
+          <div id="fileTreeList" class="file-tree"></div>
+          <div style="padding:8px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim);">
+            <span id="fileCountBadge">0 files</span>
+            <button class="btn" style="padding:0; color:var(--brand-primary); font-size:11px;" onclick="downloadActiveFile()">Download Active</button>
+          </div>
+        </div>
+
+        <!-- SPLIT: EDITOR & PREVIEW -->
+        <div class="split-editor-preview">
+          <!-- EDITOR -->
+          <div class="editor-pane">
+            <div class="pane-header">
+              <span id="activeFilePath" style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">(No file open)</span>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-outline" style="padding:2px 8px; font-size:11px;" onclick="saveActiveFileFromEditor()">Save</button>
+                <button class="btn btn-primary" style="padding:2px 8px; font-size:11px;" onclick="refreshPreview()">Run Preview</button>
+              </div>
+            </div>
+            <textarea id="fileEditor" class="code-editor" spellcheck="false" placeholder="Workspace is empty. Create a file above or ask WebPi to generate your project..." oninput="handleEditorInput()" disabled></textarea>
+          </div>
+
+          <!-- PREVIEW -->
+          <div class="preview-pane">
+            <div class="pane-header" style="background:var(--bg-dark);">
+              <span style="font-weight:600; font-size:11px; text-transform:uppercase; color:var(--text-muted);">Sandbox Preview</span>
+              <div style="display:flex; gap:4px;">
+                <button class="btn btn-outline" style="padding:2px 6px; font-size:11px;" onclick="refreshPreview()" title="Reload Frame">↻</button>
+                <button class="btn btn-outline" style="padding:2px 6px; font-size:11px;" onclick="openPreviewInNewTab()" title="Pop out">↗</button>
+              </div>
+            </div>
+            <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups"></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- CONFIGURATION MODAL -->
+    <div id="settingsModal" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="pane-header">
+          <span style="font-weight:700;">WebPi Configuration</span>
+          <button class="btn" style="padding:2px 6px;" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label class="input-label">Base URL</label>
+            <input type="text" id="cfgBaseUrl" class="input-control" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="input-group">
+              <label class="input-label">Protocol</label>
+              <select id="cfgApi" class="input-control">
+                <option value="openai-completions">openai-completions (/chat/completions)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label">API Key</label>
+              <input type="text" id="cfgApiKey" class="input-control" />
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="input-group">
+              <label class="input-label">Context Window</label>
+              <input type="number" id="cfgContextWindow" class="input-control" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Max Output Tokens</label>
+              <input type="number" id="cfgMaxTokens" class="input-control" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Model Identifier</label>
+            <input type="text" id="cfgModel" class="input-control" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">System Prompt</label>
+            <textarea id="cfgSystemPrompt" class="input-control" rows="4" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="pane-header" style="justify-content:flex-end; gap:8px;">
+          <button class="btn btn-outline" onclick="closeSettings()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. EMBEDDED PURE-JS ZIP WRITER (ZERO DEPENDENCY PKZIP IMPLEMENTATION)
+       ========================================================================== */
+    class MinimalZip {
+      constructor() {
+        this.files = [];
+      }
+      add(name, content) {
+        const bytes = typeof content === 'string' ? new TextEncoder().encode(content) : content;
+        this.files.push({ name, bytes });
+      }
+      generateBlob() {
+        const crcTable = [];
+        for (let n = 0; n < 256; n++) {
+          let c = n;
+          for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+          crcTable[n] = c >>> 0;
+        }
+        function getCRC(bytes) {
+          let crc = 0 ^ (-1);
+          for (let i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ crcTable[(crc ^ bytes[i]) & 0xff];
+          return (crc ^ (-1)) >>> 0;
+        }
+
+        const now = new Date();
+        const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+        const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+
+        const localHeaders = [];
+        const centralEntries = [];
+        let offset = 0;
+
+        for (const file of this.files) {
+          const nameBytes = new TextEncoder().encode(file.name);
+          const crc = getCRC(file.bytes);
+          const size = file.bytes.length;
+
+          // Local file header (30 bytes + name + data)
+          const lfh = new Uint8Array(30 + nameBytes.length);
+          const lView = new DataView(lfh.buffer);
+          lView.setUint32(0, 0x04034b50, true);
+          lView.setUint16(4, 20, true);
+          lView.setUint16(6, 0x0800, true); // UTF-8 filename flag
+          lView.setUint16(8, 0, true);      // Stored (no compression)
+          lView.setUint16(10, dosTime, true);
+          lView.setUint16(12, dosDate, true);
+          lView.setUint32(14, crc, true);
+          lView.setUint32(18, size, true);
+          lView.setUint32(22, size, true);
+          lView.setUint16(26, nameBytes.length, true);
+          lView.setUint16(28, 0, true);
+          lfh.set(nameBytes, 30);
+
+          localHeaders.push(lfh, file.bytes);
+
+          // Central directory entry (46 bytes + name)
+          const cde = new Uint8Array(46 + nameBytes.length);
+          const cView = new DataView(cde.buffer);
+          cView.setUint32(0, 0x02014b50, true);
+          cView.setUint16(4, 20, true);
+          cView.setUint16(6, 20, true);
+          cView.setUint16(8, 0x0800, true);
+          cView.setUint16(10, 0, true);
+          cView.setUint16(12, dosTime, true);
+          cView.setUint16(14, dosDate, true);
+          cView.setUint32(16, crc, true);
+          cView.setUint32(20, size, true);
+          cView.setUint32(24, size, true);
+          cView.setUint16(28, nameBytes.length, true);
+          cView.setUint16(30, 0, true);
+          cView.setUint16(32, 0, true);
+          cView.setUint16(34, 0, true);
+          cView.setUint32(36, 0, true);
+          cView.setUint32(42, offset, true);
+          cde.set(nameBytes, 46);
+
+          centralEntries.push(cde);
+          offset += lfh.length + size;
+        }
+
+        const cdOffset = offset;
+        let cdSize = 0;
+        for (const cd of centralEntries) cdSize += cd.length;
+
+        // End of central directory record (22 bytes)
+        const eocd = new Uint8Array(22);
+        const eView = new DataView(eocd.buffer);
+        eView.setUint32(0, 0x06054b50, true);
+        eView.setUint16(4, 0, true);
+        eView.setUint16(6, 0, true);
+        eView.setUint16(8, this.files.length, true);
+        eView.setUint16(10, this.files.length, true);
+        eView.setUint32(12, cdSize, true);
+        eView.setUint32(16, cdOffset, true);
+        eView.setUint16(20, 0, true);
+
+        return new Blob([...localHeaders, ...centralEntries, eocd], { type: "application/zip" });
+      }
+    }
+
+    /* ==========================================================================
+       2. STATE & CONFIGURATION
+       ========================================================================== */
+    const DEFAULT_SETTINGS = {
+      baseUrl: "http://localhost:1234/v1",
+      api: "openai-completions",
+      apiKey: "apiKey",
+      model: "local-model",
+      contextWindow: 262144,
+      maxTokens: 98304,
+      systemPrompt: `You are WebPi, an autonomous web coding agent.
+You can read, write, edit, delete, and move files to implement the requested software.
+Always inspect existing code before making edits.
+Keep reasoning concise and start tool execution directly once you have a plan.
+When creating web apps, make sure HTML, JS, and CSS files are properly structured and linked.
+Use the provided tools systematically to complete all user requests accurately.`
+    };
+
+    let settings = { ...DEFAULT_SETTINGS };
+    let files = {};
+    let folders = new Set();
+    let activeFilePath = "";
+
+    let chatHistory = [];
+    let isAgentRunning = false;
+    let abortController = null;
+
+    /* ==========================================================================
+       3. TOOL DEFINITIONS & SAFE EXECUTOR
+       ========================================================================== */
+    const AGENT_TOOLS = [
+      {
+        type: "function",
+        function: {
+          name: "read_file",
+          description: "Read the full contents of a file from the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "write_file",
+          description: "Create a new file or overwrite an existing file with complete content.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" }, content: { type: "string" } },
+            required: ["path", "content"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "edit_file",
+          description: "Perform exact search-and-replace edit on an existing file.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" }, old_str: { type: "string" }, new_str: { type: "string" } },
+            required: ["path", "old_str", "new_str"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_file",
+          description: "Delete a file from the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "create_folder",
+          description: "Create a new folder directory in the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_folder",
+          description: "Delete a folder and all files inside it.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "move_file",
+          description: "Move or rename a file to another folder or filename.",
+          parameters: {
+            type: "object",
+            properties: { source_path: { type: "string" }, target_path: { type: "string" } },
+            required: ["source_path", "target_path"]
+          }
+        }
+      }
+    ];
+
+    function normalizePath(p) {
+      return p ? p.replace(/^\.\//, "").replace(/^\/+/, "").trim() : "";
+    }
+
+    function resolveToolName(rawName) {
+      if (!rawName) return "";
+      const clean = rawName.trim().toLowerCase();
+      const validNames = AGENT_TOOLS.map(t => t.function.name);
+      if (validNames.includes(clean)) return clean;
+      for (const valid of validNames) {
+        if (clean.startsWith(valid) || clean.includes(valid)) return valid;
+      }
+      return clean;
+    }
+
+    function executeTool(rawName, args) {
+      const name = resolveToolName(rawName);
+      try {
+        switch (name) {
+          case "read_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) return `Error: File '${p}' does not exist. Available files: ${Object.keys(files).join(", ") || "(none)"}`;
+            return files[p];
+          }
+          case "write_file": {
+            const p = normalizePath(args.path);
+            if (!p) return `Error: No path provided.`;
+            files[p] = args.content || "";
+            const parts = p.split("/");
+            if (parts.length > 1) {
+              for (let i = 1; i < parts.length; i++) folders.add(parts.slice(0, i).join("/"));
+            }
+            if (!activeFilePath) activeFilePath = p;
+            renderFileTree();
+            if (activeFilePath === p) loadFileToEditor(p);
+            refreshPreview();
+            return `Successfully wrote ${args.content?.length || 0} bytes to ${p}`;
+          }
+          case "edit_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) return `Error: File '${p}' does not exist.`;
+            const current = files[p];
+            if (!current.includes(args.old_str)) return `Error: Could not find match for 'old_str' in '${p}'. Inspect file first.`;
+            files[p] = current.replace(args.old_str, args.new_str);
+            renderFileTree();
+            if (activeFilePath === p) loadFileToEditor(p);
+            refreshPreview();
+            return `Successfully edited ${p}`;
+          }
+          case "delete_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) return `Error: File '${p}' does not exist.`;
+            delete files[p];
+            if (activeFilePath === p) activeFilePath = Object.keys(files)[0] || "";
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            return `Deleted file ${p}`;
+          }
+          case "create_folder": {
+            const p = normalizePath(args.path);
+            folders.add(p);
+            renderFileTree();
+            return `Created folder '${p}'`;
+          }
+          case "delete_folder": {
+            const p = normalizePath(args.path);
+            let count = 0;
+            for (const f in files) {
+              if (f === p || f.startsWith(p + "/")) { delete files[f]; count++; }
+            }
+            folders.delete(p);
+            for (const fld of Array.from(folders)) {
+              if (fld.startsWith(p + "/")) folders.delete(fld);
+            }
+            renderFileTree();
+            if (!(activeFilePath in files)) activeFilePath = Object.keys(files)[0] || "";
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            return `Deleted folder '${p}' and ${count} contained files.`;
+          }
+          case "move_file": {
+            const src = normalizePath(args.source_path);
+            let tgt = normalizePath(args.target_path);
+            if (!(src in files)) return `Error: Source '${src}' does not exist.`;
+            if (folders.has(tgt) || tgt.endsWith("/")) tgt = (tgt.endsWith("/") ? tgt : tgt + "/") + src.split("/").pop();
+            files[tgt] = files[src];
+            delete files[src];
+            if (activeFilePath === src) activeFilePath = tgt;
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            return `Moved '${src}' to '${tgt}'`;
+          }
+          default:
+            return `Error: Unknown tool '${rawName}'`;
+        }
+      } catch (err) {
+        return `Execution error: ${err.message}`;
+      }
+    }
+
+    /* ==========================================================================
+       4. STREAMING AGENT LOOP
+       ========================================================================== */
+    async function handleSendPrompt(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("promptInput");
+      const userText = input.value.trim();
+      if (!userText || isAgentRunning) return;
+
+      input.value = "";
+      addChatMessage("user", userText);
+      await runAgentLoop();
+    }
+
+    async function runAgentLoop() {
+      isAgentRunning = true;
+      abortController = new AbortController();
+      setAgentStatus(true, "WebPi is thinking...");
+
+      const systemMessage = {
+        role: "system",
+        content: `${settings.systemPrompt}\n\nCURRENT WORKSPACE FILES:\n${Object.keys(files).join("\n") || "(empty)"}`
+      };
+
+      let loopCount = 0;
+      const MAX_LOOPS = 15;
+
+      while (isAgentRunning && loopCount < MAX_LOOPS) {
+        loopCount++;
+
+        const payloadMessages = [systemMessage, ...chatHistory.map(m => {
+          const item = { role: m.role, content: m.content || "" };
+          if (m.tool_calls) item.tool_calls = m.tool_calls;
+          if (m.tool_call_id) {
+            item.tool_call_id = m.tool_call_id;
+            item.name = m.name;
+          }
+          return item;
+        })];
+
+        const currentMsgIndex = chatHistory.length;
+        chatHistory.push({
+          role: "assistant",
+          content: "",
+          reasoning: "",
+          reasoningOpen: false,
+          tool_calls: null
+        });
+        renderChatMessages();
+
+        let streamedRawContent = "";
+        let streamedReasoning = "";
+        let toolCallMap = {};
+        let finishReason = null;
+
+        try {
+          setAgentStatus(true, `Streaming response (step ${loopCount})...`);
+
+          const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
+          const tokenLimit = parseInt(settings.maxTokens, 10) || 98304;
+
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${settings.apiKey}`
+            },
+            body: JSON.stringify({
+              model: settings.model || "default",
+              messages: payloadMessages,
+              tools: AGENT_TOOLS,
+              tool_choice: "auto",
+              stream: true,
+              max_tokens: tokenLimit
+            }),
+            signal: abortController.signal
+          });
+
+          if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errBody}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let sseBuffer = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split("\n");
+            sseBuffer = lines.pop();
+
+            for (const line of lines) {
+              const clean = line.trim();
+              if (!clean || clean.startsWith(":") || clean === "data: [DONE]") continue;
+
+              if (clean.startsWith("data: ")) {
+                try {
+                  const data = JSON.parse(clean.slice(6));
+                  const choice = data.choices?.[0];
+                  if (!choice) continue;
+
+                  if (choice.finish_reason) finishReason = choice.finish_reason;
+                  const delta = choice.delta;
+                  if (!delta) continue;
+
+                  if (delta.reasoning_content || delta.reasoning) {
+                    streamedReasoning += (delta.reasoning_content || delta.reasoning);
+                  }
+                  if (delta.content) {
+                    streamedRawContent += delta.content;
+                  }
+
+                  if (delta.tool_calls) {
+                    for (const tc of delta.tool_calls) {
+                      const idx = tc.index ?? 0;
+                      if (!toolCallMap[idx]) {
+                        toolCallMap[idx] = {
+                          id: tc.id || `call_${Date.now()}_${idx}`,
+                          type: "function",
+                          function: { name: "", arguments: "" }
+                        };
+                      }
+                      if (tc.id) toolCallMap[idx].id = tc.id;
+                      if (tc.function?.name) {
+                        const cur = toolCallMap[idx].function.name;
+                        const inc = tc.function.name;
+                        if (!cur) toolCallMap[idx].function.name = inc;
+                        else if (cur !== inc && !cur.includes(inc)) toolCallMap[idx].function.name += inc;
+                      }
+                      if (tc.function?.arguments) {
+                        toolCallMap[idx].function.arguments += tc.function.arguments;
+                      }
+                    }
+                  }
+
+                  const parsed = separateThinking(streamedRawContent, streamedReasoning);
+                  chatHistory[currentMsgIndex].content = parsed.content;
+                  chatHistory[currentMsgIndex].reasoning = parsed.reasoning;
+                  updateStreamingDOM(currentMsgIndex);
+
+                } catch (e) {}
+              }
+            }
+          }
+
+          if (finishReason === "length") {
+            chatHistory[currentMsgIndex].content += "\n\n⚠️ *[Stopped: Output reached max token ceiling.]*";
+            updateStreamingDOM(currentMsgIndex);
+          }
+
+          const toolCalls = Object.values(toolCallMap).map(tc => ({
+            ...tc,
+            function: { ...tc.function, name: resolveToolName(tc.function.name) }
+          }));
+
+          if (toolCalls.length > 0) chatHistory[currentMsgIndex].tool_calls = toolCalls;
+          renderChatMessages();
+
+          if (toolCalls.length > 0) {
+            for (const call of toolCalls) {
+              const name = resolveToolName(call.function.name);
+              let args = {};
+              try { args = JSON.parse(call.function.arguments); } catch (e) {}
+              setAgentStatus(true, `Executing: ${name}...`);
+              const res = executeTool(name, args);
+              addChatMessage("tool", res, null, call.id, name);
+            }
+            continue;
+          }
+
+          const fallback = parseFallbackCalls(chatHistory[currentMsgIndex].content);
+          if (fallback) {
+            const name = resolveToolName(fallback.name);
+            setAgentStatus(true, `Executing: ${name}...`);
+            const res = executeTool(name, fallback.args);
+            addChatMessage("tool", res, null, "call_" + Date.now(), name);
+            continue;
+          }
+
+          break;
+
+        } catch (err) {
+          if (err.name === "AbortError") {
+            addChatMessage("system", "WebPi execution stopped by user.");
+          } else {
+            addChatMessage("system", `⚠️ LLM Error: ${err.message}\nMake sure your local endpoint (${settings.baseUrl}) is running with CORS enabled.`);
+          }
+          break;
+        }
+      }
+
+      setAgentStatus(false);
+      isAgentRunning = false;
+      abortController = null;
+    }
+
+    function separateThinking(raw, explicit) {
+      let reasoning = explicit || "";
+      let content = raw || "";
+
+      if (content.includes("<think>")) {
+        const parts = content.split(/<\/?think>/g);
+        if (parts.length >= 3) {
+          reasoning += (reasoning ? "\n\n" : "") + parts[1].trim();
+          content = (parts[0] + parts.slice(2).join("")).trim();
+        } else if (parts.length === 2) {
+          reasoning += (reasoning ? "\n\n" : "") + parts[1];
+          content = parts[0];
+        }
+      }
+      return { reasoning: reasoning.trim(), content };
+    }
+
+    function parseFallbackCalls(text) {
+      if (!text) return null;
+      const m = text.match(/```(?:tool:)?(\w+)\s*\n([\s\S]*?)```/);
+      if (m) {
+        const name = resolveToolName(m[1]);
+        if (AGENT_TOOLS.some(t => t.function.name === name)) {
+          try { return { name, args: JSON.parse(m[2].trim()) }; } catch(e){}
+        }
+      }
+      return null;
+    }
+
+    function abortAgent() {
+      if (abortController) abortController.abort();
+      setAgentStatus(false);
+      isAgentRunning = false;
+    }
+
+    /* ==========================================================================
+       5. CHAT UI RENDERING
+       ========================================================================== */
+    function toggleThoughtProcess(idx) {
+      if (chatHistory[idx]) {
+        chatHistory[idx].reasoningOpen = !chatHistory[idx].reasoningOpen;
+        const body = document.getElementById(`reasoning-body-${idx}`);
+        const lbl = document.getElementById(`reasoning-label-${idx}`);
+        if (body && lbl) {
+          const isOpen = chatHistory[idx].reasoningOpen;
+          body.classList.toggle("hidden", !isOpen);
+          lbl.innerText = isOpen ? "hide" : "show";
+        } else {
+          renderChatMessages();
+        }
+      }
+    }
+
+    function addChatMessage(role, content, tool_calls = null, tool_call_id = null, name = null) {
+      chatHistory.push({ role, content, tool_calls, tool_call_id, name, reasoning: "", reasoningOpen: false });
+      renderChatMessages();
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById("messagesContainer");
+      container.innerHTML = "";
+      chatHistory.forEach((msg, idx) => container.appendChild(createMessageDOM(msg, idx)));
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function createMessageDOM(msg, idx) {
+      const wrap = document.createElement("div");
+      wrap.id = `msg-${idx}`;
+      wrap.className = `msg-wrap ${msg.role}`;
+
+      if (msg.role === "system") {
+        wrap.innerHTML = `<div class="bubble system">${escapeHtml(msg.content)}</div>`;
+        return wrap;
+      }
+
+      if (msg.role === "tool") {
+        wrap.innerHTML = `
+          <div class="bubble tool">
+            <div style="font-weight:700; font-size:10px; text-transform:uppercase; margin-bottom:4px;">✓ Tool Result: ${escapeHtml(msg.name || "executed")}</div>
+            <pre style="white-space:pre-wrap; font-size:11px;">${escapeHtml(msg.content)}</pre>
+          </div>`;
+        return wrap;
+      }
+
+      const isUser = msg.role === "user";
+      let toolPills = "";
+      if (msg.tool_calls && msg.tool_calls.length > 0) {
+        toolPills = msg.tool_calls.map(t => `<div class="tool-pill">⚙ ${escapeHtml(t.function?.name || "tool")}</div>`).join("");
+      }
+
+      let thoughtHtml = "";
+      if (msg.reasoning) {
+        const isOpen = !!msg.reasoningOpen;
+        thoughtHtml = `
+          <div class="thought-box">
+            <button type="button" class="thought-header" onclick="toggleThoughtProcess(${idx})">
+              <span>🧠 Thought Process</span>
+              <span id="reasoning-label-${idx}" style="font-size:10px; color:var(--text-dim);">${isOpen ? "hide" : "show"}</span>
+            </button>
+            <div id="reasoning-body-${idx}" class="thought-body ${isOpen ? '' : 'hidden'}">${escapeHtml(msg.reasoning)}</div>
+          </div>`;
+      }
+
+      wrap.innerHTML = `
+        <div class="bubble ${isUser ? 'user' : 'assistant'}">
+          <div id="msg-thought-holder-${idx}">${thoughtHtml}</div>
+          <div id="msg-content-${idx}" style="white-space:pre-wrap;">${escapeHtml(msg.content)}</div>
+          ${toolPills ? `<div>${toolPills}</div>` : ""}
+        </div>`;
+      return wrap;
+    }
+
+    function updateStreamingDOM(idx) {
+      const msg = chatHistory[idx];
+      if (!msg) return;
+
+      const container = document.getElementById("messagesContainer");
+      let elem = document.getElementById(`msg-${idx}`);
+
+      if (!elem) {
+        elem = createMessageDOM(msg, idx);
+        container.appendChild(elem);
+      } else {
+        const cDiv = document.getElementById(`msg-content-${idx}`);
+        const tHolder = document.getElementById(`msg-thought-holder-${idx}`);
+        if (cDiv) cDiv.innerText = msg.content;
+        if (msg.reasoning && tHolder && !tHolder.innerHTML.trim()) {
+          const isOpen = !!msg.reasoningOpen;
+          tHolder.innerHTML = `
+            <div class="thought-box">
+              <button type="button" class="thought-header" onclick="toggleThoughtProcess(${idx})">
+                <span>🧠 Thought Process</span>
+                <span id="reasoning-label-${idx}" style="font-size:10px; color:var(--text-dim);">${isOpen ? "hide" : "show"}</span>
+              </button>
+              <div id="reasoning-body-${idx}" class="thought-body ${isOpen ? '' : 'hidden'}">${escapeHtml(msg.reasoning)}</div>
+            </div>`;
+        } else if (msg.reasoning) {
+          const body = document.getElementById(`reasoning-body-${idx}`);
+          if (body) body.innerText = msg.reasoning;
+        }
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function setAgentStatus(active, text = "") {
+      const bar = document.getElementById("agentStatus");
+      const txt = document.getElementById("agentStatusText");
+      if (active) {
+        bar.style.display = "flex";
+        txt.innerText = text;
+      } else {
+        bar.style.display = "none";
+      }
+    }
+
+    function clearChatHistory() {
+      if (confirm("Clear agent thread?")) {
+        chatHistory = [];
+        renderChatMessages();
+      }
+    }
+
+    /* ==========================================================================
+       6. FILE EXPLORER & EDITOR
+       ========================================================================== */
+    function renderFileTree() {
+      const tree = document.getElementById("fileTreeList");
+      const count = document.getElementById("fileCountBadge");
+      tree.innerHTML = "";
+
+      const paths = Object.keys(files).sort();
+      count.innerText = `${paths.length} file${paths.length === 1 ? '' : 's'}`;
+
+      if (paths.length === 0 && folders.size === 0) {
+        tree.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-dim); font-size:11px;">Workspace is empty</div>`;
+        return;
+      }
+
+      folders.forEach(folder => {
+        const fDiv = document.createElement("div");
+        fDiv.className = "file-item";
+        fDiv.innerHTML = `
+          <span>📁 ${escapeHtml(folder)}</span>
+          <button class="btn" style="padding:0; color:var(--accent-rose);" onclick="deleteFolderPrompt('${escapeHtml(folder)}')">✕</button>`;
+        tree.appendChild(fDiv);
+      });
+
+      paths.forEach(p => {
+        const isActive = p === activeFilePath;
+        const item = document.createElement("div");
+        item.className = `file-item ${isActive ? 'active' : ''}`;
+        item.onclick = (e) => { if (!e.target.closest("button")) loadFileToEditor(p); };
+        item.innerHTML = `
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📄 ${escapeHtml(p)}</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn" style="padding:0;" onclick="downloadSpecificFile('${escapeHtml(p)}')" title="Download">↓</button>
+            <button class="btn" style="padding:0; color:var(--accent-rose);" onclick="deleteFilePrompt('${escapeHtml(p)}')" title="Delete">✕</button>
+          </div>`;
+        tree.appendChild(item);
+      });
+    }
+
+    function loadFileToEditor(path) {
+      activeFilePath = path;
+      const editor = document.getElementById("fileEditor");
+      const label = document.getElementById("activeFilePath");
+
+      if (path && (path in files)) {
+        label.innerText = path;
+        label.style.color = "var(--text-main)";
+        editor.value = files[path];
+        editor.disabled = false;
+      } else {
+        label.innerText = "(No file open)";
+        label.style.color = "var(--text-dim)";
+        editor.value = "";
+        editor.disabled = true;
+      }
+      renderFileTree();
+    }
+
+    function handleEditorInput() {
+      // unsaved indicator hook
+    }
+
+    function saveActiveFileFromEditor() {
+      if (!activeFilePath) return;
+      files[activeFilePath] = document.getElementById("fileEditor").value;
+      refreshPreview();
+    }
+
+    function promptCreateFile() {
+      const p = prompt("New file path (e.g. index.html):");
+      if (p) {
+        const norm = normalizePath(p);
+        if (!(norm in files)) {
+          files[norm] = "";
+          loadFileToEditor(norm);
+          renderFileTree();
+          refreshPreview();
+        }
+      }
+    }
+
+    function promptCreateFolder() {
+      const f = prompt("New folder name:");
+      if (f) {
+        folders.add(normalizePath(f));
+        renderFileTree();
+      }
+    }
+
+    function promptMoveFile() {
+      if (!activeFilePath) return alert("Select a file first.");
+      const tgt = prompt(`Move '${activeFilePath}' to:`, activeFilePath);
+      if (tgt && tgt !== activeFilePath) {
+        executeTool("move_file", { source_path: activeFilePath, target_path: tgt });
+      }
+    }
+
+    function deleteFilePrompt(path) {
+      if (confirm(`Delete '${path}'?`)) executeTool("delete_file", { path });
+    }
+
+    function deleteFolderPrompt(path) {
+      if (confirm(`Delete folder '${path}' and all its files?`)) executeTool("delete_folder", { path });
+    }
+
+    /* ==========================================================================
+       7. SANDBOX LIVE PREVIEW
+       ========================================================================== */
+    function refreshPreview() {
+      const frame = document.getElementById("previewFrame");
+      let html = files["index.html"] || (activeFilePath.endsWith(".html") ? files[activeFilePath] : "");
+
+      if (!html) {
+        frame.srcdoc = `<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#64748b;background:#0f172a;text-align:center;"><div><h3>Preview Sandbox</h3><p style="font-size:12px;">Create index.html to preview your application.</p></div></body></html>`;
+        return;
+      }
+
+      let bundled = html;
+      // Inline virtual CSS
+      bundled = bundled.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi, (match, href) => {
+        const n = normalizePath(href);
+        return (n in files) ? `<style data-inlined="${n}">\n${files[n]}\n</style>` : match;
+      });
+
+      // Inline virtual JS
+      bundled = bundled.replace(/<script\s+[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi, (match, src) => {
+        const n = normalizePath(src);
+        return (n in files) ? `<script data-inlined="${n}">\n${files[n]}\n<\/script>` : match;
+      });
+
+      frame.srcdoc = bundled;
+    }
+
+    function openPreviewInNewTab() {
+      const frame = document.getElementById("previewFrame");
+      const blob = new Blob([frame.srcdoc], { type: "text/html" });
+      window.open(URL.createObjectURL(blob), "_blank");
+    }
+
+    /* ==========================================================================
+       8. EXPORT / IMPORT & AIR-GAPPED ZIP
+       ========================================================================== */
+    function downloadSpecificFile(path) {
+      if (!(path in files)) return;
+      const blob = new Blob([files[path]], { type: "text/plain;charset=utf-8" });
+      triggerDownload(blob, path.split("/").pop());
+    }
+
+    function downloadActiveFile() {
+      if (activeFilePath) downloadSpecificFile(activeFilePath);
+      else alert("No active file selected.");
+    }
+
+    function downloadZip() {
+      const keys = Object.keys(files);
+      if (keys.length === 0) return alert("Workspace is empty. Nothing to export.");
+      const zip = new MinimalZip();
+      for (const [p, content] of Object.entries(files)) zip.add(p, content);
+      triggerDownload(zip.generateBlob(), "webpi-project.zip");
+    }
+
+    function exportSession() {
+      const data = {
+        version: "1.0",
+        app: "WebPi",
+        timestamp: new Date().toISOString(),
+        settings,
+        folders: Array.from(folders),
+        files,
+        chatHistory,
+        activeFilePath
+      };
+      triggerDownload(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), `webpi-session-${new Date().toISOString().slice(0,10)}.json`);
+    }
+
+    function importSession(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (data.files !== undefined && data.chatHistory !== undefined) {
+            files = data.files;
+            folders = new Set(data.folders || []);
+            chatHistory = data.chatHistory;
+            if (data.settings) settings = { ...settings, ...data.settings };
+            activeFilePath = data.activeFilePath || Object.keys(files)[0] || "";
+            updateSettingsUI();
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            renderChatMessages();
+            refreshPreview();
+            alert("Session restored successfully!");
+          }
+        } catch (err) {
+          alert("Error restoring session: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
+    function triggerDownload(blob, name) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ==========================================================================
+       9. SETTINGS & HELPERS
+       ========================================================================== */
+    function openSettings() {
+      document.getElementById("cfgBaseUrl").value = settings.baseUrl;
+      document.getElementById("cfgApiKey").value = settings.apiKey;
+      document.getElementById("cfgApi").value = settings.api;
+      document.getElementById("cfgModel").value = settings.model;
+      document.getElementById("cfgContextWindow").value = settings.contextWindow;
+      document.getElementById("cfgMaxTokens").value = settings.maxTokens;
+      document.getElementById("cfgSystemPrompt").value = settings.systemPrompt;
+      document.getElementById("settingsModal").style.display = "flex";
+    }
+
+    function closeSettings() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+
+    function saveSettings() {
+      settings.baseUrl = document.getElementById("cfgBaseUrl").value.trim() || DEFAULT_SETTINGS.baseUrl;
+      settings.apiKey = document.getElementById("cfgApiKey").value.trim() || DEFAULT_SETTINGS.apiKey;
+      settings.api = document.getElementById("cfgApi").value;
+      settings.model = document.getElementById("cfgModel").value.trim() || "local-model";
+      settings.contextWindow = parseInt(document.getElementById("cfgContextWindow").value, 10) || DEFAULT_SETTINGS.contextWindow;
+      settings.maxTokens = parseInt(document.getElementById("cfgMaxTokens").value, 10) || DEFAULT_SETTINGS.maxTokens;
+      settings.systemPrompt = document.getElementById("cfgSystemPrompt").value || DEFAULT_SETTINGS.systemPrompt;
+      updateSettingsUI();
+      closeSettings();
+    }
+
+    function updateSettingsUI() {
+      document.getElementById("modelBadge").innerText = settings.model;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    /* ==========================================================================
+       10. INITIALIZATION
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      updateSettingsUI();
+      renderFileTree();
+      loadFileToEditor(activeFilePath);
+      refreshPreview();
+      addChatMessage("assistant", "Hello! I am WebPi, your autonomous web coding agent running 100% air-gapped with zero external dependencies. Tell me what you'd like to build!");
+    });
+  </script>
+</body>
+</html>
