@@ -36,6 +36,8 @@ The Web-UI should have (at minimum) the following elements:
 
 ---
 
+Create a webpage about job hunting in Vancouver Canada. Include techniques, tools, organizations, sites, etc. for Emily Carr graduates (esp. majoring in illustration) to break into the technology scene e.g. Games Studios.
+
 
 Create a self-contained, single-file, responsive webpage that converts md files into html, epub and mobi formats. Provide a way to customize title, author, and cover image for the epub and mobi conversions. Create a table of contents based on # markdown tags. Make the page handsome, sophisticated and professional. Refer to the attached documents for technical specifications.
 
