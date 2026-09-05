@@ -40,7 +40,7 @@
 
     /* App Shell */
     .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-    header { height: 52px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; shrink-0; z-index: 20; }
+    header { height: 52px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; flex-shrink: 0; z-index: 20; }
     
     .brand-group { display: flex; align-items: center; gap: 0.75rem; }
     .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--brand-primary); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
@@ -77,7 +77,14 @@
     .thought-header:hover { background: var(--bg-surface-hover); color: var(--text-main); }
     .thought-body { padding: 8px 10px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
 
-    .tool-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; margin-top: 6px; margin-right: 4px; border-radius: 4px; background: #130a2a; border: 1px solid rgba(124, 58, 237, 0.6); color: var(--brand-light); font-family: var(--font-mono); font-size: 10px; }
+    @keyframes pulseGlow {
+      0% { opacity: 0.6; border-color: rgba(124, 58, 237, 0.4); }
+      50% { opacity: 1; border-color: rgba(124, 58, 237, 1); }
+      100% { opacity: 0.6; border-color: rgba(124, 58, 237, 0.4); }
+    }
+
+    .tool-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; margin-top: 6px; margin-right: 4px; border-radius: 4px; background: #130a2a; border: 1px solid rgba(124, 58, 237, 0.6); color: var(--brand-light); font-family: var(--font-mono); font-size: 11px; }
+    .tool-pill.streaming { animation: pulseGlow 1.5s infinite ease-in-out; background: #1e1045; }
 
     /* Chat Input */
     .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); }
@@ -258,7 +265,7 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <div class="input-group">
-              <label class="input-label">Context Window</label>
+              <label class="input-label">Context Window (Tokens)</label>
               <input type="number" id="cfgContextWindow" class="input-control" />
             </div>
             <div class="input-group">
@@ -272,7 +279,7 @@
           </div>
           <div class="input-group">
             <label class="input-label">System Prompt</label>
-            <textarea id="cfgSystemPrompt" class="input-control" rows="4" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
+            <textarea id="cfgSystemPrompt" class="input-control" rows="5" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
           </div>
         </div>
         <div class="pane-header" style="justify-content:flex-end; gap:8px;">
@@ -326,8 +333,8 @@
           const lView = new DataView(lfh.buffer);
           lView.setUint32(0, 0x04034b50, true);
           lView.setUint16(4, 20, true);
-          lView.setUint16(6, 0x0800, true); // UTF-8 filename flag
-          lView.setUint16(8, 0, true);      // Stored (no compression)
+          lView.setUint16(6, 0x0800, true);
+          lView.setUint16(8, 0, true);
           lView.setUint16(10, dosTime, true);
           lView.setUint16(12, dosDate, true);
           lView.setUint32(14, crc, true);
@@ -368,7 +375,6 @@
         let cdSize = 0;
         for (const cd of centralEntries) cdSize += cd.length;
 
-        // End of central directory record (22 bytes)
         const eocd = new Uint8Array(22);
         const eView = new DataView(eocd.buffer);
         eView.setUint32(0, 0x06054b50, true);
@@ -385,21 +391,21 @@
     }
 
     /* ==========================================================================
-       2. STATE & CONFIGURATION
+       2. STATE & CONFIGURATION (WITH LOCALSTORAGE PERSISTENCE)
        ========================================================================== */
+    const STORAGE_KEY = "webpi_config_settings_v2";
+
     const DEFAULT_SETTINGS = {
-      baseUrl: "http://localhost:1234/v1",
+      baseUrl: "http://192.168.1.114:1234/v1",
       api: "openai-completions",
       apiKey: "apiKey",
       model: "local-model",
-      contextWindow: 262144,
-      maxTokens: 98304,
+      contextWindow: 65536,
+      maxTokens: 40960,
       systemPrompt: `You are WebPi, an autonomous web coding agent.
 You can read, write, edit, delete, and move files to implement the requested software.
-Always inspect existing code before making edits.
-Keep reasoning concise and start tool execution directly once you have a plan.
-When creating web apps, make sure HTML, JS, and CSS files are properly structured and linked.
-Use the provided tools systematically to complete all user requests accurately.`
+Structure your thought process to be thorough yet targeted on planning, architecture, and tool usage. Avoid unnecessary repetition in thinking.
+When ready, proceed directly to tool calls to complete the user request.`
     };
 
     let settings = { ...DEFAULT_SETTINGS };
@@ -410,6 +416,26 @@ Use the provided tools systematically to complete all user requests accurately.`
     let chatHistory = [];
     let isAgentRunning = false;
     let abortController = null;
+
+    function loadPersistedSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          settings = { ...DEFAULT_SETTINGS, ...parsed };
+        }
+      } catch (e) {
+        console.warn("Could not load stored configuration:", e);
+      }
+    }
+
+    function persistSettings() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      } catch (e) {
+        console.warn("Could not persist configuration:", e);
+      }
+    }
 
     /* ==========================================================================
        3. TOOL DEFINITIONS & SAFE EXECUTOR
@@ -604,8 +630,50 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     /* ==========================================================================
-       4. STREAMING AGENT LOOP
+       4. CONTEXT BUDGET ESTIMATOR & STREAMING AGENT LOOP
        ========================================================================== */
+    function estimateTokens(text) {
+      if (!text) return 0;
+      return Math.ceil(text.length / 3.4);
+    }
+
+    function buildContextMessages(systemMessage) {
+      const maxCtx = parseInt(settings.contextWindow, 10) || DEFAULT_SETTINGS.contextWindow;
+      const maxOut = parseInt(settings.maxTokens, 10) || DEFAULT_SETTINGS.maxTokens;
+      const budget = Math.max(2048, maxCtx - maxOut);
+
+      // Filter out empty turns and any middle-of-history system/ui error messages
+      const validHistory = chatHistory
+        .filter(m => m.role !== "system" && m.role !== "ui-error")
+        .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
+        .map(m => {
+          const item = { role: m.role, content: m.content || "" };
+          if (m.tool_calls) item.tool_calls = m.tool_calls;
+          if (m.tool_call_id) {
+            item.tool_call_id = m.tool_call_id;
+            item.name = m.name;
+          }
+          return item;
+        });
+
+      const allMsgs = [systemMessage, ...validHistory];
+
+      let totalEst = allMsgs.reduce((acc, m) => {
+        return acc + estimateTokens(m.content) + estimateTokens(JSON.stringify(m.tool_calls || ""));
+      }, 0);
+
+      if (totalEst <= budget) return allMsgs;
+
+      // Prune oldest messages from conversation history while retaining system message
+      const sys = allMsgs[0];
+      const rest = allMsgs.slice(1);
+      while (rest.length > 2 && totalEst > budget) {
+        const removed = rest.shift();
+        totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
+      }
+      return [sys, ...rest];
+    }
+
     async function handleSendPrompt(e) {
       if (e) e.preventDefault();
       const input = document.getElementById("promptInput");
@@ -628,22 +696,14 @@ Use the provided tools systematically to complete all user requests accurately.`
       };
 
       let loopCount = 0;
-      const MAX_LOOPS = 15;
+      const MAX_LOOPS = 25;
 
       while (isAgentRunning && loopCount < MAX_LOOPS) {
         loopCount++;
 
-        const payloadMessages = [systemMessage, ...chatHistory.map(m => {
-          const item = { role: m.role, content: m.content || "" };
-          if (m.tool_calls) item.tool_calls = m.tool_calls;
-          if (m.tool_call_id) {
-            item.tool_call_id = m.tool_call_id;
-            item.name = m.name;
-          }
-          return item;
-        })];
-
+        const payloadMessages = buildContextMessages(systemMessage);
         const currentMsgIndex = chatHistory.length;
+
         chatHistory.push({
           role: "assistant",
           content: "",
@@ -659,10 +719,10 @@ Use the provided tools systematically to complete all user requests accurately.`
         let finishReason = null;
 
         try {
-          setAgentStatus(true, `Streaming response (step ${loopCount})...`);
+          setAgentStatus(true, `Streaming response (turn ${loopCount})...`);
 
           const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
-          const tokenLimit = parseInt(settings.maxTokens, 10) || 98304;
+          const tokenLimit = parseInt(settings.maxTokens, 10) || DEFAULT_SETTINGS.maxTokens;
 
           const response = await fetch(endpoint, {
             method: "POST",
@@ -671,12 +731,13 @@ Use the provided tools systematically to complete all user requests accurately.`
               "Authorization": `Bearer ${settings.apiKey}`
             },
             body: JSON.stringify({
-              model: settings.model || "default",
+              model: settings.model || "local-model",
               messages: payloadMessages,
               tools: AGENT_TOOLS,
               tool_choice: "auto",
               stream: true,
-              max_tokens: tokenLimit
+              max_tokens: tokenLimit,
+              max_completion_tokens: tokenLimit
             }),
             signal: abortController.signal
           });
@@ -740,12 +801,27 @@ Use the provided tools systematically to complete all user requests accurately.`
                         toolCallMap[idx].function.arguments += tc.function.arguments;
                       }
                     }
+
+                    // Live update streaming tool calls in state
+                    chatHistory[currentMsgIndex].tool_calls = Object.values(toolCallMap);
                   }
 
                   const parsed = separateThinking(streamedRawContent, streamedReasoning);
                   chatHistory[currentMsgIndex].content = parsed.content;
                   chatHistory[currentMsgIndex].reasoning = parsed.reasoning;
-                  updateStreamingDOM(currentMsgIndex);
+
+                  updateStreamingDOM(currentMsgIndex, true);
+
+                  // Update status bar with live progress
+                  const activeCalls = Object.values(toolCallMap);
+                  if (activeCalls.length > 0) {
+                    const primary = activeCalls[0];
+                    const fnName = resolveToolName(primary.function.name) || primary.function.name || "tool";
+                    const argsLen = primary.function.arguments.length;
+                    const pathMatch = primary.function.arguments.match(/"path"\s*:\s*"([^"]+)"/);
+                    const targetFile = pathMatch ? pathMatch[1] : "";
+                    setAgentStatus(true, `Streaming ${fnName} ${targetFile ? '('+targetFile+')' : ''} [${argsLen.toLocaleString()} chars]...`);
+                  }
 
                 } catch (e) {}
               }
@@ -753,8 +829,7 @@ Use the provided tools systematically to complete all user requests accurately.`
           }
 
           if (finishReason === "length") {
-            chatHistory[currentMsgIndex].content += "\n\n⚠️ *[Stopped: Output reached max token ceiling.]*";
-            updateStreamingDOM(currentMsgIndex);
+            chatHistory[currentMsgIndex].content += "\n\n⚠️ *[Stopped: Output reached maximum token limit. Increase 'Max Output Tokens' in Settings if needed.]*";
           }
 
           const toolCalls = Object.values(toolCallMap).map(tc => ({
@@ -762,14 +837,17 @@ Use the provided tools systematically to complete all user requests accurately.`
             function: { ...tc.function, name: resolveToolName(tc.function.name) }
           }));
 
-          if (toolCalls.length > 0) chatHistory[currentMsgIndex].tool_calls = toolCalls;
+          chatHistory[currentMsgIndex].tool_calls = toolCalls.length > 0 ? toolCalls : null;
           renderChatMessages();
 
+          // Execute structured tool calls
           if (toolCalls.length > 0) {
             for (const call of toolCalls) {
               const name = resolveToolName(call.function.name);
               let args = {};
-              try { args = JSON.parse(call.function.arguments); } catch (e) {}
+              try { args = JSON.parse(call.function.arguments); } catch (e) {
+                args = { raw: call.function.arguments };
+              }
               setAgentStatus(true, `Executing: ${name}...`);
               const res = executeTool(name, args);
               addChatMessage("tool", res, null, call.id, name);
@@ -777,6 +855,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             continue;
           }
 
+          // Fallback text tool call parsing (for models that output code fences instead of OpenAI tool schemas)
           const fallback = parseFallbackCalls(chatHistory[currentMsgIndex].content);
           if (fallback) {
             const name = resolveToolName(fallback.name);
@@ -789,10 +868,15 @@ Use the provided tools systematically to complete all user requests accurately.`
           break;
 
         } catch (err) {
+          // Remove trailing empty assistant message if it didn't complete
+          if (chatHistory[currentMsgIndex] && !chatHistory[currentMsgIndex].content && !chatHistory[currentMsgIndex].tool_calls) {
+            chatHistory.splice(currentMsgIndex, 1);
+          }
+
           if (err.name === "AbortError") {
             addChatMessage("system", "WebPi execution stopped by user.");
           } else {
-            addChatMessage("system", `⚠️ LLM Error: ${err.message}\nMake sure your local endpoint (${settings.baseUrl}) is running with CORS enabled.`);
+            addChatMessage("system", `⚠️ LLM Error: ${err.message}\nMake sure your endpoint (${settings.baseUrl}) is running with CORS enabled.`);
           }
           break;
         }
@@ -839,7 +923,7 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     /* ==========================================================================
-       5. CHAT UI RENDERING
+       5. CHAT UI RENDERING & LIVE STREAMING TOOL VISUALIZATION
        ========================================================================== */
     function toggleThoughtProcess(idx) {
       if (chatHistory[idx]) {
@@ -864,11 +948,30 @@ Use the provided tools systematically to complete all user requests accurately.`
     function renderChatMessages() {
       const container = document.getElementById("messagesContainer");
       container.innerHTML = "";
-      chatHistory.forEach((msg, idx) => container.appendChild(createMessageDOM(msg, idx)));
+      chatHistory.forEach((msg, idx) => container.appendChild(createMessageDOM(msg, idx, false)));
       container.scrollTop = container.scrollHeight;
     }
 
-    function createMessageDOM(msg, idx) {
+    function formatToolPills(toolCalls, isStreaming = false) {
+      if (!toolCalls || toolCalls.length === 0) return "";
+      return toolCalls.map(t => {
+        const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
+        const argsRaw = t.function?.arguments || "";
+        
+        let pathTag = "";
+        const pathMatch = argsRaw.match(/"path"\s*:\s*"([^"]+)"/);
+        if (pathMatch) {
+          pathTag = ` <span style="color:#f8fafc; font-weight:600;">(${escapeHtml(pathMatch[1])})</span>`;
+        }
+
+        const sizeTag = argsRaw.length > 0 ? ` <span style="opacity:0.75; font-size:10px;">${argsRaw.length.toLocaleString()} chars</span>` : "";
+        const streamClass = isStreaming ? "streaming" : "";
+
+        return `<div class="tool-pill ${streamClass}">⚙ ${escapeHtml(fnName)}${pathTag}${sizeTag}</div>`;
+      }).join("");
+    }
+
+    function createMessageDOM(msg, idx, isStreaming = false) {
       const wrap = document.createElement("div");
       wrap.id = `msg-${idx}`;
       wrap.className = `msg-wrap ${msg.role}`;
@@ -888,10 +991,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
 
       const isUser = msg.role === "user";
-      let toolPills = "";
-      if (msg.tool_calls && msg.tool_calls.length > 0) {
-        toolPills = msg.tool_calls.map(t => `<div class="tool-pill">⚙ ${escapeHtml(t.function?.name || "tool")}</div>`).join("");
-      }
+      const toolPills = formatToolPills(msg.tool_calls, isStreaming);
 
       let thoughtHtml = "";
       if (msg.reasoning) {
@@ -910,12 +1010,12 @@ Use the provided tools systematically to complete all user requests accurately.`
         <div class="bubble ${isUser ? 'user' : 'assistant'}">
           <div id="msg-thought-holder-${idx}">${thoughtHtml}</div>
           <div id="msg-content-${idx}" style="white-space:pre-wrap;">${escapeHtml(msg.content)}</div>
-          ${toolPills ? `<div>${toolPills}</div>` : ""}
+          <div id="msg-tools-${idx}">${toolPills}</div>
         </div>`;
       return wrap;
     }
 
-    function updateStreamingDOM(idx) {
+    function updateStreamingDOM(idx, isStreaming = true) {
       const msg = chatHistory[idx];
       if (!msg) return;
 
@@ -923,12 +1023,15 @@ Use the provided tools systematically to complete all user requests accurately.`
       let elem = document.getElementById(`msg-${idx}`);
 
       if (!elem) {
-        elem = createMessageDOM(msg, idx);
+        elem = createMessageDOM(msg, idx, isStreaming);
         container.appendChild(elem);
       } else {
         const cDiv = document.getElementById(`msg-content-${idx}`);
         const tHolder = document.getElementById(`msg-thought-holder-${idx}`);
+        const toolsDiv = document.getElementById(`msg-tools-${idx}`);
+
         if (cDiv) cDiv.innerText = msg.content;
+
         if (msg.reasoning && tHolder && !tHolder.innerHTML.trim()) {
           const isOpen = !!msg.reasoningOpen;
           tHolder.innerHTML = `
@@ -942,6 +1045,10 @@ Use the provided tools systematically to complete all user requests accurately.`
         } else if (msg.reasoning) {
           const body = document.getElementById(`reasoning-body-${idx}`);
           if (body) body.innerText = msg.reasoning;
+        }
+
+        if (toolsDiv) {
+          toolsDiv.innerHTML = formatToolPills(msg.tool_calls, isStreaming);
         }
       }
       container.scrollTop = container.scrollHeight;
@@ -959,7 +1066,7 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     function clearChatHistory() {
-      if (confirm("Clear agent thread?")) {
+      if (confirm("Clear conversation history?")) {
         chatHistory = [];
         renderChatMessages();
       }
@@ -967,7 +1074,7 @@ Use the provided tools systematically to complete all user requests accurately.`
 
     /* ==========================================================================
        6. FILE EXPLORER & EDITOR
-       ========================================================================== */
+       ========================================================================= */
     function renderFileTree() {
       const tree = document.getElementById("fileTreeList");
       const count = document.getElementById("fileCountBadge");
@@ -1024,9 +1131,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       renderFileTree();
     }
 
-    function handleEditorInput() {
-      // unsaved indicator hook
-    }
+    function handleEditorInput() {}
 
     function saveActiveFileFromEditor() {
       if (!activeFilePath) return;
@@ -1084,13 +1189,11 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
 
       let bundled = html;
-      // Inline virtual CSS
       bundled = bundled.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi, (match, href) => {
         const n = normalizePath(href);
         return (n in files) ? `<style data-inlined="${n}">\n${files[n]}\n</style>` : match;
       });
 
-      // Inline virtual JS
       bundled = bundled.replace(/<script\s+[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi, (match, src) => {
         const n = normalizePath(src);
         return (n in files) ? `<script data-inlined="${n}">\n${files[n]}\n<\/script>` : match;
@@ -1106,7 +1209,7 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     /* ==========================================================================
-       8. EXPORT / IMPORT & AIR-GAPPED ZIP
+       8. EXPORT / IMPORT
        ========================================================================== */
     function downloadSpecificFile(path) {
       if (!(path in files)) return;
@@ -1152,7 +1255,10 @@ Use the provided tools systematically to complete all user requests accurately.`
             files = data.files;
             folders = new Set(data.folders || []);
             chatHistory = data.chatHistory;
-            if (data.settings) settings = { ...settings, ...data.settings };
+            if (data.settings) {
+              settings = { ...settings, ...data.settings };
+              persistSettings();
+            }
             activeFilePath = data.activeFilePath || Object.keys(files)[0] || "";
             updateSettingsUI();
             renderFileTree();
@@ -1180,7 +1286,7 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     /* ==========================================================================
-       9. SETTINGS & HELPERS
+       9. SETTINGS MANAGEMENT (FULL LOCALSTORAGE SUPPORT)
        ========================================================================== */
     function openSettings() {
       document.getElementById("cfgBaseUrl").value = settings.baseUrl;
@@ -1198,13 +1304,23 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     function saveSettings() {
-      settings.baseUrl = document.getElementById("cfgBaseUrl").value.trim() || DEFAULT_SETTINGS.baseUrl;
-      settings.apiKey = document.getElementById("cfgApiKey").value.trim() || DEFAULT_SETTINGS.apiKey;
-      settings.api = document.getElementById("cfgApi").value;
-      settings.model = document.getElementById("cfgModel").value.trim() || "local-model";
-      settings.contextWindow = parseInt(document.getElementById("cfgContextWindow").value, 10) || DEFAULT_SETTINGS.contextWindow;
-      settings.maxTokens = parseInt(document.getElementById("cfgMaxTokens").value, 10) || DEFAULT_SETTINGS.maxTokens;
-      settings.systemPrompt = document.getElementById("cfgSystemPrompt").value || DEFAULT_SETTINGS.systemPrompt;
+      const rawBase = document.getElementById("cfgBaseUrl").value.trim();
+      const rawKey = document.getElementById("cfgApiKey").value.trim();
+      const rawApi = document.getElementById("cfgApi").value;
+      const rawModel = document.getElementById("cfgModel").value.trim();
+      const rawCtx = parseInt(document.getElementById("cfgContextWindow").value, 10);
+      const rawMaxTok = parseInt(document.getElementById("cfgMaxTokens").value, 10);
+      const rawSys = document.getElementById("cfgSystemPrompt").value;
+
+      settings.baseUrl = rawBase || DEFAULT_SETTINGS.baseUrl;
+      settings.apiKey = rawKey !== "" ? rawKey : DEFAULT_SETTINGS.apiKey;
+      settings.api = rawApi || DEFAULT_SETTINGS.api;
+      settings.model = rawModel || DEFAULT_SETTINGS.model;
+      settings.contextWindow = !isNaN(rawCtx) && rawCtx > 0 ? rawCtx : DEFAULT_SETTINGS.contextWindow;
+      settings.maxTokens = !isNaN(rawMaxTok) && rawMaxTok > 0 ? rawMaxTok : DEFAULT_SETTINGS.maxTokens;
+      settings.systemPrompt = rawSys !== "" ? rawSys : DEFAULT_SETTINGS.systemPrompt;
+
+      persistSettings();
       updateSettingsUI();
       closeSettings();
     }
@@ -1222,6 +1338,7 @@ Use the provided tools systematically to complete all user requests accurately.`
        10. INITIALIZATION
        ========================================================================== */
     window.addEventListener("DOMContentLoaded", () => {
+      loadPersistedSettings();
       updateSettingsUI();
       renderFileTree();
       loadFileToEditor(activeFilePath);
