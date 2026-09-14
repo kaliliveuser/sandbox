@@ -50,6 +50,7 @@ Access the full interactive directory and launcher here:
 | **Lunar Lander** | Inertia & gravity-based landing simulation | [Code](https://github.com/kaliliveuser/sandbox/blob/main/lunar.html) | [Launch](https://kaliliveuser.github.io/sandbox/lunar.html) |
 | **Space Invaders** | Classic wave-defense arcade shooter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/invaders.html) | [Launch](https://kaliliveuser.github.io/sandbox/invaders.html) |
 | **Tetris** | Complete block-stacking puzzle engine | [Code](https://github.com/kaliliveuser/sandbox/blob/main/tetris.html) | [Launch](https://kaliliveuser.github.io/sandbox/tetris.html) |
+| **Frogger** | Cross the road if you dare | [Code](https://github.com/kaliliveuser/sandbox/blob/main/frogger.html) | [Launch](https://kaliliveuser.github.io/sandbox/frogger.html) |
 | **Galaxian** | Fast-paced alien fleet assault shooter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/galaxian.html) | [Launch](https://kaliliveuser.github.io/sandbox/galaxian.html) |
 | **Artillery** | Turn-based trajectory and ballistics game | [Code](https://github.com/kaliliveuser/sandbox/blob/main/artillery.html) | [Launch](https://kaliliveuser.github.io/sandbox/artillery.html) |
 | **Snake** | Classic 2D grid snake | [Code](https://github.com/kaliliveuser/sandbox/blob/main/snake.html) | [Launch](https://kaliliveuser.github.io/sandbox/snake.html) |
