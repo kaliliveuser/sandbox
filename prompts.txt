@@ -36,8 +36,15 @@ The Web-UI should have (at minimum) the following elements:
 
 ---
 
-Create a webpage about job hunting in Vancouver Canada. Include techniques, tools, organizations, sites, etc. for Emily Carr graduates (esp. majoring in illustration) to break into the technology scene e.g. Games Studios.
+Create a self-contained, single-file, responsive website that shows how to create a sole proprietorship in Vancouver Canada. The company should be focused on AGI research and Sovereign AI/Automation. Make it attractive, handsome and sophisticated and give it a professional technical theme. Also, make a slide presentation and and markdown formatted book from this information.
 
+Create a self-contained, single-file responsive website that has the 80s game frogger. Make it look as faithful to the original as possible.
+
+Create a self-contained, single-file, responsive webpage that displays 3D model of an excavator rotating in space.
+
+Create a self-contained, single-file, responsive webpage that shows a grid of 8x6 white squares (representing a paper sheet) and provide a way to cut the grid into a patterns that fit together. I am looking for a way to maximize patterns to make paper cubes with the minimum amout of tape. 
+
+Create a webpage about job hunting in Vancouver Canada. Include techniques, tools, organizations, sites, etc. for Emily Carr graduates (esp. majoring in illustration) to break into the technology scene e.g. Games Studios.
 
 Create a self-contained, single-file, responsive webpage that converts md files into html, epub and mobi formats. Provide a way to customize title, author, and cover image for the epub and mobi conversions. Create a table of contents based on # markdown tags. Make the page handsome, sophisticated and professional. Refer to the attached documents for technical specifications.
 
