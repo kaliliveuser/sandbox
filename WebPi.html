@@ -179,7 +179,7 @@
               rows="3"
               placeholder="Ask WebPi to build, scaffold, or modify your application..."
               onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendPrompt(event); }"
-            ></textarea>
+            >Create a self-contained, single-file, responsive website that ... Make it attractive, handsome and sophisticated and give it a professional technical theme.</textarea>
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:10px; color:var(--text-dim);">Shift+Enter for newline</span>
               <button type="submit" class="btn btn-primary">
@@ -279,7 +279,7 @@
           </div>
           <div class="input-group">
             <label class="input-label">System Prompt</label>
-            <textarea id="cfgSystemPrompt" class="input-control" rows="5" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
+            <textarea id="cfgSystemPrompt" class="input-control" rows="4" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
           </div>
         </div>
         <div class="pane-header" style="justify-content:flex-end; gap:8px;">
@@ -393,19 +393,24 @@
     /* ==========================================================================
        2. STATE & CONFIGURATION (WITH LOCALSTORAGE PERSISTENCE)
        ========================================================================== */
-    const STORAGE_KEY = "webpi_config_settings_v2";
+    const STORAGE_KEY = "webpi_config_settings_v1";
 
     const DEFAULT_SETTINGS = {
-      baseUrl: "http://192.168.1.114:1234/v1",
+      baseUrl: "http://192.168.1.207:1234/v1",
       api: "openai-completions",
       apiKey: "apiKey",
       model: "local-model",
-      contextWindow: 65536,
-      maxTokens: 40960,
+      contextWindow: 262144,
+      maxTokens: 98304,
       systemPrompt: `You are WebPi, an autonomous web coding agent.
 You can read, write, edit, delete, and move files to implement the requested software.
-Structure your thought process to be thorough yet targeted on planning, architecture, and tool usage. Avoid unnecessary repetition in thinking.
-When ready, proceed directly to tool calls to complete the user request.`
+Always inspect existing code before making edits.
+When editing files with edit_file:
+- Ensure 'old_str' has sufficient unique lines of context so it only matches once.
+- If making multiple distinct changes to the same file, do them carefully, or use write_file if rewriting large portions of the file is cleaner.
+Keep reasoning concise and start tool execution directly once you have a plan.
+When creating web apps, make sure HTML, JS, and CSS files are properly structured and linked.
+Use the provided tools systematically to complete all user requests accurately.`
     };
 
     let settings = { ...DEFAULT_SETTINGS };
@@ -469,10 +474,14 @@ When ready, proceed directly to tool calls to complete the user request.`
         type: "function",
         function: {
           name: "edit_file",
-          description: "Perform exact search-and-replace edit on an existing file.",
+          description: "Perform an exact search-and-replace on a target file. Provide enough unique surrounding context in old_str to ensure a single unique match.",
           parameters: {
             type: "object",
-            properties: { path: { type: "string" }, old_str: { type: "string" }, new_str: { type: "string" } },
+            properties: {
+              path: { type: "string", description: "Path to the file to edit." },
+              old_str: { type: "string", description: "The exact existing text block to be replaced (including surrounding context)." },
+              new_str: { type: "string", description: "The new replacement text." }
+            },
             required: ["path", "old_str", "new_str"]
           }
         }
@@ -568,13 +577,28 @@ When ready, proceed directly to tool calls to complete the user request.`
           case "edit_file": {
             const p = normalizePath(args.path);
             if (!(p in files)) return `Error: File '${p}' does not exist.`;
-            const current = files[p];
-            if (!current.includes(args.old_str)) return `Error: Could not find match for 'old_str' in '${p}'. Inspect file first.`;
-            files[p] = current.replace(args.old_str, args.new_str);
+            if (typeof args.old_str !== "string" || typeof args.new_str !== "string") {
+              return `Error: 'old_str' and 'new_str' must both be strings.`;
+            }
+
+            const currentNormalized = files[p].replace(/\r\n/g, "\n");
+            const oldNormalized = args.old_str.replace(/\r\n/g, "\n");
+            const newNormalized = args.new_str.replace(/\r\n/g, "\n");
+
+            const count = currentNormalized.split(oldNormalized).length - 1;
+
+            if (count === 0) {
+              return `Error: 'old_str' was not found in '${p}'. Check exact whitespace, indentation, or call read_file to inspect current contents.`;
+            }
+            if (count > 1) {
+              return `Error: 'old_str' matched ${count} times in '${p}'. Please include more surrounding context lines in 'old_str' to make the match unique.`;
+            }
+
+            files[p] = currentNormalized.replace(oldNormalized, () => newNormalized);
             renderFileTree();
             if (activeFilePath === p) loadFileToEditor(p);
             refreshPreview();
-            return `Successfully edited ${p}`;
+            return `Successfully edited '${p}' (replaced 1 instance).`;
           }
           case "delete_file": {
             const p = normalizePath(args.path);
@@ -1074,7 +1098,7 @@ When ready, proceed directly to tool calls to complete the user request.`
 
     /* ==========================================================================
        6. FILE EXPLORER & EDITOR
-       ========================================================================= */
+       ========================================================================== */
     function renderFileTree() {
       const tree = document.getElementById("fileTreeList");
       const count = document.getElementById("fileCountBadge");
