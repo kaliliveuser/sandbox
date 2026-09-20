@@ -28,7 +28,7 @@ Access the full interactive directory and launcher here:
 | **Ollama Voice Chat** | Voice-driven local LLM conversational client | [Code](https://github.com/kaliliveuser/sandbox/blob/main/converser2.html) | [Launch](https://kaliliveuser.github.io/sandbox/converser2.html) |
 | **Pollinations Chatbot** | Browser-based chatbot using Pollinations API | [Code](https://github.com/kaliliveuser/sandbox/blob/main/pollinations.html) | [Launch](https://kaliliveuser.github.io/sandbox/pollinations.html) |
 | **Embedded Chatbot** | Standalone, lightweight embedded script | [Code](https://github.com/kaliliveuser/sandbox/blob/main/chatbot.js) | [Launch](https://kaliliveuser.github.io/sandbox/chatbot.html) |
-| **WebPi** | Single-file Pi web control / utility interface | [Code](https://github.com/kaliliveuser/sandbox/blob/main/WebPi.html) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
+
 
 ---
 
@@ -62,6 +62,8 @@ Access the full interactive directory and launcher here:
 ### 🛠️ Standalone Tools & Visual Canvas Experiments
 | Project | Description / Stack | Source Code | Live Demo |
 | :--- | :--- | :---: | :---: |
+| **WebPi** | Single-file Pi web control / utility interface | [Code](https://github.com/kaliliveuser/sandbox/blob/main/WebPi.html) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
+| **epub2mobi** | Single-file Pi web control / utility interface | [Code](https://github.com/kaliliveuser/sandbox/blob/main/epub2mobi.html) | [Launch](https://kaliliveuser.github.io/sandbox/epub2mobi.html) |
 | **QR Code Generator** | Offline, client-side dynamic QR generator | [Code](https://github.com/kaliliveuser/sandbox/blob/main/qrcode.html) | [Launch](https://kaliliveuser.github.io/sandbox/qrcode.html) |
 | **Library Card Barcode** | Client-side barcode generator (Code 39 / 128) | [Code](https://github.com/kaliliveuser/sandbox/blob/main/librarycard.html) | [Launch](https://kaliliveuser.github.io/sandbox/librarycard.html) |
 | **Countdown Calendar** | Event tracking & schedule countdown timer | [Code](https://github.com/kaliliveuser/sandbox/blob/main/calendar.html) | [Launch](https://kaliliveuser.github.io/sandbox/calendar.html) |
