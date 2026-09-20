@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>WebPi - Autonomous Coding Agent</title>
   <style>
     /* ==========================================================================
@@ -39,7 +39,7 @@
     ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
     /* App Shell */
-    .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+    .app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; width: 100vw; }
     header { height: 52px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; flex-shrink: 0; z-index: 20; }
     
     .brand-group { display: flex; align-items: center; gap: 0.75rem; }
@@ -53,6 +53,9 @@
     .btn-primary:hover { background: var(--brand-hover); }
     .btn-outline { background: var(--bg-surface); border-color: var(--border-color); color: var(--text-muted); }
     .btn-outline:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+
+    /* Mobile Navigation Tabs (Hidden on Desktop) */
+    .mobile-nav-tabs { display: none; }
 
     /* Workspace & Resizable Grid Layout */
     .workspace {
@@ -140,7 +143,7 @@
       min-height: 0;
       position: relative;
     }
-    .pane-header { padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.5); }
+    .pane-header { padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.5); flex-shrink: 0; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
     
     /* Messages & Reasoning */
@@ -181,7 +184,7 @@
     .tool-output-body { padding: 8px 10px; border-top: 1px solid rgba(124, 58, 237, 0.3); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
 
     /* Chat Input */
-    .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); }
+    .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); flex-shrink: 0; }
     .prompt-textarea { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-main); font-size: 12px; font-family: var(--font-sans); resize: none; outline: none; }
     .prompt-textarea:focus { border-color: var(--brand-primary); }
 
@@ -202,8 +205,120 @@
     .input-control { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--text-main); font-size: 12px; outline: none; }
     .input-control:focus { border-color: var(--brand-primary); }
 
-    .status-bar { padding: 6px 12px; background: var(--bg-darkest); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--brand-light); display: none; align-items: center; justify-content: space-between; }
+    .status-bar { padding: 6px 12px; background: var(--bg-darkest); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--brand-light); display: none; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .hidden { display: none !important; }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE OVERRIDES (ONLY APPLIES TO SCREENS <= 768px)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      header {
+        padding: 0 8px;
+      }
+      .brand-title span#modelBadge {
+        display: none;
+      }
+      .btn-label {
+        display: none;
+      }
+      header .btn {
+        padding: 6px 8px;
+      }
+
+      /* Mobile tab navigation bar */
+      .mobile-nav-tabs {
+        display: flex;
+        background: var(--bg-dark);
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+        z-index: 25;
+      }
+      .mobile-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 9px 4px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .mobile-tab-btn:hover {
+        color: var(--text-main);
+      }
+      .mobile-tab-btn.active {
+        color: var(--brand-light);
+        font-weight: 600;
+        border-bottom: 2px solid var(--brand-primary);
+        background: rgba(124, 58, 237, 0.12);
+      }
+
+      /* Hide cross handle on mobile */
+      .cross-handle {
+        display: none !important;
+      }
+
+      /* Make workspace full width & height */
+      .workspace {
+        flex-direction: column !important;
+        overflow: hidden !important;
+      }
+      .pane-col-left,
+      .pane-col-right {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+      }
+
+      /* Hide all four panes by default on mobile */
+      .pane-files,
+      .pane-chat,
+      .editor-pane,
+      .preview-pane {
+        display: none !important;
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+      }
+
+      /* Toggle view based on workspace[data-mobile-tab] */
+      #workspace[data-mobile-tab="files"] .pane-col-left,
+      #workspace[data-mobile-tab="chat"] .pane-col-left {
+        display: flex !important;
+      }
+      #workspace[data-mobile-tab="files"] .pane-col-right,
+      #workspace[data-mobile-tab="chat"] .pane-col-right {
+        display: none !important;
+      }
+
+      #workspace[data-mobile-tab="editor"] .pane-col-right,
+      #workspace[data-mobile-tab="preview"] .pane-col-right {
+        display: flex !important;
+      }
+      #workspace[data-mobile-tab="editor"] .pane-col-left,
+      #workspace[data-mobile-tab="preview"] .pane-col-left {
+        display: none !important;
+      }
+
+      #workspace[data-mobile-tab="files"] .pane-files {
+        display: flex !important;
+      }
+      #workspace[data-mobile-tab="chat"] .pane-chat {
+        display: flex !important;
+      }
+      #workspace[data-mobile-tab="editor"] .editor-pane {
+        display: flex !important;
+      }
+      #workspace[data-mobile-tab="preview"] .preview-pane {
+        display: flex !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -226,16 +341,16 @@
       <div style="display:flex; align-items:center; gap:8px;">
         <button class="btn btn-outline" onclick="exportSession()" title="Export Session (.json)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Save Session
+          <span class="btn-label">Save Session</span>
         </button>
         <label class="btn btn-outline" style="cursor:pointer;" title="Restore Session">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          Restore
+          <span class="btn-label">Restore</span>
           <input type="file" id="sessionFileInput" accept=".json" class="hidden" onchange="importSession(event)" />
         </label>
         <button class="btn btn-outline" onclick="downloadZip()" title="Export Entire Project as ZIP">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>
-          Export ZIP
+          <span class="btn-label">Export ZIP</span>
         </button>
         <button class="btn btn-outline" onclick="openSettings()" title="Configuration">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -243,8 +358,28 @@
       </div>
     </header>
 
+    <!-- MOBILE TABS BAR (VISIBLE ONLY ON MOBILE VIEW) -->
+    <nav class="mobile-nav-tabs" id="mobileNavTabs">
+      <button type="button" class="mobile-tab-btn active" data-tab="chat" onclick="switchMobileTab('chat')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Chat
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="files" onclick="switchMobileTab('files')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+        Files
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="editor" onclick="switchMobileTab('editor')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        Editor
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="preview" onclick="switchMobileTab('preview')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        Preview
+      </button>
+    </nav>
+
     <!-- WORKSPACE: FOUR VIEWS WITH CENTRE INTERSECTION CROSS RESIZE HANDLE -->
-    <main class="workspace" id="workspace">
+    <main class="workspace" id="workspace" data-mobile-tab="chat">
       <!-- CENTRE RESIZE HANDLE -->
       <div id="centerResizeHandle" class="cross-handle" title="Drag to resize panes (Double-click to reset)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -887,9 +1022,11 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     function buildContextMessages(systemMessage) {
-      const maxCtx = parseInt(settings.contextWindow, 10) || DEFAULT_SETTINGS.contextWindow;
-      const maxOut = parseInt(settings.maxTokens, 10) || DEFAULT_SETTINGS.maxTokens;
-      const budget = Math.max(2048, maxCtx - maxOut);
+      const maxCtx = parseInt(settings.contextWindow, 10) || 32768;
+      const maxOut = parseInt(settings.maxTokens, 10) || 4096;
+      
+      const reservedOutput = Math.min(maxOut, Math.floor(maxCtx * 0.35));
+      const budget = Math.max(4096, maxCtx - reservedOutput);
 
       // Filter out empty turns and any middle-of-history system/ui error messages
       const validHistory = chatHistory
@@ -905,22 +1042,44 @@ Use the provided tools systematically to complete all user requests accurately.`
           return item;
         });
 
-      const allMsgs = [systemMessage, ...validHistory];
+      if (validHistory.length === 0) return [systemMessage];
 
-      let totalEst = allMsgs.reduce((acc, m) => {
-        return acc + estimateTokens(m.content) + estimateTokens(JSON.stringify(m.tool_calls || ""));
-      }, 0);
+      // Keep user prompt anchored so Jinja templates never throw "No user query"
+      const firstUserIdx = validHistory.findIndex(m => m.role === "user");
+      let initialUserMsg = null;
+      let turns = [];
 
-      if (totalEst <= budget) return allMsgs;
+      if (firstUserIdx !== -1) {
+        initialUserMsg = validHistory[firstUserIdx];
+        turns = [
+          ...validHistory.slice(0, firstUserIdx),
+          ...validHistory.slice(firstUserIdx + 1)
+        ];
+      } else {
+        initialUserMsg = { role: "user", content: "Continue task." };
+        turns = [...validHistory];
+      }
 
-      // Prune oldest messages from conversation history while retaining system message
-      const sys = allMsgs[0];
-      const rest = allMsgs.slice(1);
-      while (rest.length > 2 && totalEst > budget) {
-        const removed = rest.shift();
+      function calcTokens(msgs) {
+        return msgs.reduce((acc, m) => {
+          return acc + estimateTokens(m.content) + estimateTokens(JSON.stringify(m.tool_calls || ""));
+        }, 0);
+      }
+
+      let totalEst = estimateTokens(systemMessage.content) +
+                     calcTokens([initialUserMsg]) +
+                     calcTokens(turns);
+
+      while (turns.length > 2 && totalEst > budget) {
+        const removed = turns.shift();
         totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
       }
-      return [sys, ...rest];
+
+      while (turns.length > 0 && turns[0].role === "tool") {
+        turns.shift();
+      }
+
+      return [systemMessage, initialUserMsg, ...turns];
     }
 
     async function handleSendPrompt(e) {
@@ -1185,7 +1344,7 @@ Use the provided tools systematically to complete all user requests accurately.`
 
     /* ==========================================================================
        6. CHAT UI RENDERING & EXPANDABLE TOOL CALLS / OUTPUTS
-       ========================================================================= */
+       ========================================================================== */
     function toggleThoughtProcess(idx) {
       if (chatHistory[idx]) {
         chatHistory[idx].reasoningOpen = !chatHistory[idx].reasoningOpen;
@@ -1470,7 +1629,12 @@ Use the provided tools systematically to complete all user requests accurately.`
         const isActive = p === activeFilePath;
         const item = document.createElement("div");
         item.className = `file-item ${isActive ? 'active' : ''}`;
-        item.onclick = (e) => { if (!e.target.closest("button")) loadFileToEditor(p); };
+        item.onclick = (e) => { 
+          if (!e.target.closest("button")) {
+            loadFileToEditor(p);
+            if (window.innerWidth <= 768) switchMobileTab('editor');
+          }
+        };
         item.innerHTML = `
           <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📄 ${escapeHtml(p)}</span>
           <div style="display:flex; gap:4px;">
@@ -1519,6 +1683,7 @@ Use the provided tools systematically to complete all user requests accurately.`
           loadFileToEditor(norm);
           renderFileTree();
           refreshPreview();
+          if (window.innerWidth <= 768) switchMobileTab('editor');
         }
       }
     }
@@ -1720,8 +1885,17 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     /* ==========================================================================
-       11. DRAGGABLE CENTRE CROSS-HANDLE RESIZING
+       11. DRAGGABLE CENTRE CROSS-HANDLE RESIZING & MOBILE TABS
        ========================================================================== */
+    function switchMobileTab(tab) {
+      const ws = document.getElementById("workspace");
+      if (ws) ws.setAttribute("data-mobile-tab", tab);
+      document.querySelectorAll(".mobile-tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+      });
+      if (tab === "preview") refreshPreview();
+    }
+
     function initResizeHandle() {
       const handle = document.getElementById("centerResizeHandle");
       const workspace = document.getElementById("workspace");
@@ -1730,12 +1904,12 @@ Use the provided tools systematically to complete all user requests accurately.`
       let isDragging = false;
 
       function onPointerDown(e) {
+        if (window.innerWidth <= 768) return;
         isDragging = true;
         handle.classList.add("active");
         document.body.style.userSelect = "none";
         document.body.style.cursor = "all-scroll";
 
-        // Prevent iframe from intercepting mouse drag events
         const preview = document.getElementById("previewFrame");
         if (preview) preview.style.pointerEvents = "none";
 
@@ -1754,7 +1928,6 @@ Use the provided tools systematically to complete all user requests accurately.`
         const px = ((e.clientX - rect.left) / rect.width) * 100;
         const py = ((e.clientY - rect.top) / rect.height) * 100;
 
-        // Bound between 15% and 85% to ensure all panes remain visible
         const clampedX = Math.max(15, Math.min(85, px));
         const clampedY = Math.max(15, Math.min(85, py));
 
@@ -1777,7 +1950,6 @@ Use the provided tools systematically to complete all user requests accurately.`
         } catch (err) {}
       }
 
-      // Reset to default 50% / 50% split on double-click
       handle.addEventListener("dblclick", () => {
         workspace.style.setProperty("--split-x", "50%");
         workspace.style.setProperty("--split-y", "50%");
