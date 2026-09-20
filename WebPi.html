@@ -435,7 +435,7 @@
                 rows="3"
                 placeholder="Ask WebPi to build, scaffold, or modify your application..."
                 onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendPrompt(event); }"
-              >Create a self-contained, single-file, responsive website about ... Make it attractive, handsome and sophisticated and give it a professional theme. Name the file ....html</textarea>
+              >Create a self-contained, single-file, responsive website about . Make it attractive, handsome and sophisticated and give it a professional theme. Name the file .html</textarea>
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:10px; color:var(--text-dim);">Shift+Enter for newline</span>
                 <button type="submit" class="btn btn-primary">
@@ -1028,8 +1028,15 @@ Use the provided tools systematically to complete all user requests accurately.`
       const reservedOutput = Math.min(maxOut, Math.floor(maxCtx * 0.35));
       const budget = Math.max(4096, maxCtx - reservedOutput);
 
-      // Filter out empty turns and any middle-of-history system/ui error messages
-      const validHistory = chatHistory
+      // Find the first actual user message in chat history
+      const firstUserIdx = chatHistory.findIndex(m => m.role === "user");
+      if (firstUserIdx === -1) return [systemMessage];
+
+      // Ignore any UI greeting that appeared before the first user message
+      const conversationHistory = chatHistory.slice(firstUserIdx);
+
+      // Filter out empty turns and UI markers
+      const validHistory = conversationHistory
         .filter(m => m.role !== "system" && m.role !== "ui-error")
         .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
         .map(m => {
@@ -1044,21 +1051,9 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       if (validHistory.length === 0) return [systemMessage];
 
-      // Keep user prompt anchored so Jinja templates never throw "No user query"
-      const firstUserIdx = validHistory.findIndex(m => m.role === "user");
-      let initialUserMsg = null;
-      let turns = [];
-
-      if (firstUserIdx !== -1) {
-        initialUserMsg = validHistory[firstUserIdx];
-        turns = [
-          ...validHistory.slice(0, firstUserIdx),
-          ...validHistory.slice(firstUserIdx + 1)
-        ];
-      } else {
-        initialUserMsg = { role: "user", content: "Continue task." };
-        turns = [...validHistory];
-      }
+      // The user's initiating prompt remains anchored at the start
+      const initialUserMsg = validHistory[0];
+      const subsequentTurns = validHistory.slice(1);
 
       function calcTokens(msgs) {
         return msgs.reduce((acc, m) => {
@@ -1068,18 +1063,20 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       let totalEst = estimateTokens(systemMessage.content) +
                      calcTokens([initialUserMsg]) +
-                     calcTokens(turns);
+                     calcTokens(subsequentTurns);
 
-      while (turns.length > 2 && totalEst > budget) {
-        const removed = turns.shift();
+      // Prune older intermediate turns if needed, preserving the latest context
+      while (subsequentTurns.length > 2 && totalEst > budget) {
+        const removed = subsequentTurns.shift();
         totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
       }
 
-      while (turns.length > 0 && turns[0].role === "tool") {
-        turns.shift();
+      // Avoid leading orphan tool messages
+      while (subsequentTurns.length > 0 && subsequentTurns[0].role === "tool") {
+        subsequentTurns.shift();
       }
 
-      return [systemMessage, initialUserMsg, ...turns];
+      return [systemMessage, initialUserMsg, ...subsequentTurns];
     }
 
     async function handleSendPrompt(e) {
@@ -1972,7 +1969,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       loadFileToEditor(activeFilePath);
       refreshPreview();
       initResizeHandle();
-      addChatMessage("assistant", "Hello! I am WebPi, your autonomous web coding agent running 100% air-gapped with zero external dependencies. Tell me what you'd like to build!");
+      addChatMessage("assistant", "Hello! I am WebPi, your autonomous coding agent running 100% in the browser. Only a local AI server is needed (see settings). Tell me what you'd like to build!");
     });
   </script>
 </body>
