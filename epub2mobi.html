@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPUB to MOBI Converter & Cover Studio (Kindle Compatible)</title>
+  
+  <style>
+    /* =========================================================================
+       RESET & BASE DESIGN SYSTEM (Offline Self-Contained)
+       ========================================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background-color: #f59e0b;
+      color: #000;
+    }
+
+    /* Scrollbars */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+
+    /* Book Shadow */
+    .book-shadow {
+      box-shadow: -10px 15px 30px rgba(0,0,0,0.6), 0 0 10px rgba(255,255,255,0.05) inset;
+    }
+
+    /* Layout & Flex / Grid Helpers */
+    .max-w-7xl { max-width: 80rem; }
+    .max-w-2xl { max-width: 42rem; }
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .my-12 { margin-top: 3rem; margin-bottom: 3rem; }
+    .my-2 { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .pt-4 { padding-top: 1rem; }
+    .p-12 { padding: 3rem; }
+    .p-6 { padding: 1.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-2\.5 { padding: 0.625rem; }
+    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .h-16 { height: 4rem; }
+    .h-9 { height: 2.25rem; }
+    .w-9 { width: 2.25rem; }
+    .h-8 { height: 2rem; }
+    .w-8 { width: 2rem; }
+    .h-5 { height: 1.25rem; }
+    .w-5 { width: 1.25rem; }
+    .h-2 { height: 0.5rem; }
+    .w-2 { width: 0.5rem; }
+    .w-7 { width: 1.75rem; }
+    .h-7 { height: 1.75rem; }
+    .w-64 { width: 16rem; }
+    .w-16 { width: 4rem; }
+    .h-16-sq { height: 4rem; width: 4rem; }
+    .flex-1 { flex: 1 1 0%; }
+    .flex { display: flex; }
+    .grid { display: grid; }
+    .hidden { display: none !important; }
+    .inline-block { display: inline-block; }
+    .flex-col { flex-direction: column; }
+    .flex-wrap { flex-wrap: wrap; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-8 { gap: 2rem; }
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+    .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+    .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .sticky { position: sticky; }
+    .top-0 { top: 0; }
+    .inset-0 { inset: 0; }
+    .inset-y-0 { top: 0; bottom: 0; }
+    .left-0 { left: 0; }
+    .w-3 { width: 0.75rem; }
+    .z-20 { z-index: 20; }
+    .z-50 { z-index: 50; }
+    .pointer-events-none { pointer-events: none; }
+    .cursor-pointer { cursor: pointer; }
+    .select-none { user-select: none; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ml-auto { margin-left: auto; }
+    .-ml-1 { margin-left: -0.25rem; }
+    .mr-2 { margin-right: 0.5rem; }
+    .opacity-0 { opacity: 0; }
+    .opacity-25 { opacity: 0.25; }
+    .opacity-75 { opacity: 0.75; }
+    .aspect-\[2\/3\] { aspect-ratio: 2 / 3; }
+    .object-cover { object-fit: cover; }
+    .max-h-48 { max-height: 12rem; }
+    .overflow-y-auto { overflow-y: auto; }
+
+    /* Colors & Borders */
+    .bg-slate-900 { background-color: #0f172a; }
+    .bg-slate-950 { background-color: #020617; }
+    .bg-slate-950\/60 { background-color: rgba(2, 6, 23, 0.6); }
+    .bg-slate-900\/80 { background-color: rgba(15, 23, 42, 0.8); }
+    .bg-slate-900\/50 { background-color: rgba(15, 23, 42, 0.5); }
+    .bg-slate-800 { background-color: #1e293b; }
+    .bg-slate-800\/60 { background-color: rgba(30, 41, 59, 0.6) !important; }
+    .bg-slate-800\/40 { background-color: rgba(30, 41, 59, 0.4); }
+    .bg-amber-500 { background-color: #f59e0b; }
+    .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1); }
+    .bg-emerald-400 { background-color: #34d399; }
+    .bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.1); }
+    .bg-rose-500\/10 { background-color: rgba(244, 63, 94, 0.1); }
+
+    .border { border-width: 1px; border-style: solid; }
+    .border-2 { border-width: 2px; border-style: solid; }
+    .border-dashed { border-style: dashed; }
+    .border-b { border-bottom-width: 1px; border-bottom-style: solid; }
+    .border-t { border-top-width: 1px; border-top-style: solid; }
+    .border-r { border-right-width: 1px; border-right-style: solid; }
+    .border-y { border-top-width: 1px; border-bottom-width: 1px; border-top-style: solid; border-bottom-style: solid; }
+    .border-slate-800 { border-color: #1e293b; }
+    .border-slate-800\/80 { border-color: rgba(30, 41, 59, 0.8); }
+    .border-slate-700 { border-color: #334155; }
+    .border-slate-700\/50 { border-color: rgba(51, 65, 85, 0.5); }
+    .border-amber-500 { border-color: #f59e0b; }
+    .border-amber-400 { border-color: #fbbf24 !important; }
+    .border-emerald-500\/20 { border-color: rgba(16, 185, 129, 0.2); }
+    .border-rose-500\/20 { border-color: rgba(244, 63, 94, 0.2); }
+
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-full { border-radius: 9999px; }
+    .rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
+    .rounded-l-\[2px\] { border-top-left-radius: 2px; border-bottom-left-radius: 2px; }
+
+    /* Typography */
+    .text-white { color: #ffffff; }
+    .text-slate-950 { color: #020617; }
+    .text-slate-300 { color: #cbd5e1; }
+    .text-slate-400 { color: #94a3b8; }
+    .text-slate-500 { color: #64748b; }
+    .text-amber-400 { color: #fbbf24; }
+    .text-amber-300 { color: #fcd34d; }
+    .text-emerald-400 { color: #34d399; }
+    .text-emerald-300 { color: #6ee7b7; }
+    .text-rose-300 { color: #fda4af; }
+
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .text-\[10px\] { font-size: 10px; }
+    .text-\[11px\] { font-size: 11px; }
+
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .font-black { font-weight: 900; }
+    .uppercase { text-transform: uppercase; }
+    .italic { font-style: italic; }
+    .tracking-tight { letter-spacing: -0.025em; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    .text-center { text-align: center; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .font-sans { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    /* Effects & Gradients */
+    .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .bg-gradient-to-tr { background-image: linear-gradient(to top right, #f59e0b, #fcd34d); }
+    .bg-gradient-to-r { background-image: linear-gradient(to right, #f59e0b, #fbbf24); }
+    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .shadow-amber-500\/20 { box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2); }
+    .shadow-amber-500\/25 { box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.25); }
+
+    /* Transitions & Interactivity */
+    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    .duration-200 { transition-duration: 200ms; }
+    .transition-colors { transition-property: color, background-color, border-color; transition-duration: 150ms; }
+    .transition-transform { transition-property: transform; transition-duration: 150ms; }
+    .scale-110 { transform: scale(1.1); }
+
+    /* Interactive pseudo-classes */
+    #dropzone:hover {
+      border-color: rgba(251, 191, 36, 0.8);
+      background-color: rgba(30, 41, 59, 0.4);
+    }
+    .group:hover .group-hover\:bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1); }
+    .group:hover .group-hover\:text-amber-400 { color: #fbbf24; }
+    .hover\:scale-105:hover { transform: scale(1.05); }
+    .hover\:border-slate-600:hover { border-color: #475569; }
+    .hover\:text-slate-300:hover { color: #cbd5e1; }
+    .hover\:text-white:hover { color: #ffffff; }
+    .hover\:text-amber-300:hover { color: #fcd34d; }
+    .hover\:underline:hover { text-decoration: underline; }
+    .hover\:bg-amber-400:hover { background-color: #fbbf24; }
+    #convertBtn:hover {
+      background-image: linear-gradient(to right, #fbbf24, #fcd34d);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #fbbf24;
+    }
+
+    /* Animation */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin { animation: spin 1s linear infinite; }
+
+    /* Responsive Grid */
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    @media (min-width: 640px) {
+      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sm\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .sm\:w-72 { width: 18rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+      .lg\:col-span-7 { grid-column: span 7 / span 7; }
+      .lg\:col-span-5 { grid-column: span 5 / span 5; }
+      .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+    }
+  </style>
+</head>
+<body class="selection:bg-amber-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-lg bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 font-black">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight text-white">EPUB <span class="text-amber-400 font-extrabold">&rarr;</span> MOBI Studio</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> Offline Mode &bull; Legacy Kindle (KF7) + Modern
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Upload Dropzone (Visible when no book loaded) -->
+    <div id="dropzoneSection" class="max-w-2xl mx-auto my-12">
+      <div id="dropzone" class="relative group cursor-pointer border-2 border-dashed border-slate-700 rounded-2xl p-12 text-center bg-slate-900/50 transition-all duration-200">
+        <input type="file" id="epubInput" accept=".epub" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+        <div class="pointer-events-none w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800 group-hover:bg-amber-500/10 flex items-center justify-center text-slate-400 group-hover:text-amber-400 transition-colors">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        </div>
+        <h3 class="pointer-events-none text-lg font-semibold text-white mb-1">Drop your EPUB document here</h3>
+        <p class="pointer-events-none text-sm text-slate-400 mb-4">Select an .epub file to generate an older & newer Kindle-compatible MOBI</p>
+        <button type="button" class="pointer-events-none px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm transition shadow-md shadow-amber-500/20">
+          Browse File
+        </button>
+      </div>
+      <div id="dropStatusAlert" class="hidden mt-4 p-3 rounded-lg text-xs font-medium text-center bg-rose-500/10 text-rose-300 border border-rose-500/20"></div>
+    </div>
+
+    <!-- Workspace -->
+    <div id="workspaceSection" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Column: Controls & Metadata & TOC -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Metadata Box -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm uppercase tracking-wider text-slate-400 font-semibold">Book Metadata</h2>
+            <button id="changeFileBtn" class="text-xs text-amber-400 hover:text-amber-300 font-medium">Load Different EPUB</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Title</label>
+              <input type="text" id="metaTitle" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Author</label>
+              <input type="text" id="metaAuthor" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover Customizer -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+          <h2 class="text-sm uppercase tracking-wider text-slate-400 font-semibold mb-4">Cover Studio</h2>
+          
+          <!-- Presets -->
+          <label class="block text-xs font-medium text-slate-400 mb-2">Design Preset</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <button type="button" data-preset="classic" class="preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-amber-500 bg-amber-500/10 text-amber-300">Literary Classic</button>
+            <button type="button" data-preset="modern" class="preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600">Modern Swiss</button>
+            <button type="button" data-preset="aurora" class="preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600">Vibrant Aurora</button>
+            <button type="button" data-preset="noir" class="preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600">Noir Luxe</button>
+          </div>
+
+          <!-- Color Palettes -->
+          <label class="block text-xs font-medium text-slate-400 mb-2">Color Palette</label>
+          <div class="flex flex-wrap gap-2 mb-4" id="paletteContainer"></div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Subtitle / Tagline</label>
+              <input type="text" id="metaSubtitle" placeholder="e.g. A Novel or Special Edition" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Emblem / Ornament</label>
+              <select id="coverOrnament" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                <option value="diamond">Geometric Diamond</option>
+                <option value="laurel">Classic Laurel Wreath</option>
+                <option value="monogram">Author Initials Monogram</option>
+                <option value="minimal">Minimal Line Rule</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Original EPUB cover: <span id="hasOrigCoverBadge" class="text-slate-300">Scanning...</span></span>
+            <button id="toggleOrigCoverBtn" class="hidden text-xs text-amber-400 hover:underline">Use Original Cover</button>
+          </div>
+        </div>
+
+        <!-- Table of Contents Inspector -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm uppercase tracking-wider text-slate-400 font-semibold">Table of Contents Navigation</h2>
+            <span id="tocCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">0 items</span>
+          </div>
+          <div class="mb-3 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300">
+            <strong>Older Kindle Compatibility Enabled:</strong> Compiling binary byte-offsets (<code>filepos</code>), hardware <code>&lt;guide&gt;</code> references, <code>&lt;mbp:pagebreak/&gt;</code> markers, and EXTH 116/501 metadata to un-grey the hardware <strong>Go to &rarr; Table of Contents</strong> and <strong>Beginning</strong> buttons.
+          </div>
+          <div id="tocTree" class="max-h-48 overflow-y-auto custom-scrollbar bg-slate-950/60 rounded-lg p-3 border border-slate-800/80 space-y-1 text-xs font-mono"></div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Cover Preview & Convert Button -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm flex flex-col items-center">
+          <div class="w-full flex items-center justify-between mb-4">
+            <h2 class="text-sm uppercase tracking-wider text-slate-400 font-semibold">Cover Preview</h2>
+            <span class="text-[11px] text-slate-400 font-mono">1200 &times; 1800 HD</span>
+          </div>
+
+          <div class="relative group my-2">
+            <canvas id="coverCanvas" width="1200" height="1800" class="w-64 sm:w-72 aspect-[2/3] rounded-r-lg rounded-l-[2px] book-shadow border-r border-y border-slate-700/50 object-cover"></canvas>
+            <div class="absolute inset-y-0 left-0 w-3 pointer-events-none rounded-l-[2px]" style="background-image: linear-gradient(to right, rgba(0,0,0,0.4), rgba(255,255,255,0.1), transparent);"></div>
+          </div>
+
+          <div class="w-full mt-6 space-y-3">
+            <button id="convertBtn" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-bold text-base rounded-xl transition shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              <span>Convert & Download MOBI</span>
+            </button>
+            <div id="statusAlert" class="hidden p-3 rounded-lg text-xs font-medium text-center"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    /* =========================================================================
+       SELF-CONTAINED CLIENT-SIDE ZIP ENGINE (Replaces external JSZip)
+       ========================================================================= */
+    function miniInflate(input) {
+      let bitBuf = 0, bitCnt = 0, inPos = 0;
+      function getBits(n) {
+        while (bitCnt < n) {
+          if (inPos >= input.length) return 0;
+          bitBuf |= (input[inPos++] << bitCnt);
+          bitCnt += 8;
+        }
+        const res = bitBuf & ((1 << n) - 1);
+        bitBuf >>>= n;
+        bitCnt -= n;
+        return res;
+      }
+
+      const output = [];
+      const BORDER = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+      const LENS = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+      const LEXT = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+      const DISTS = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+      const DEXT = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+
+      function buildTree(lengths) {
+        let maxLen = 0;
+        for (let i = 0; i < lengths.length; i++) if (lengths[i] > maxLen) maxLen = lengths[i];
+        const count = new Uint16Array(maxLen + 1);
+        for (let i = 0; i < lengths.length; i++) if (lengths[i]) count[lengths[i]]++;
+        const nextCode = new Uint16Array(maxLen + 1);
+        let code = 0;
+        for (let len = 1; len <= maxLen; len++) {
+          code = (code + count[len - 1]) << 1;
+          nextCode[len] = code;
+        }
+        const tree = {};
+        for (let i = 0; i < lengths.length; i++) {
+          const len = lengths[i];
+          if (len) tree[(len << 16) | nextCode[len]++] = i;
+        }
+        return { tree, maxLen };
+      }
+
+      function decodeSymbol(huff) {
+        let code = 0;
+        for (let len = 1; len <= huff.maxLen; len++) {
+          code = (code << 1) | getBits(1);
+          const sym = huff.tree[(len << 16) | code];
+          if (sym !== undefined) return sym;
+        }
+        return -1;
+      }
+
+      const fixedLitLens = new Uint8Array(288);
+      for (let i = 0; i < 144; i++) fixedLitLens[i] = 8;
+      for (let i = 144; i < 256; i++) fixedLitLens[i] = 9;
+      for (let i = 256; i < 280; i++) fixedLitLens[i] = 7;
+      for (let i = 280; i < 288; i++) fixedLitLens[i] = 8;
+      const fixedLit = buildTree(fixedLitLens);
+
+      const fixedDistLens = new Uint8Array(32);
+      for (let i = 0; i < 32; i++) fixedDistLens[i] = 5;
+      const fixedDist = buildTree(fixedDistLens);
+
+      let bfinal = 0;
+      while (!bfinal) {
+        bfinal = getBits(1);
+        const btype = getBits(2);
+        if (btype === 0) {
+          bitBuf = 0; bitCnt = 0;
+          const len = input[inPos] | (input[inPos + 1] << 8);
+          inPos += 4;
+          for (let i = 0; i < len; i++) output.push(input[inPos++]);
+        } else if (btype === 1 || btype === 2) {
+          let litTree, distTree;
+          if (btype === 1) {
+            litTree = fixedLit;
+            distTree = fixedDist;
+          } else {
+            const hlit = getBits(5) + 257;
+            const hdist = getBits(5) + 1;
+            const hclen = getBits(4) + 4;
+            const clen = new Uint8Array(19);
+            for (let i = 0; i < hclen; i++) clen[BORDER[i]] = getBits(3);
+            const codeTree = buildTree(clen);
+
+            const lengths = new Uint8Array(hlit + hdist);
+            let idx = 0;
+            while (idx < hlit + hdist) {
+              const sym = decodeSymbol(codeTree);
+              if (sym < 16) {
+                lengths[idx++] = sym;
+              } else if (sym === 16) {
+                let repeat = getBits(2) + 3;
+                const prev = lengths[idx - 1];
+                while (repeat--) lengths[idx++] = prev;
+              } else if (sym === 17) {
+                let repeat = getBits(3) + 3;
+                while (repeat--) lengths[idx++] = 0;
+              } else if (sym === 18) {
+                let repeat = getBits(7) + 11;
+                while (repeat--) lengths[idx++] = 0;
+              }
+            }
+            litTree = buildTree(lengths.subarray(0, hlit));
+            distTree = buildTree(lengths.subarray(hlit));
+          }
+
+          while (true) {
+            const sym = decodeSymbol(litTree);
+            if (sym === 256 || sym === -1) break;
+            if (sym < 256) {
+              output.push(sym);
+            } else {
+              const lenIdx = sym - 257;
+              const matchLen = LENS[lenIdx] + getBits(LEXT[lenIdx]);
+              const distSym = decodeSymbol(distTree);
+              const matchDist = DISTS[distSym] + getBits(DEXT[distSym]);
+              for (let i = 0; i < matchLen; i++) {
+                output.push(output[output.length - matchDist]);
+              }
+            }
+          }
+        } else {
+          throw new Error("Invalid deflate block");
+        }
+      }
+      return new Uint8Array(output);
+    }
+
+    class MiniZipEntry {
+      constructor(name, dataPromise) {
+        this.name = name;
+        this._getData = dataPromise;
+      }
+      async async(type) {
+        const uint8 = await this._getData();
+        if (type === "text") {
+          return new TextDecoder("utf-8").decode(uint8);
+        }
+        if (type === "blob") {
+          return new Blob([uint8]);
+        }
+        if (type === "uint8array") {
+          return uint8;
+        }
+        return uint8.buffer.slice(uint8.byteOffset, uint8.byteOffset + uint8.byteLength);
+      }
+    }
+
+    class MiniZip {
+      constructor() {
+        this.entries = new Map();
+      }
+
+      static async loadAsync(data) {
+        let buffer;
+        if (data instanceof ArrayBuffer) {
+          buffer = data;
+        } else if (data instanceof Uint8Array) {
+          buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+        } else if (data && typeof data.arrayBuffer === "function") {
+          buffer = await data.arrayBuffer();
+        } else {
+          throw new Error("Invalid file buffer format");
+        }
+
+        const zip = new MiniZip();
+        await zip._parse(buffer);
+        return zip;
+      }
+
+      async _parse(buffer) {
+        const view = new DataView(buffer);
+        const byteLen = buffer.byteLength;
+
+        let eocdOffset = -1;
+        for (let i = byteLen - 22; i >= Math.max(0, byteLen - 65557); i--) {
+          if (view.getUint32(i, true) === 0x06054b50) {
+            eocdOffset = i;
+            break;
+          }
+        }
+
+        if (eocdOffset === -1) {
+          throw new Error("Invalid EPUB format (ZIP Central Directory not found).");
+        }
+
+        const totalEntries = view.getUint16(eocdOffset + 10, true);
+        const cdOffset = view.getUint32(eocdOffset + 16, true);
+        const decoder = new TextDecoder("utf-8");
+        let p = cdOffset;
+
+        for (let i = 0; i < totalEntries; i++) {
+          if (p + 46 > byteLen) break;
+          if (view.getUint32(p, true) !== 0x02014b50) break;
+
+          const method = view.getUint16(p + 10, true);
+          const compSize = view.getUint32(p + 20, true);
+          const uncompSize = view.getUint32(p + 24, true);
+          const nameLen = view.getUint16(p + 28, true);
+          const extraLen = view.getUint16(p + 30, true);
+          const commentLen = view.getUint16(p + 32, true);
+          const localHeaderOffset = view.getUint32(p + 42, true);
+
+          const nameBytes = new Uint8Array(buffer, p + 46, nameLen);
+          const rawName = decoder.decode(nameBytes);
+          p += 46 + nameLen + extraLen + commentLen;
+
+          if (rawName.endsWith("/")) continue;
+
+          const getData = async () => {
+            if (localHeaderOffset + 30 > byteLen) throw new Error("File record header out of bounds");
+            const localNameLen = view.getUint16(localHeaderOffset + 26, true);
+            const localExtraLen = view.getUint16(localHeaderOffset + 28, true);
+            const dataStart = localHeaderOffset + 30 + localNameLen + localExtraLen;
+            const compBytes = new Uint8Array(buffer, dataStart, compSize);
+
+            if (method === 0) {
+              return compBytes;
+            } else if (method === 8) {
+              if (typeof DecompressionStream !== "undefined") {
+                try {
+                  const ds = new DecompressionStream("deflate-raw");
+                  const stream = new Blob([compBytes]).stream().pipeThrough(ds);
+                  const ab = await new Response(stream).arrayBuffer();
+                  return new Uint8Array(ab);
+                } catch (e) {
+                  // Fallback to pure JS inflator if DecompressionStream fails
+                }
+              }
+              return miniInflate(compBytes);
+            } else {
+              throw new Error("Unsupported ZIP compression: " + method);
+            }
+          };
+
+          const entry = new MiniZipEntry(rawName, getData);
+          this.entries.set(rawName, entry);
+          const cleanName = rawName.replace(/^\/+/, "");
+          if (cleanName !== rawName) {
+            this.entries.set(cleanName, entry);
+          }
+        }
+      }
+
+      file(path) {
+        if (!path) return null;
+        let norm = path.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^\/+/, "");
+        if (this.entries.has(norm)) return this.entries.get(norm);
+
+        try {
+          const decoded = decodeURIComponent(norm);
+          if (this.entries.has(decoded)) return this.entries.get(decoded);
+        } catch (e) {}
+
+        const lower = norm.toLowerCase();
+        for (const [k, v] of this.entries.entries()) {
+          if (k.toLowerCase() === lower || k.replace(/^\/+/, "").toLowerCase() === lower) {
+            return v;
+          }
+        }
+        return null;
+      }
+    }
+
+    // Set globally for drop-in compatibility
+    window.JSZip = MiniZip;
+
+    /* =========================================================================
+       GLOBAL APP STATE & PALETTES
+       ========================================================================= */
+    const state = {
+      originalFileName: "",
+      epubZip: null,
+      title: "Untitled Book",
+      author: "Unknown Author",
+      subtitle: "",
+      language: "en",
+      toc: [],
+      spineItems: [],
+      manifest: {},
+      coverPreset: "classic",
+      paletteIdx: 0,
+      ornament: "diamond",
+      originalCoverDataUrl: null,
+      useOriginalCover: false
+    };
+
+    const PALETTES = [
+      { name: "Emerald & Gold", bg: "#064e3b", primary: "#fef3c7", accent: "#d97706" },
+      { name: "Royal Navy", bg: "#0f172a", primary: "#f8fafc", accent: "#38bdf8" },
+      { name: "Burgundy Velvet", bg: "#450a0a", primary: "#ffedd5", accent: "#f59e0b" },
+      { name: "Charcoal & Ochre", bg: "#18181b", primary: "#fafafa", accent: "#eab308" },
+      { name: "Aurora Violet", bg: "#2e1065", primary: "#ffffff", accent: "#ec4899" },
+      { name: "Bone & Ink", bg: "#f5f5f4", primary: "#1c1917", accent: "#78716c" }
+    ];
+
+    /* =========================================================================
+       DOM ELEMENTS & CONTROLS
+       ========================================================================= */
+    const dropzoneSection = document.getElementById("dropzoneSection");
+    const dropzone = document.getElementById("dropzone");
+    const dropStatusAlert = document.getElementById("dropStatusAlert");
+    const workspaceSection = document.getElementById("workspaceSection");
+    const epubInput = document.getElementById("epubInput");
+    const changeFileBtn = document.getElementById("changeFileBtn");
+    const metaTitle = document.getElementById("metaTitle");
+    const metaAuthor = document.getElementById("metaAuthor");
+    const metaSubtitle = document.getElementById("metaSubtitle");
+    const coverCanvas = document.getElementById("coverCanvas");
+    const coverOrnament = document.getElementById("coverOrnament");
+    const paletteContainer = document.getElementById("paletteContainer");
+    const tocTree = document.getElementById("tocTree");
+    const tocCountBadge = document.getElementById("tocCountBadge");
+    const convertBtn = document.getElementById("convertBtn");
+    const statusAlert = document.getElementById("statusAlert");
+    const hasOrigCoverBadge = document.getElementById("hasOrigCoverBadge");
+    const toggleOrigCoverBtn = document.getElementById("toggleOrigCoverBtn");
+
+    // File input & Drag-and-Drop
+    epubInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    ["dragenter", "dragover"].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add("border-amber-400", "bg-slate-800/60");
+      });
+    });
+
+    ["dragleave", "dragend"].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove("border-amber-400", "bg-slate-800/60");
+      });
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.remove("border-amber-400", "bg-slate-800/60");
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    changeFileBtn.addEventListener("click", () => {
+      workspaceSection.classList.add("hidden");
+      dropzoneSection.classList.remove("hidden");
+      epubInput.value = "";
+      state.originalFileName = "";
+      if (dropStatusAlert) dropStatusAlert.classList.add("hidden");
+    });
+
+    metaTitle.addEventListener("input", (e) => { state.title = e.target.value; renderCover(); });
+    metaAuthor.addEventListener("input", (e) => { state.author = e.target.value; renderCover(); });
+    metaSubtitle.addEventListener("input", (e) => { state.subtitle = e.target.value; renderCover(); });
+    coverOrnament.addEventListener("change", (e) => { state.ornament = e.target.value; renderCover(); });
+
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".preset-btn").forEach(b => {
+          b.className = "preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600";
+        });
+        btn.className = "preset-btn px-3 py-2 text-xs font-semibold rounded-lg border border-amber-500 bg-amber-500/10 text-amber-300";
+        state.coverPreset = btn.dataset.preset;
+        renderCover();
+      });
+    });
+
+    function setupPalettes() {
+      paletteContainer.innerHTML = "";
+      PALETTES.forEach((p, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `w-7 h-7 rounded-full border-2 transition-transform ${idx === state.paletteIdx ? 'border-amber-400 scale-110' : 'border-slate-700 hover:scale-105'}`;
+        btn.style.backgroundColor = p.bg;
+        btn.title = p.name;
+        btn.addEventListener("click", () => {
+          state.paletteIdx = idx;
+          setupPalettes();
+          renderCover();
+        });
+        paletteContainer.appendChild(btn);
+      });
+    }
+    setupPalettes();
+
+    toggleOrigCoverBtn.addEventListener("click", () => {
+      state.useOriginalCover = !state.useOriginalCover;
+      toggleOrigCoverBtn.textContent = state.useOriginalCover ? "Use Studio Designer" : "Use Original Cover";
+      renderCover();
+    });
+
+    convertBtn.addEventListener("click", handleConvert);
+
+    /* =========================================================================
+       EPUB PARSER (Namespace-safe)
+       ========================================================================= */
+    function getXmlText(doc, tagNames) {
+      for (const name of tagNames) {
+        const els = doc.getElementsByTagName(name);
+        if (els && els.length > 0 && els[0].textContent) {
+          const text = els[0].textContent.trim();
+          if (text) return text;
+        }
+      }
+      const all = doc.getElementsByTagName("*");
+      for (let i = 0; i < all.length; i++) {
+        const el = all[i];
+        const local = (el.localName || el.tagName.split(":").pop()).toLowerCase();
+        for (const name of tagNames) {
+          const target = name.split(":").pop().toLowerCase();
+          if (local === target && el.textContent && el.textContent.trim()) {
+            return el.textContent.trim();
+          }
+        }
+      }
+      return "";
+    }
+
+    async function handleFile(file) {
+      if (!file) return;
+      state.originalFileName = file.name || "";
+      if (dropStatusAlert) dropStatusAlert.classList.add("hidden");
+      showStatus("Unpacking EPUB structure offline...", "info");
+
+      try {
+        const zip = await JSZip.loadAsync(file);
+        state.epubZip = zip;
+
+        const containerFile = zip.file("META-INF/container.xml");
+        if (!containerFile) throw new Error("Invalid EPUB: META-INF/container.xml missing.");
+        const containerXml = await containerFile.async("text");
+        const containerDoc = new DOMParser().parseFromString(containerXml, "text/xml");
+
+        let rootfileEl = containerDoc.getElementsByTagName("rootfile")[0] || containerDoc.querySelector("rootfile");
+        let rootfilePath = rootfileEl?.getAttribute("full-path");
+        if (!rootfilePath) throw new Error("Invalid EPUB: OPF rootfile reference not found.");
+
+        const opfFile = zip.file(rootfilePath);
+        if (!opfFile) throw new Error("Could not find OPF file at: " + rootfilePath);
+        const opfXml = await opfFile.async("text");
+        const opfDoc = new DOMParser().parseFromString(opfXml, "text/xml");
+        const opfDir = rootfilePath.includes("/") ? rootfilePath.substring(0, rootfilePath.lastIndexOf("/") + 1) : "";
+
+        state.title = getXmlText(opfDoc, ["dc:title", "title"]) || file.name.replace(/\.epub$/i, "");
+        state.author = getXmlText(opfDoc, ["dc:creator", "creator"]) || "Unknown Author";
+        state.language = getXmlText(opfDoc, ["dc:language", "language"]) || "en";
+
+        metaTitle.value = state.title;
+        metaAuthor.value = state.author;
+
+        state.manifest = {};
+        let coverHref = null;
+        const manifestItems = opfDoc.getElementsByTagName("item");
+        for (let i = 0; i < manifestItems.length; i++) {
+          const item = manifestItems[i];
+          const id = item.getAttribute("id");
+          const href = item.getAttribute("href");
+          const mediaType = item.getAttribute("media-type") || "";
+          const properties = item.getAttribute("properties") || "";
+          if (id && href) {
+            const normHref = normalizeRelativePath(opfDir + href);
+            state.manifest[id] = { href: normHref, mediaType };
+
+            if (properties.includes("cover-image") || (id.toLowerCase().includes("cover") && mediaType.startsWith("image/"))) {
+              coverHref = normHref;
+            }
+          }
+        }
+
+        state.spineItems = [];
+        const spineItemrefs = opfDoc.getElementsByTagName("itemref");
+        for (let i = 0; i < spineItemrefs.length; i++) {
+          const ref = spineItemrefs[i];
+          const idref = ref.getAttribute("idref");
+          if (idref && state.manifest[idref]) {
+            state.spineItems.push({
+              id: idref,
+              href: state.manifest[idref].href
+            });
+          }
+        }
+
+        state.originalCoverDataUrl = null;
+        if (coverHref && zip.file(coverHref)) {
+          const coverBlob = await zip.file(coverHref).async("blob");
+          state.originalCoverDataUrl = URL.createObjectURL(coverBlob);
+          hasOrigCoverBadge.textContent = "Yes, found";
+          hasOrigCoverBadge.className = "text-emerald-400 font-semibold";
+          toggleOrigCoverBtn.classList.remove("hidden");
+        } else {
+          hasOrigCoverBadge.textContent = "None (Studio cover will be used)";
+          hasOrigCoverBadge.className = "text-slate-400 italic";
+          toggleOrigCoverBtn.classList.add("hidden");
+        }
+
+        await extractTOC(opfDoc, opfDir, zip);
+
+        dropzoneSection.classList.add("hidden");
+        workspaceSection.classList.remove("hidden");
+        hideStatus();
+        renderCover();
+      } catch (err) {
+        console.error(err);
+        if (dropStatusAlert) {
+          dropStatusAlert.textContent = "Error loading EPUB: " + err.message;
+          dropStatusAlert.classList.remove("hidden");
+        }
+        showStatus("Error loading EPUB: " + err.message, "error");
+      }
+    }
+
+    async function extractTOC(opfDoc, opfDir, zip) {
+      state.toc = [];
+
+      function getChildrenByTag(parent, tagName) {
+        return Array.from(parent.children).filter(c => {
+          const name = (c.localName || c.tagName.split(":").pop()).toLowerCase();
+          return name === tagName.toLowerCase();
+        });
+      }
+      function getChildByTag(parent, tagName) {
+        return Array.from(parent.children).find(c => {
+          const name = (c.localName || c.tagName.split(":").pop()).toLowerCase();
+          return name === tagName.toLowerCase();
+        });
+      }
+
+      // 1. EPUB 2 NCX
+      const ncxItem = Object.values(state.manifest).find(
+        m => m.mediaType === "application/x-dtbncx+xml" || m.href.endsWith(".ncx")
+      );
+      if (ncxItem && zip.file(ncxItem.href)) {
+        const ncxXml = await zip.file(ncxItem.href).async("text");
+        const ncxDoc = new DOMParser().parseFromString(ncxXml, "text/xml");
+        const ncxDir = ncxItem.href.includes("/") ? ncxItem.href.substring(0, ncxItem.href.lastIndexOf("/") + 1) : "";
+
+        function parseNavPoints(parent, level = 0) {
+          const navPoints = getChildrenByTag(parent, "navpoint");
+          navPoints.forEach(np => {
+            const navLabel = getChildByTag(np, "navlabel");
+            const textEl = navLabel ? getChildByTag(navLabel, "text") : null;
+            const label = textEl?.textContent?.trim() || "Untitled Section";
+
+            const contentEl = getChildByTag(np, "content");
+            let rawSrc = contentEl?.getAttribute("src") || "";
+            if (rawSrc) {
+              const fullSrc = normalizeRelativePath(ncxDir + rawSrc);
+              const parts = fullSrc.split("#");
+              state.toc.push({
+                title: label,
+                href: fullSrc,
+                spineHref: parts[0],
+                fragment: parts[1] || null,
+                level
+              });
+            }
+            parseNavPoints(np, level + 1);
+          });
+        }
+
+        const navMaps = ncxDoc.getElementsByTagName("navMap");
+        const navMap = navMaps.length > 0 ? navMaps[0] : (ncxDoc.getElementsByTagName("navmap")[0] || null);
+        if (navMap) parseNavPoints(navMap, 0);
+      }
+
+      // 2. EPUB 3 Nav Document (if NCX missing)
+      if (state.toc.length === 0) {
+        const navItem = Object.values(state.manifest).find(
+          m => m.mediaType === "application/xhtml+xml" && (m.href.includes("nav") || m.href.includes("toc"))
+        );
+        if (navItem && zip.file(navItem.href)) {
+          const navXhtml = await zip.file(navItem.href).async("text");
+          const navDoc = new DOMParser().parseFromString(navXhtml, "text/html");
+          const navDir = navItem.href.includes("/") ? navItem.href.substring(0, navItem.href.lastIndexOf("/") + 1) : "";
+          const navLinks = navDoc.querySelectorAll("nav[epub\\:type='toc'] a, nav#toc a, nav a");
+          navLinks.forEach(a => {
+            const label = a.textContent.trim();
+            let href = a.getAttribute("href") || "";
+            if (href) {
+              const fullSrc = normalizeRelativePath(navDir + href);
+              const parts = fullSrc.split("#");
+              state.toc.push({
+                title: label || "Untitled Section",
+                href: fullSrc,
+                spineHref: parts[0],
+                fragment: parts[1] || null,
+                level: 0
+              });
+            }
+          });
+        }
+      }
+
+      // 3. Fallback: Generate from Spine
+      if (state.toc.length === 0) {
+        state.spineItems.forEach((spine, idx) => {
+          state.toc.push({
+            title: `Chapter ${idx + 1}`,
+            href: spine.href,
+            spineHref: spine.href,
+            fragment: null,
+            level: 0
+          });
+        });
+      }
+
+      tocTree.innerHTML = "";
+      tocCountBadge.textContent = `${state.toc.length} sections`;
+      state.toc.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-2 py-0.5 text-slate-300 hover:text-white";
+        row.style.paddingLeft = `${item.level * 14}px`;
+        row.innerHTML = `
+          <span class="text-amber-500 select-none">&bull;</span>
+          <span class="truncate font-sans">${escapeHtml(item.title)}</span>
+          <span class="text-[10px] text-slate-500 truncate ml-auto font-mono">${escapeHtml(item.href.split('/').pop())}</span>
+        `;
+        tocTree.appendChild(row);
+      });
+    }
+
+    function normalizeRelativePath(path) {
+      const parts = path.split("/");
+      const resolved = [];
+      for (const p of parts) {
+        if (!p || p === ".") continue;
+        if (p === "..") {
+          resolved.pop();
+        } else {
+          resolved.push(p);
+        }
+      }
+      return resolved.join("/");
+    }
+
+    /* =========================================================================
+       COVER STUDIO ENGINE (Using offline typography fallbacks)
+       ========================================================================= */
+    function renderCover() {
+      const canvas = coverCanvas;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width;
+      const H = canvas.height;
+
+      if (state.useOriginalCover && state.originalCoverDataUrl) {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, W, H);
+        img.src = state.originalCoverDataUrl;
+        return;
+      }
+
+      const p = PALETTES[state.paletteIdx];
+      ctx.fillStyle = p.bg;
+      ctx.fillRect(0, 0, W, H);
+
+      const serifFamily = "'Cormorant Garamond', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+      const displayFamily = "'Cinzel', 'Trajan Pro', 'Baskerville', 'Times New Roman', Georgia, serif";
+      const modernFamily = "'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      const editorialFamily = "'Playfair Display', 'Didot', 'Bodoni MT', 'Times New Roman', Georgia, serif";
+
+      if (state.coverPreset === "classic") {
+        ctx.strokeStyle = p.accent;
+        ctx.lineWidth = 10;
+        ctx.strokeRect(60, 60, W - 120, H - 120);
+        ctx.lineWidth = 3;
+        ctx.strokeRect(80, 80, W - 160, H - 160);
+
+        if (state.subtitle) {
+          ctx.font = `600 32px ${modernFamily}`;
+          ctx.fillStyle = p.accent;
+          ctx.textAlign = "center";
+          ctx.fillText(state.subtitle.toUpperCase(), W / 2, 280);
+        }
+
+        ctx.fillStyle = p.primary;
+        ctx.font = `700 84px ${serifFamily}`;
+        wrapText(ctx, state.title, W / 2, H * 0.40, W - 260, 100);
+        drawOrnament(ctx, W / 2, H * 0.58, p.accent, state.ornament);
+
+        ctx.strokeStyle = p.accent;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(W / 2 - 120, H * 0.74);
+        ctx.lineTo(W / 2 + 120, H * 0.74);
+        ctx.stroke();
+
+        ctx.font = `600 48px ${displayFamily}`;
+        ctx.fillStyle = p.primary;
+        ctx.textAlign = "center";
+        ctx.fillText(state.author.toUpperCase(), W / 2, H * 0.84);
+      } else if (state.coverPreset === "modern") {
+        ctx.fillStyle = p.primary;
+        ctx.fillRect(70, 70, 24, H - 140);
+        ctx.font = `800 28px ${modernFamily}`;
+        ctx.fillStyle = p.accent;
+        ctx.textAlign = "left";
+        ctx.fillText((state.subtitle || "ORIGINAL WORK").toUpperCase(), 130, 140);
+        ctx.fillStyle = p.primary;
+        ctx.font = `900 100px ${modernFamily}`;
+        wrapText(ctx, state.title, 130, 320, W - 220, 110, "left");
+        drawOrnament(ctx, W - 240, H * 0.65, p.accent, state.ornament);
+        ctx.fillStyle = p.primary;
+        ctx.font = `600 42px ${modernFamily}`;
+        ctx.textAlign = "left";
+        ctx.fillText("BY " + state.author.toUpperCase(), 130, H - 140);
+      } else if (state.coverPreset === "aurora") {
+        const grad = ctx.createRadialGradient(W * 0.7, H * 0.3, 100, W / 2, H / 2, W * 0.9);
+        grad.addColorStop(0, p.accent);
+        grad.addColorStop(0.5, p.bg);
+        grad.addColorStop(1, "#030712");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.45)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.lineWidth = 3;
+        roundRect(ctx, 80, 80, W - 160, H - 160, 24, true, true);
+        ctx.font = `800 86px ${editorialFamily}`;
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        wrapText(ctx, state.title, W / 2, H * 0.40, W - 260, 104);
+        if (state.subtitle) {
+          ctx.font = `500 32px ${modernFamily}`;
+          ctx.fillStyle = p.accent;
+          ctx.fillText(state.subtitle, W / 2, H * 0.56);
+        }
+        drawOrnament(ctx, W / 2, H * 0.68, "#ffffff", state.ornament);
+        ctx.font = `600 40px ${modernFamily}`;
+        ctx.fillStyle = "#f8fafc";
+        ctx.fillText(state.author.toUpperCase(), W / 2, H * 0.84);
+      } else if (state.coverPreset === "noir") {
+        ctx.fillStyle = "#09090b";
+        ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = "#eab308";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(90, 90, W - 180, H - 180);
+        ctx.font = `700 36px ${displayFamily}`;
+        ctx.fillStyle = "#eab308";
+        ctx.textAlign = "center";
+        ctx.fillText(state.author.toUpperCase(), W / 2, 220);
+        ctx.font = `700 90px ${editorialFamily}`;
+        ctx.fillStyle = "#ffffff";
+        wrapText(ctx, state.title, W / 2, H * 0.48, W - 260, 110);
+        drawOrnament(ctx, W / 2, H * 0.72, "#eab308", state.ornament);
+        if (state.subtitle) {
+          ctx.font = `400 30px ${displayFamily}`;
+          ctx.fillStyle = "#a1a1aa";
+          ctx.fillText(state.subtitle.toUpperCase(), W / 2, H * 0.85);
+        }
+      }
+    }
+
+    function drawOrnament(ctx, x, y, color, type) {
+      if (type === "none") return;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      if (type === "diamond") {
+        ctx.beginPath();
+        ctx.moveTo(x, y - 35);
+        ctx.lineTo(x + 35, y);
+        ctx.lineTo(x, y + 35);
+        ctx.lineTo(x - 35, y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === "laurel") {
+        ctx.beginPath();
+        ctx.arc(x, y, 40, 0.4 * Math.PI, 1.6 * Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x, y, 40, -0.6 * Math.PI, 0.6 * Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (type === "monogram") {
+        const initials = state.author.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("") || "BK";
+        ctx.beginPath();
+        ctx.arc(x, y, 45, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.font = "700 36px 'Cinzel', 'Trajan Pro', Georgia, serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(initials, x, y);
+      } else if (type === "minimal") {
+        ctx.beginPath();
+        ctx.moveTo(x - 80, y);
+        ctx.lineTo(x + 80, y);
+        ctx.stroke();
+        ctx.fillRect(x - 6, y - 6, 12, 12);
+      }
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = "center") {
+      ctx.textAlign = align;
+      const words = text.split(" ");
+      let line = "";
+      const lines = [];
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          lines.push(line.trim());
+          line = words[n] + " ";
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line.trim());
+      const startY = y - ((lines.length - 1) * lineHeight) / 2;
+      for (let k = 0; k < lines.length; k++) {
+        ctx.fillText(lines[k], x, startY + (k * lineHeight));
+      }
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    /* =========================================================================
+       MOBI FORMAT COMPILER (With Older Kindle KF7 filepos & guide compatibility)
+       ========================================================================= */
+    class BinaryWriter {
+      constructor(size = 4096) {
+        this.buffer = new Uint8Array(size);
+        this.length = 0;
+        this.view = new DataView(this.buffer.buffer);
+      }
+      ensureCapacity(needed) {
+        if (this.length + needed > this.buffer.length) {
+          let newSize = Math.max(this.buffer.length * 2, this.length + needed);
+          let newBuf = new Uint8Array(newSize);
+          newBuf.set(this.buffer);
+          this.buffer = newBuf;
+          this.view = new DataView(this.buffer.buffer);
+        }
+      }
+      writeUint8(v) { this.ensureCapacity(1); this.view.setUint8(this.length, v); this.length += 1; }
+      writeUint16(v) { this.ensureCapacity(2); this.view.setUint16(this.length, v, false); this.length += 2; }
+      writeUint32(v) { this.ensureCapacity(4); this.view.setUint32(this.length, v, false); this.length += 4; }
+      writeBytes(bytes) { this.ensureCapacity(bytes.length); this.buffer.set(bytes, this.length); this.length += bytes.length; }
+      writeString(str) { this.writeBytes(new TextEncoder().encode(str)); }
+      getBytes() { return this.buffer.subarray(0, this.length); }
+    }
+
+    async function handleConvert() {
+      if (!state.epubZip) return;
+      convertBtn.disabled = true;
+      convertBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-slate-950" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Calculating byte offsets & MOBI records...
+      `;
+      showStatus("Building Kindle TOC & calculating filepos offsets...", "info");
+
+      try {
+        const coverBlob = await new Promise(res => coverCanvas.toBlob(res, "image/jpeg", 0.92));
+        const coverBytes = new Uint8Array(await coverBlob.arrayBuffer());
+
+        const rawHtmlTemplate = await buildFullHtmlStream();
+        const resolved = resolveFileposPlaceholders(rawHtmlTemplate, state.toc.length);
+
+        const encoder = new TextEncoder();
+        const htmlBytes = encoder.encode(resolved.html);
+        const textChunks = splitUtf8Chunks(htmlBytes, 4096);
+
+        const mobiBlob = buildMobiBinary(textChunks, htmlBytes.length, coverBytes, resolved.begPos);
+
+        const baseName = state.originalFileName
+          ? state.originalFileName.replace(/\.[^/.]+$/, "")
+          : (state.title || "book").replace(/[^a-z0-9_-]/gi, "_");
+
+        const fileName = `${baseName}.mobi`;
+        const url = URL.createObjectURL(mobiBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showStatus(`Success! Generated "${fileName}" (${(mobiBlob.size / 1024).toFixed(1)} KB) with un-greyed TOC support!`, "success");
+      } catch (err) {
+        console.error(err);
+        showStatus("Conversion failed: " + err.message, "error");
+      } finally {
+        convertBtn.disabled = false;
+        convertBtn.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <span>Convert & Download MOBI</span>
+        `;
+      }
+    }
+
+    async function buildFullHtmlStream() {
+      let combined = `<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />` +
+        `<title>${escapeHtml(state.title)}</title>` +
+        `<guide>` +
+        `<reference type="cover" title="Cover" filepos="0000000000" />` +
+        `<reference type="toc" title="Table of Contents" filepos="__TOC_POS_" />` +
+        `<reference type="text" title="Beginning" filepos="__BEG_POS_" />` +
+        `<reference type="start" title="Beginning" filepos="__BEG_POS_" />` +
+        `</guide>` +
+        `</head><body>`;
+
+      // 1. Cover Page
+      combined += `
+        <div id="mobi-cover" style="text-align: center;">
+          <img recindex="1" style="max-width: 100%; height: auto;" alt="Cover" />
+        </div>
+        <mbp:pagebreak style="page-break-before: always; display: block;" />
+      `;
+
+      // 2. Title Page
+      combined += `
+        <div id="mobi-title-page" style="text-align: center; padding: 3em 0;">
+          <h1 style="font-size: 2em; margin-bottom: 0.5em;">${escapeHtml(state.title)}</h1>
+          ${state.subtitle ? `<h3 style="font-weight: normal; color: #555; margin-bottom: 1em;">${escapeHtml(state.subtitle)}</h3>` : ""}
+          <p style="font-size: 1.2em; font-weight: bold;">${escapeHtml(state.author)}</p>
+        </div>
+        <mbp:pagebreak style="page-break-before: always; display: block;" />
+      `;
+
+      // 3. Table of Contents Section
+      combined += `
+        <div id="mobi-toc">
+          <a name="toc" id="toc"></a>
+          <h2 style="text-align: center; font-size: 1.6em; margin-bottom: 1.2em;">Table of Contents</h2>
+          <table style="width: 100%; border-collapse: collapse; line-height: 1.8;">
+      `;
+
+      state.toc.forEach((item, idx) => {
+        const ph = `__CH_${String(idx).padStart(4, "0")}_`;
+        const indent = Math.min(item.level * 20, 80);
+        combined += `
+          <tr>
+            <td style="padding: 4px 0; padding-left: ${indent}px; border-bottom: 1px dotted #ccc;">
+              <a href="#toc_target_${idx}" filepos="${ph}" style="text-decoration: none; color: #004b91;">${escapeHtml(item.title)}</a>
+            </td>
+          </tr>
+        `;
+      });
+      combined += `</table></div><mbp:pagebreak style="page-break-before: always; display: block;" />`;
+
+      // Marker for Beginning of book
+      combined += `<div id="mobi-beginning"></div>`;
+
+      // 4. Content Chapters
+      for (let sIdx = 0; sIdx < state.spineItems.length; sIdx++) {
+        const spine = state.spineItems[sIdx];
+        const chapterFile = state.epubZip.file(spine.href);
+        if (!chapterFile) continue;
+
+        let content = await chapterFile.async("text");
+        const doc = new DOMParser().parseFromString(content, "text/html");
+
+        doc.querySelectorAll("script, style, link[rel='stylesheet']").forEach(el => el.remove());
+
+        state.toc.forEach((tItem, tIdx) => {
+          if (tItem.spineHref === spine.href) {
+            let targetEl = null;
+            if (tItem.fragment) {
+              targetEl = doc.getElementById(tItem.fragment) || doc.querySelector(`[name="${tItem.fragment}"]`);
+            }
+            const anchor = doc.createElement("a");
+            anchor.setAttribute("id", `toc_target_${tIdx}`);
+            anchor.setAttribute("name", `toc_target_${tIdx}`);
+
+            if (targetEl && targetEl.parentNode) {
+              targetEl.parentNode.insertBefore(anchor, targetEl);
+            } else {
+              doc.body.insertBefore(anchor, doc.body.firstChild);
+            }
+          }
+        });
+
+        const chapAnchor = doc.createElement("a");
+        chapAnchor.setAttribute("id", `chap_spine_${sIdx}`);
+        chapAnchor.setAttribute("name", `chap_spine_${sIdx}`);
+        doc.body.insertBefore(chapAnchor, doc.body.firstChild);
+
+        combined += `
+          <div class="mobi-chapter">
+            ${doc.body.innerHTML}
+          </div>
+          <mbp:pagebreak style="page-break-before: always; display: block;" />
+        `;
+      }
+
+      combined += `</body></html>`;
+      return combined;
+    }
+
+    function resolveFileposPlaceholders(htmlString, tocItemsCount) {
+      const encoder = new TextEncoder();
+      const utf8Bytes = encoder.encode(htmlString);
+
+      function findByteOffset(needleStr) {
+        const needle = encoder.encode(needleStr);
+        outer: for (let i = 0; i <= utf8Bytes.length - needle.length; i++) {
+          for (let j = 0; j < needle.length; j++) {
+            if (utf8Bytes[i + j] !== needle[j]) continue outer;
+          }
+          return i;
+        }
+        return -1;
+      }
+
+      function findTagByteOffset(needleStr) {
+        let pos = findByteOffset(needleStr);
+        if (pos === -1) return -1;
+        while (pos > 0 && utf8Bytes[pos] !== 0x3C) {
+          pos--;
+        }
+        return pos;
+      }
+
+      let tocPos = findTagByteOffset('id="mobi-toc"');
+      if (tocPos === -1) tocPos = 0;
+
+      let begPos = findTagByteOffset('id="mobi-beginning"');
+      if (begPos === -1) begPos = findTagByteOffset('class="mobi-chapter"');
+      if (begPos === -1) begPos = tocPos;
+
+      const chapterOffsets = [];
+      for (let i = 0; i < tocItemsCount; i++) {
+        let pos = findTagByteOffset(`id="toc_target_${i}"`);
+        if (pos === -1) pos = findTagByteOffset(`name="toc_target_${i}"`);
+        if (pos === -1) pos = begPos;
+        chapterOffsets.push(pos);
+      }
+
+      const pad10 = (n) => String(n).padStart(10, "0");
+
+      let resolvedHtml = htmlString
+        .replaceAll("__TOC_POS_", pad10(tocPos))
+        .replaceAll("__BEG_POS_", pad10(begPos));
+
+      for (let i = 0; i < tocItemsCount; i++) {
+        const ph = `__CH_${String(i).padStart(4, "0")}_`;
+        resolvedHtml = resolvedHtml.replaceAll(ph, pad10(chapterOffsets[i]));
+      }
+
+      return {
+        html: resolvedHtml,
+        tocPos,
+        begPos
+      };
+    }
+
+    function splitUtf8Chunks(uint8Array, maxChunkSize = 4096) {
+      const chunks = [];
+      let start = 0;
+      while (start < uint8Array.length) {
+        let end = Math.min(start + maxChunkSize, uint8Array.length);
+        if (end < uint8Array.length) {
+          while (end > start && (uint8Array[end] & 0xC0) === 0x80) {
+            end--;
+          }
+          if (end === start) end = Math.min(start + maxChunkSize, uint8Array.length);
+        }
+        chunks.push(uint8Array.subarray(start, end));
+        start = end;
+      }
+      return chunks;
+    }
+
+    function buildMobiBinary(textChunks, totalTextLength, coverJpegBytes, begPos) {
+      const numTextRecords = textChunks.length;
+      const numImageRecords = 1; 
+      const totalRecords = 1 + numTextRecords + numImageRecords + 2 + 1;
+
+      const palmEpochOffset = 2082844800;
+      const currentPalmTime = Math.floor(Date.now() / 1000) + palmEpochOffset;
+
+      const rec0 = buildRecordZero(numTextRecords, totalTextLength, state.title, state.author, begPos);
+      const fcisRecord = buildFcisRecord(totalTextLength);
+      const flisRecord = buildFlisRecord();
+      const eofRecord = new Uint8Array([0xe9, 0x8e, 0x03, 0x00]);
+
+      const records = [rec0, ...textChunks, coverJpegBytes, fcisRecord, flisRecord, eofRecord];
+
+      const pdb = new BinaryWriter(65536);
+      const cleanTitle = (state.title || "Book").slice(0, 31);
+      const titleBytes = new TextEncoder().encode(cleanTitle);
+      const namePadded = new Uint8Array(32);
+      namePadded.set(titleBytes.subarray(0, 31));
+      pdb.writeBytes(namePadded);
+
+      pdb.writeUint16(0); 
+      pdb.writeUint16(0); 
+      pdb.writeUint32(currentPalmTime);
+      pdb.writeUint32(currentPalmTime);
+      pdb.writeUint32(0);
+      pdb.writeUint32(0);
+      pdb.writeUint32(0);
+      pdb.writeUint32(0);
+      pdb.writeBytes(new TextEncoder().encode("BOOK"));
+      pdb.writeBytes(new TextEncoder().encode("MOBI"));
+      pdb.writeUint32(100);
+      pdb.writeUint32(0);
+      pdb.writeUint16(records.length);
+
+      let currentOffset = 78 + (records.length * 8) + 2;
+
+      for (let i = 0; i < records.length; i++) {
+        pdb.writeUint32(currentOffset);
+        pdb.writeUint8(0);
+        pdb.writeUint8((i >> 16) & 0xff);
+        pdb.writeUint8((i >> 8) & 0xff);
+        pdb.writeUint8(i & 0xff);
+        currentOffset += records[i].length;
+      }
+
+      pdb.writeUint16(0);
+
+      for (const rec of records) {
+        pdb.writeBytes(rec);
+      }
+
+      return new Blob([pdb.getBytes()], { type: "application/x-mobipocket-ebook" });
+    }
+
+    function buildRecordZero(numTextRecords, totalTextLength, title, author, begPos) {
+      const rec0 = new BinaryWriter(4096);
+
+      // PalmDOC Header (16 bytes)
+      rec0.writeUint16(1);
+      rec0.writeUint16(0);
+      rec0.writeUint32(totalTextLength);
+      rec0.writeUint16(numTextRecords);
+      rec0.writeUint16(4096);
+      rec0.writeUint32(0);
+
+      // MOBI Header (232 bytes)
+      const mobiHeaderStart = rec0.length;
+      rec0.writeBytes(new TextEncoder().encode("MOBI"));
+      rec0.writeUint32(232);
+      rec0.writeUint32(2);
+      rec0.writeUint32(65001);
+      rec0.writeUint32(Math.floor(Math.random() * 1000000) + 1);
+      rec0.writeUint32(6);
+
+      for (let i = 0; i < 10; i++) rec0.writeUint32(0xffffffff);
+
+      rec0.writeUint32(numTextRecords + 1);
+      
+      const fullNameOffsetPos = rec0.length;
+      rec0.writeUint32(0);
+      rec0.writeUint32(new TextEncoder().encode(title).length);
+      
+      rec0.writeUint32(1033);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0);
+      rec0.writeUint32(6);
+      rec0.writeUint32(numTextRecords + 1);
+
+      for (let i = 0; i < 4; i++) rec0.writeUint32(0);
+
+      rec0.writeUint32(0x50);
+
+      for (let i = 0; i < 8; i++) rec0.writeUint32(0);
+
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0);
+
+      rec0.writeUint16(1);
+      rec0.writeUint16(numTextRecords);
+      rec0.writeUint32(1);
+
+      const fcisIdx = numTextRecords + 1 + 1;
+      const flisIdx = numTextRecords + 1 + 2;
+
+      rec0.writeUint32(fcisIdx);
+      rec0.writeUint32(1);
+      rec0.writeUint32(flisIdx);
+      rec0.writeUint32(1);
+
+      rec0.writeUint32(0);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0xffffffff);
+      rec0.writeUint32(0);
+      rec0.writeUint32(0xffffffff);
+
+      while (rec0.length - mobiHeaderStart < 232) {
+        rec0.writeUint8(0);
+      }
+
+      // EXTH Header
+      const exthRecords = [];
+
+      if (author) {
+        exthRecords.push({ type: 100, data: new TextEncoder().encode(author) });
+      }
+
+      const startOffsetBytes = new Uint8Array(4);
+      new DataView(startOffsetBytes.buffer).setUint32(0, begPos || 0, false);
+      exthRecords.push({ type: 116, data: startOffsetBytes });
+
+      const coverOffsetBytes = new Uint8Array(4);
+      new DataView(coverOffsetBytes.buffer).setUint32(0, 0, false);
+      exthRecords.push({ type: 201, data: coverOffsetBytes });
+
+      exthRecords.push({ type: 501, data: new TextEncoder().encode("EBOK") });
+
+      if (title) {
+        exthRecords.push({ type: 503, data: new TextEncoder().encode(title) });
+      }
+
+      let exthDataSize = 12;
+      for (const r of exthRecords) {
+        exthDataSize += 8 + r.data.length;
+      }
+      const exthPadding = (4 - (exthDataSize % 4)) % 4;
+      const totalExthLength = exthDataSize + exthPadding;
+
+      rec0.writeBytes(new TextEncoder().encode("EXTH"));
+      rec0.writeUint32(totalExthLength);
+      rec0.writeUint32(exthRecords.length);
+
+      for (const r of exthRecords) {
+        rec0.writeUint32(r.type);
+        rec0.writeUint32(8 + r.data.length);
+        rec0.writeBytes(r.data);
+      }
+
+      for (let p = 0; p < exthPadding; p++) rec0.writeUint8(0);
+
+      const fullNameOffset = rec0.length;
+      rec0.view.setUint32(fullNameOffsetPos, fullNameOffset, false);
+      rec0.writeString(title);
+      rec0.writeUint16(0);
+
+      return rec0.getBytes();
+    }
+
+    function buildFcisRecord(totalTextLength) {
+      const w = new BinaryWriter(44);
+      w.writeBytes(new TextEncoder().encode("FCIS"));
+      w.writeUint32(20);
+      w.writeUint32(16);
+      w.writeUint32(totalTextLength);
+      w.writeUint32(0);
+      w.writeUint32(0);
+      w.writeUint32(32);
+      w.writeUint32(0);
+      w.writeUint32(0);
+      w.writeUint32(0);
+      w.writeUint32(0);
+      return w.getBytes();
+    }
+
+    function buildFlisRecord() {
+      const w = new BinaryWriter(36);
+      w.writeBytes(new TextEncoder().encode("FLIS"));
+      w.writeUint32(8);
+      w.writeUint16(65);
+      w.writeUint16(0);
+      w.writeUint32(0);
+      w.writeUint32(0xffffffff);
+      w.writeUint16(1);
+      w.writeUint16(3);
+      w.writeUint32(0);
+      w.writeUint32(0);
+      w.writeUint16(1);
+      w.writeUint16(0);
+      return w.getBytes();
+    }
+
+    function showStatus(text, type = "info") {
+      statusAlert.classList.remove("hidden", "bg-emerald-500/10", "text-emerald-300", "border-emerald-500/20", "bg-rose-500/10", "text-rose-300", "border-rose-500/20", "bg-slate-800", "text-slate-300");
+      if (type === "success") {
+        statusAlert.classList.add("bg-emerald-500/10", "text-emerald-300", "border", "border-emerald-500/20");
+      } else if (type === "error") {
+        statusAlert.classList.add("bg-rose-500/10", "text-rose-300", "border", "border-rose-500/20");
+      } else {
+        statusAlert.classList.add("bg-slate-800", "text-slate-300", "border", "border-slate-700");
+      }
+      statusAlert.textContent = text;
+    }
+
+    function hideStatus() {
+      statusAlert.classList.add("hidden");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
