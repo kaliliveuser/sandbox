@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebPi - Technical Architecture & UML Specification</title>
+  
+  <!-- Mermaid.js for Vector UML Diagram Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0f172a',
+        primaryColor: '#7c3aed',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#6d28d9',
+        lineColor: '#c4b5fd',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#0b1120',
+        noteBkgColor: '#1e1b4b',
+        noteTextColor: '#ede9fe',
+        actorBkg: '#1e293b',
+        actorBorder: '#7c3aed',
+        actorTextColor: '#f8fafc'
+      }
+    });
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #070b14;
+      --bg-surface: #0f172a;
+      --bg-card: #1e293b;
+      --border-color: #243049;
+      --brand-primary: #7c3aed;
+      --brand-light: #ede9fe;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.7;
+      padding: 2.5rem 1rem;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 3rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(124, 58, 237, 0.2);
+      color: var(--brand-light);
+      border: 1px solid rgba(124, 58, 237, 0.4);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    .lead {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--brand-light);
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+
+    p { margin-bottom: 1.2rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.2rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.4rem; }
+
+    /* Diagram Container */
+    .diagram-card {
+      background: #090e1a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0 2rem 0;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid {
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background: var(--bg-card);
+      color: var(--brand-light);
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: rgba(30, 41, 59, 0.4);
+    }
+
+    /* Inline & Block Code */
+    code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(124, 58, 237, 0.15);
+      color: #c4b5fd;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(124, 58, 237, 0.2);
+    }
+    pre {
+      background: #060911;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin-bottom: 1.2rem;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: #e2e8f0;
+      display: block;
+    }
+
+    /* Formula display */
+    .math-block {
+      background: var(--bg-card);
+      border-left: 3px solid var(--brand-primary);
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 1.2rem 0;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: #e2e8f0;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-dim);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 1.5rem; }
+      body { padding: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header>
+      <span class="badge">Architecture Specification</span>
+      <h1>WebPi Autonomous Coding Agent</h1>
+      <p class="lead">Zero-Dependency, In-Browser Autonomous IDE, Virtual File System, and Execution Engine</p>
+    </header>
+
+    <!-- SECTION 1 -->
+    <section>
+      <h2>1. System Architecture Overview</h2>
+      <p>
+        WebPi executes entirely within the browser's thread without Node.js, Webpack, or external microservices.
+        It interfaces with an OpenAI-compatible completion endpoint (LM Studio, Ollama, vLLM) over Server-Sent Events (SSE).
+        The following UML Component Diagram illustrates the relationship between the UI, runtime systems, in-memory virtual storage, and external inference endpoints:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+graph TB
+    subgraph Browser["Browser Runtime (Single-File App)"]
+        subgraph UI["Presentation & Workspace Shell"]
+            Cross["2D Dual-Axis Resizer<br/>(--split-x, --split-y)"]
+            ChatUI["Chat View & Reasoning Blocks"]
+            EditorUI["Code Editor"]
+            PreviewUI["Sandboxed Preview (iframe)"]
+            TreeUI["File Tree & Snapshots"]
+        end
+
+        subgraph CoreEngine["Agent & Execution Core"]
+            ContextMgr["Context Window & Token Budgeter"]
+            SSEParser["SSE Stream & Chunk Assembler"]
+            ToolRouter["Tool Dispatcher & Normalizer"]
+            ZipWriter["Pure-JS PKZip Binary Engine"]
+        end
+
+        subgraph Storage["In-Memory State & Storage"]
+            VFS[("Virtual File System<br/>files: Record&lt;path, content&gt;<br/>folders: Set&lt;path&gt;")]
+            Snapshots[("Snapshot Engine<br/>Point-In-Time Checkpoints")]
+            History[("Chat History<br/>Messages & Tool Invocations")]
+            LStore[("LocalStorage<br/>Persistent Configuration")]
+        end
+    end
+
+    subgraph LLM["Language Model Backend (External / Local)"]
+        Endpoint["/v1/chat/completions<br/>(LM Studio, Ollama, vLLM)"]
+    end
+
+    ChatUI --> ContextMgr
+    ContextMgr --> Endpoint
+    Endpoint -- "SSE Stream (deltas, tools, reasoning)" --> SSEParser
+    SSEParser --> ToolRouter
+    ToolRouter -- "Capture Checkpoint" --> Snapshots
+    ToolRouter -- "Mutate State" --> VFS
+    Snapshots -. "Rollback Restore" .-> VFS
+    VFS --> EditorUI
+    VFS --> PreviewUI
+    VFS --> ZipWriter
+    LStore -. "Hydrate / Persist" .-> CoreEngine
+        </pre>
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section>
+      <h2>2. Domain Model & Class Diagram (UML)</h2>
+      <p>
+        The system models file manipulation, conversation state, token estimation, and archive serialization through modular entities.
+        The structural relationships are defined below:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+classDiagram
+    class MinimalZip {
+        -Array~FileEntry~ files
+        +add(name: string, content: string|Uint8Array): void
+        +generateBlob(): Blob
+        -getCRC(bytes: Uint8Array): number
+    }
+
+    class Settings {
+        +string baseUrl
+        +string api
+        +string apiKey
+        +string model
+        +string reasoningEffort
+        +number contextWindow
+        +number maxTokens
+        +string systemPrompt
+    }
+
+    class Snapshot {
+        +string id
+        +string timestamp
+        +string description
+        +Record~string, string~ files
+        +Array~string~ folders
+        +string activeFilePath
+    }
+
+    class ChatMessage {
+        +string role
+        +string content
+        +string reasoning
+        +boolean reasoningOpen
+        +Array~ToolCall~ tool_calls
+        +string tool_call_id
+        +string name
+        +string snapshotId
+        +boolean toolOutputOpen
+        +Record~number, boolean~ toolCallsOpen
+    }
+
+    class ToolCall {
+        +string id
+        +string type
+        +ToolFunction function
+        +string snapshotId
+    }
+
+    class ToolFunction {
+        +string name
+        +string arguments
+    }
+
+    class VirtualFileSystem {
+        +Record~string, string~ files
+        +Set~string~ folders
+        +string activeFilePath
+        +normalizePath(path: string): string
+        +executeTool(name: string, args: Object): string
+        +captureSnapshot(desc: string): string
+        +restoreSnapshot(id: string): void
+        +refreshPreview(): void
+    }
+
+    VirtualFileSystem "1" o-- "*" Snapshot : tracks
+    VirtualFileSystem "1" o-- "*" ChatMessage : records
+    ChatMessage "1" o-- "*" ToolCall : invokes
+    ToolCall "1" o-- "1" ToolFunction : defines
+    VirtualFileSystem ..> MinimalZip : serializes to zip
+    VirtualFileSystem ..> Settings : configured by
+        </pre>
+      </div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section>
+      <h2>3. Autonomous Agent Loop (UML Sequence Diagram)</h2>
+      <p>
+        The autonomous agent loop (<code>runAgentLoop</code>) iterates sequentially up to a maximum limit of 25 turns.
+        Every mutating call generates an immutable workspace snapshot before tool execution, enabling atomic rollbacks.
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User
+    participant UI as Chat & Workspace UI
+    participant Agent as Agent Execution Loop
+    participant Budget as Context Token Budgeter
+    participant API as LLM Endpoint (/chat/completions)
+    participant Snap as Snapshot Engine
+    participant VFS as Virtual File System
+
+    User->>UI: Submit prompt / instruction
+    UI->>Agent: handleSendPrompt()
+    Agent->>Agent: Set running state & AbortController
+
+    loop Until terminal response or max iterations (25)
+        Agent->>Budget: buildContextMessages(systemMessage)
+        Budget-->>Agent: payloadMessages (anchored start, pruned middle)
+
+        Agent->>API: POST /chat/completions (stream=true, tools=AGENT_TOOLS)
+        
+        loop Stream Processing (SSE)
+            API-->>Agent: data: { choices: [{ delta: { content, reasoning, tool_calls } }] }
+            Agent->>Agent: Parse thinking (&lt;think&gt; or reasoning_content)
+            Agent->>Agent: Reassemble streaming tool_calls JSON chunks
+            Agent->>UI: updateStreamingDOM() (Real-time render)
+        end
+
+        alt Tool Calls Present
+            loop For each Tool Call
+                Agent->>Snap: captureSnapshot("Before " + tool_name)
+                Snap-->>Agent: snapshotId
+                Agent->>VFS: executeTool(name, parsed_args)
+                VFS-->>Agent: executionResult (string)
+                Agent->>UI: addChatMessage("tool", executionResult, snapshotId)
+            end
+            Note over Agent: Re-enters loop to provide tool output back to model
+        else Terminal Text Response
+            Agent->>UI: Render final assistant response
+            Note over Agent: Break loop
+        end
+    end
+
+    Agent->>UI: setAgentStatus(false)
+        </pre>
+      </div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section>
+      <h2>4. Subsystem Breakdown</h2>
+
+      <h3>4.1. Workspace Layout & 2D Dual-Axis Resizer</h3>
+      <p>
+        The workspace divides into four responsive panes: <strong>Files</strong> (Top-Left), <strong>Chat</strong> (Bottom-Left),
+        <strong>Code Editor</strong> (Top-Right), and <strong>Sandboxed Preview</strong> (Bottom-Right).
+      </p>
+      <p>
+        A central handle (<code>#centerResizeHandle</code>) monitors pointer movements via <code>setPointerCapture</code>.
+        As users drag, percentages are calculated relative to the workspace container and written to custom CSS properties:
+      </p>
+      <div class="math-block">
+        clampedX = Math.max(15, Math.min(85, ((e.clientX - rect.left) / rect.width) * 100))<br/>
+        clampedY = Math.max(15, Math.min(85, ((e.clientY - rect.top) / rect.height) * 100))
+      </div>
+
+      <h3>4.2. Context Window & Token Budgeting Engine</h3>
+      <p>
+        To prevent local models with small context windows from failing with <code>HTTP 400 Context Overflow</code>,
+        <code>buildContextMessages()</code> calculates character-to-token estimates (<code>~3.4 chars/token</code>):
+      </p>
+      <div class="math-block">
+        Budget = Math.max(4096, contextWindow - Math.min(maxTokens, Math.floor(contextWindow * 0.35)))
+      </div>
+      <p>
+        The budgeting engine keeps the <strong>System Prompt</strong> and the <strong>User's Root Objective</strong> strictly anchored.
+        Intermediate conversation turns and raw file payloads are pruned in First-In, First-Out (FIFO) sequence when total tokens exceed the budget.
+      </p>
+
+      <h3>4.3. Virtual File System (VFS) & Safe Replacement</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool Name</th>
+            <th>Parameters</th>
+            <th>Function & Safety Enforcement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>read_file</code></td>
+            <td><code>path</code></td>
+            <td>Returns raw text from the in-memory dictionary. Returns an error if the file does not exist.</td>
+          </tr>
+          <tr>
+            <td><code>write_file</code></td>
+            <td><code>path, content</code></td>
+            <td>Creates or overwrites files and auto-registers parent directories.</td>
+          </tr>
+          <tr>
+            <td><code>edit_file</code></td>
+            <td><code>path, old_str, new_str</code></td>
+            <td>
+              Ensures safe targeted replacements. Counts occurrences of <code>old_str</code>:
+              rejects with an error if 0 matches or &gt;1 matches occur to prevent file corruption.
+            </td>
+          </tr>
+          <tr>
+            <td><code>delete_file</code></td>
+            <td><code>path</code></td>
+            <td>Deletes the file entry and shifts the active file pointer.</td>
+          </tr>
+          <tr>
+            <td><code>create_folder</code></td>
+            <td><code>path</code></td>
+            <td>Registers a folder in the folder <code>Set</code>.</td>
+          </tr>
+          <tr>
+            <td><code>delete_folder</code></td>
+            <td><code>path</code></td>
+            <td>Recursively deletes the folder and all prefixed file keys.</td>
+          </tr>
+          <tr>
+            <td><code>move_file</code></td>
+            <td><code>source_path, target_path</code></td>
+            <td>Copies file contents to the destination key and unlinks the source.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.4. Sandboxed Preview & In-Memory Asset Inliner</h3>
+      <p>
+        The preview engine runs directly via an iframe's <code>srcdoc</code> property. When <code>refreshPreview()</code> executes,
+        an in-memory preprocessor extracts <code>index.html</code>, searches for linked stylesheets and scripts, and replaces them
+        with inline equivalents from the VFS:
+      </p>
+      <pre><code>// Stylesheet inlining regex
+html.replace(/&lt;link\s+[^&gt;]*rel=["']stylesheet["'][^&gt;]*href=["']([^"']+)["'][^&gt;]*&gt;/gi, (_, href) =&gt; {
+  const norm = normalizePath(href);
+  return (norm in files) ? `&lt;style data-inlined="${norm}"&gt;\n${files[norm]}\n&lt;/style&gt;` : match;
+});</code></pre>
+
+      <h3>4.5. Pure-JavaScript Zero-Dependency PKZIP Engine (MinimalZip)</h3>
+      <p>
+        WebPi exports workspaces directly to standard <code>.zip</code> archives without external libraries.
+        The layout uses a standard PKZIP binary structure:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+graph TD
+    subgraph ZipArchive["PKZIP Binary Archive Layout"]
+        LFH1["Local File Header 1 (30 bytes + name)"] --> FD1["File Data 1 (Raw UTF-8 bytes)"]
+        FD1 --> LFH2["Local File Header 2 (30 bytes + name)"]
+        LFH2 --> FD2["File Data 2 (Raw UTF-8 bytes)"]
+        FD2 --> CD1["Central Directory Header 1 (46 bytes + name)"]
+        CD1 --> CD2["Central Directory Header 2 (46 bytes + name)"]
+        CD2 --> EOCD["End of Central Directory Record - EOCD (22 bytes)"]
+    end
+        </pre>
+      </div>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section>
+      <h2>5. Agent State Machine (UML State Diagram)</h2>
+      <p>
+        The state machine below describes the agent lifecycle through reception, parsing, safety checkpoints, and tool execution:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Idle
+
+    Idle --> ContextPreparation : User submits prompt
+    ContextPreparation --> StreamingResponse : Build pruned message budget & dispatch fetch
+
+    state StreamingResponse {
+        [*] --> IngestSSE
+        IngestSSE --> ParseThinking : delta.reasoning / &lt;think&gt;
+        IngestSSE --> ParseToolCalls : delta.tool_calls
+        IngestSSE --> ParseContent : delta.content
+        ParseThinking --> RenderDelta
+        ParseToolCalls --> RenderDelta
+        ParseContent --> RenderDelta
+        RenderDelta --> IngestSSE : Next chunk
+        RenderDelta --> CheckTermination : Stream done
+    }
+
+    StreamingResponse --> CaptureSnapshot : Tool calls detected
+    StreamingResponse --> ErrorHandling : Network failure / Abort
+
+    state ToolExecution {
+        CaptureSnapshot --> ExecutingTool : Checkpoint files saved
+        ExecutingTool --> FormatResult : executeTool(name, args)
+        FormatResult --> CheckpointLinked : Append snapshotId to chat turn
+    }
+
+    CheckpointLinked --> ContextPreparation : Next loop iteration (loopCount < 25)
+    
+    StreamingResponse --> Idle : Finished natural response (No tools)
+    ErrorHandling --> Idle : Report error bubble
+        </pre>
+      </div>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section>
+      <h2>6. Security and Isolation Model</h2>
+      <ul>
+        <li><strong>Air-Gapped & Zero Dependencies:</strong> Contains zero external font, script, or stylesheet references.</li>
+        <li><strong>Strict iframe Sandbox:</strong> The live preview executes with <code>sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups"</code> to prevent escape into the parent IDE window.</li>
+        <li><strong>Non-Destructive Rollback:</strong> Snapshots are immutable in-memory records. If an LLM hallucinates an error or deletes code, clicking <code>↩ Rollback</code> restores the exact prior state.</li>
+      </ul>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <span>WebPi Architecture Documentation</span>
+      <span>Rendered with Mermaid.js &bull; Clean Architecture Spec</span>
+    </footer>
+  </div>
+
+</body>
+</html>
