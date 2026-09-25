@@ -193,7 +193,7 @@
     }
 
     /* ==========================================================================
-       STACKED TOOL CALLS & RESPONSES (ANTI-SQUASH RESPONSIVE DESIGN)
+       STACKED TOOL CALLS & RESPONSES
        ========================================================================== */
     .tool-call-item {
       margin-top: 8px;
@@ -211,7 +211,7 @@
       border-color: rgba(244, 63, 94, 0.6);
     }
 
-    /* Top: The Tool Call (Invocation / Inputs) */
+    /* Top: Tool Call */
     .tool-call-top {
       display: flex;
       flex-direction: column;
@@ -264,7 +264,7 @@
       font-size: 11px;
     }
 
-    /* Bottom: The Tool Response (Stacked directly under Call) */
+    /* Bottom: Tool Response */
     .tool-response-bottom {
       display: flex;
       flex-direction: column;
@@ -325,7 +325,7 @@
     .diff-removed { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fca5a5; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
     .diff-added { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #86efac; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
 
-    /* Expandable Standalone Tool Results (Fallback for unlinked results) */
+    /* Expandable Standalone Tool Results */
     .tool-output-box { width: 100%; border-radius: 8px; background: #0b1120; border: 1px solid rgba(124, 58, 237, 0.4); overflow: hidden; font-family: var(--font-mono); margin-top: 6px; }
     .tool-output-header { width: 100%; padding: 6px 10px; background: rgba(15, 23, 42, 0.8); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; cursor: pointer; border: none; color: var(--brand-light); font-size: 11px; font-family: var(--font-mono); text-align: left; }
     .tool-output-header:hover { background: var(--bg-surface-hover); }
@@ -357,23 +357,14 @@
     .hidden { display: none !important; }
 
     /* ==========================================================================
-       MOBILE RESPONSIVE OVERRIDES (ONLY APPLIES TO SCREENS <= 768px)
+       MOBILE RESPONSIVE OVERRIDES
        ========================================================================== */
     @media (max-width: 768px) {
-      header {
-        padding: 0 8px;
-      }
-      .brand-title span#modelBadge {
-        display: none;
-      }
-      .btn-label {
-        display: none;
-      }
-      header .btn {
-        padding: 6px 8px;
-      }
+      header { padding: 0 8px; }
+      .brand-title span#modelBadge { display: none; }
+      .btn-label { display: none; }
+      header .btn { padding: 6px 8px; }
 
-      /* Mobile tab navigation bar */
       .mobile-nav-tabs {
         display: flex;
         background: var(--bg-dark);
@@ -397,9 +388,7 @@
         cursor: pointer;
         transition: all 0.15s ease;
       }
-      .mobile-tab-btn:hover {
-        color: var(--text-main);
-      }
+      .mobile-tab-btn:hover { color: var(--text-main); }
       .mobile-tab-btn.active {
         color: var(--brand-light);
         font-weight: 600;
@@ -407,65 +396,31 @@
         background: rgba(124, 58, 237, 0.12);
       }
 
-      /* Hide cross handle on mobile */
-      .cross-handle {
-        display: none !important;
-      }
+      .cross-handle { display: none !important; }
+      .workspace { flex-direction: column !important; overflow: hidden !important; }
+      .pane-col-left, .pane-col-right { width: 100% !important; height: 100% !important; border: none !important; }
 
-      /* Make workspace full width & height */
-      .workspace {
-        flex-direction: column !important;
-        overflow: hidden !important;
-      }
-      .pane-col-left,
-      .pane-col-right {
-        width: 100% !important;
-        height: 100% !important;
-        border: none !important;
-      }
-
-      /* Hide all four panes by default on mobile */
-      .pane-files,
-      .pane-chat,
-      .editor-pane,
-      .preview-pane {
+      .pane-files, .pane-chat, .editor-pane, .preview-pane {
         display: none !important;
         width: 100% !important;
         height: 100% !important;
         border: none !important;
       }
 
-      /* Toggle view based on workspace[data-mobile-tab] */
       #workspace[data-mobile-tab="files"] .pane-col-left,
-      #workspace[data-mobile-tab="chat"] .pane-col-left {
-        display: flex !important;
-      }
+      #workspace[data-mobile-tab="chat"] .pane-col-left { display: flex !important; }
       #workspace[data-mobile-tab="files"] .pane-col-right,
-      #workspace[data-mobile-tab="chat"] .pane-col-right {
-        display: none !important;
-      }
+      #workspace[data-mobile-tab="chat"] .pane-col-right { display: none !important; }
 
       #workspace[data-mobile-tab="editor"] .pane-col-right,
-      #workspace[data-mobile-tab="preview"] .pane-col-right {
-        display: flex !important;
-      }
+      #workspace[data-mobile-tab="preview"] .pane-col-right { display: flex !important; }
       #workspace[data-mobile-tab="editor"] .pane-col-left,
-      #workspace[data-mobile-tab="preview"] .pane-col-left {
-        display: none !important;
-      }
+      #workspace[data-mobile-tab="preview"] .pane-col-left { display: none !important; }
 
-      #workspace[data-mobile-tab="files"] .pane-files {
-        display: flex !important;
-      }
-      #workspace[data-mobile-tab="chat"] .pane-chat {
-        display: flex !important;
-      }
-      #workspace[data-mobile-tab="editor"] .editor-pane {
-        display: flex !important;
-      }
-      #workspace[data-mobile-tab="preview"] .preview-pane {
-        display: flex !important;
-      }
+      #workspace[data-mobile-tab="files"] .pane-files { display: flex !important; }
+      #workspace[data-mobile-tab="chat"] .pane-chat { display: flex !important; }
+      #workspace[data-mobile-tab="editor"] .editor-pane { display: flex !important; }
+      #workspace[data-mobile-tab="preview"] .preview-pane { display: flex !important; }
     }
   </style>
 </head>
@@ -548,6 +503,17 @@
               <button class="btn" style="padding:2px 4px;" onclick="promptMoveFile()" title="Move/Rename File">➔</button>
             </div>
           </div>
+
+          <!-- HISTORICAL ROLLBACK WARNING BANNER -->
+          <div id="rollbackBanner" style="background:rgba(245, 158, 11, 0.15); border-bottom:1px solid rgba(245, 158, 11, 0.3); padding:6px 8px; display:none; align-items:center; justify-content:space-between; font-size:11px; color:var(--text-main); flex-shrink:0;">
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:6px;">
+              ⚠️ <span style="color:var(--accent-amber); font-weight:600;">Checkpoint:</span> <span id="rollbackCheckpointName" style="color:var(--text-muted);"></span>
+            </div>
+            <button type="button" class="btn" style="background:rgba(16, 185, 129, 0.25); border:1px solid rgba(16, 185, 129, 0.6); color:#86efac; font-weight:600; padding:2px 8px; font-size:11px; flex-shrink:0;" onclick="restoreLatestState()">
+              ⤴ Restore Latest
+            </button>
+          </div>
+
           <div id="fileTreeList" class="file-tree"></div>
           <div style="padding:8px; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px; font-size:11px; color:var(--text-dim);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -556,7 +522,10 @@
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:4px;">
               <span id="snapshotCountBadge" style="color:var(--text-dim);">0 snapshots</span>
-              <button class="btn" style="padding:0; color:var(--accent-amber); font-size:11px; font-weight:600;" onclick="openSnapshotsModal()" title="View and restore checkpoints">⏱ History</button>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button id="restoreLatestBtn" class="btn hidden" style="padding:0; color:var(--accent-green); font-size:11px; font-weight:600;" onclick="restoreLatestState()" title="Restore the latest version (undo all rollbacks)">⤴ Restore Latest</button>
+                <button class="btn" style="padding:0; color:var(--accent-amber); font-size:11px; font-weight:600;" onclick="openSnapshotsModal()" title="View and restore checkpoints">⏱ History</button>
+              </div>
             </div>
           </div>
         </div>
@@ -841,6 +810,11 @@ Use the provided tools systematically to complete all user requests accurately.`
     // State Snapshots (id -> { id, timestamp, description, files, folders, activeFilePath })
     let snapshots = {};
 
+    // Latest State Tracking & Rollback Management
+    let latestState = null; // { files, folders, activeFilePath, timestamp, description }
+    let isViewingRollback = false;
+    let currentRollbackCheckpoint = "";
+
     let chatHistory = [];
     let isAgentRunning = false;
     let abortController = null;
@@ -868,6 +842,37 @@ Use the provided tools systematically to complete all user requests accurately.`
     /* ==========================================================================
        3. WORKSPACE SNAPSHOT & ROLLBACK ENGINE
        ========================================================================== */
+    function recordLatestState(description) {
+      latestState = {
+        timestamp: new Date().toLocaleTimeString(),
+        description: description || "Latest version",
+        files: JSON.parse(JSON.stringify(files)),
+        folders: Array.from(folders),
+        activeFilePath: activeFilePath
+      };
+    }
+
+    function updateRollbackUI() {
+      const banner = document.getElementById("rollbackBanner");
+      const cpName = document.getElementById("rollbackCheckpointName");
+      const restoreBtn = document.getElementById("restoreLatestBtn");
+
+      if (isViewingRollback && latestState) {
+        if (banner) {
+          banner.style.display = "flex";
+          if (cpName) cpName.innerText = currentRollbackCheckpoint || "Checkpoint";
+        }
+        if (restoreBtn) {
+          restoreBtn.classList.remove("hidden");
+        }
+      } else {
+        if (banner) banner.style.display = "none";
+        if (restoreBtn) {
+          restoreBtn.classList.add("hidden");
+        }
+      }
+    }
+
     function captureSnapshot(description) {
       const id = "snap_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
       snapshots[id] = {
@@ -887,20 +892,60 @@ Use the provided tools systematically to complete all user requests accurately.`
       const snap = snapshots[snapId];
       if (!snap) return alert("Snapshot checkpoint not found.");
 
+      // Safeguard: Ensure the latest version is captured prior to rolling back
+      if (!isViewingRollback || !latestState) {
+        recordLatestState("Latest version before rollback");
+      }
+
       const fileCount = Object.keys(snap.files).length;
-      const ok = confirm(`↩ Roll back workspace files to checkpoint:\n\n"${snap.description}"\nCaptured at: ${snap.timestamp} (${fileCount} files)\n\nExisting files will be replaced with this checkpoint.`);
+      const ok = confirm(`↩ Roll back workspace files to checkpoint:\n\n"${snap.description}"\nCaptured at: ${snap.timestamp} (${fileCount} files)\n\nExisting files will be replaced with this checkpoint.\n\nYou can restore the latest version at any time using "Restore Latest".`);
       if (!ok) return;
+
+      // Also record pre-rollback state into timeline
+      captureSnapshot(`State before rollback to: ${snap.description}`);
 
       files = JSON.parse(JSON.stringify(snap.files));
       folders = new Set(snap.folders || []);
       activeFilePath = (snap.activeFilePath in files) ? snap.activeFilePath : (Object.keys(files)[0] || "");
+      isViewingRollback = true;
+      currentRollbackCheckpoint = snap.description;
 
       renderFileTree();
       loadFileToEditor(activeFilePath);
       refreshPreview();
       updateSnapshotCountBadge();
+      updateRollbackUI();
 
-      addChatMessage("system", `↩ Restored workspace state to checkpoint: "${snap.description}" (${snap.timestamp}).`);
+      addChatMessage(
+        "system",
+        `↩ Restored workspace state to checkpoint: "${escapeHtml(snap.description)}" (${snap.timestamp}). <button class="btn" style="display:inline-flex; align-items:center; gap:3px; background:rgba(16,185,129,0.25); border:1px solid rgba(16,185,129,0.5); color:#86efac; font-weight:600; padding:2px 8px; font-size:11px; margin-left:6px; vertical-align:middle; border-radius:4px; cursor:pointer;" onclick="restoreLatestState()">⤴ Restore Latest Version</button>`,
+        null, null, null, null, true
+      );
+      closeSnapshotsModal();
+    }
+
+    function restoreLatestState(event) {
+      if (event) event.stopPropagation();
+      if (!latestState) {
+        return alert("No latest version recorded yet.");
+      }
+
+      const ok = confirm(`⤴ Restore workspace to the latest version?\n\nCaptured at: ${latestState.timestamp} (${Object.keys(latestState.files).length} files)\n\nAll historical rollbacks will be undone and your project will be returned to its head state.`);
+      if (!ok) return;
+
+      files = JSON.parse(JSON.stringify(latestState.files));
+      folders = new Set(latestState.folders || []);
+      activeFilePath = (latestState.activeFilePath in files) ? latestState.activeFilePath : (Object.keys(files)[0] || "");
+      isViewingRollback = false;
+      currentRollbackCheckpoint = "";
+
+      renderFileTree();
+      loadFileToEditor(activeFilePath);
+      refreshPreview();
+      updateSnapshotCountBadge();
+      updateRollbackUI();
+
+      addChatMessage("system", `⤴ Restored workspace to the latest version (${latestState.timestamp}).`);
       closeSnapshotsModal();
     }
 
@@ -915,9 +960,35 @@ Use the provided tools systematically to complete all user requests accurately.`
       const list = document.getElementById("snapshotsListContainer");
       list.innerHTML = "";
 
+      // Display the Head / Latest Version at the top of the history modal
+      if (latestState) {
+        const latestCard = document.createElement("div");
+        latestCard.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.4); border-radius:8px; margin-bottom:6px;";
+        const fileCount = Object.keys(latestState.files || {}).length;
+        latestCard.innerHTML = `
+          <div style="overflow:hidden; margin-right:8px;">
+            <div style="font-weight:700; color:#86efac; font-size:12px; display:flex; align-items:center; gap:6px;">
+              <span>★</span> Latest Version (Head)
+              ${!isViewingRollback ? '<span class="badge" style="background:rgba(16,185,129,0.25); color:#86efac; border-color:rgba(16,185,129,0.4); font-size:10px; padding:1px 6px;">Active</span>' : ''}
+            </div>
+            <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">
+              ${escapeHtml(latestState.timestamp)} &bull; ${fileCount} files &bull; Active: ${escapeHtml(latestState.activeFilePath || "(none)")}
+            </div>
+          </div>
+          ${isViewingRollback ? `
+            <button class="btn" style="background:rgba(16, 185, 129, 0.25); border:1px solid rgba(16, 185, 129, 0.6); color:#86efac; font-weight:600; font-size:11px; padding:4px 10px;" onclick="restoreLatestState(event)">
+              ⤴ Restore Latest
+            </button>
+          ` : `
+            <span style="font-size:11px; color:#86efac; font-weight:500;">Currently at latest</span>
+          `}
+        `;
+        list.appendChild(latestCard);
+      }
+
       const snapList = Object.values(snapshots).reverse();
 
-      if (snapList.length === 0) {
+      if (snapList.length === 0 && !latestState) {
         list.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-dim);">No checkpoints captured yet. WebPi automatically takes a snapshot before every tool execution.</div>`;
       } else {
         snapList.forEach(snap => {
@@ -948,7 +1019,7 @@ Use the provided tools systematically to complete all user requests accurately.`
     }
 
     function clearAllSnapshots() {
-      if (confirm("Clear all captured workspace snapshots?")) {
+      if (confirm("Clear all captured workspace snapshots? (The current project state and latest version will remain intact)")) {
         snapshots = {};
         updateSnapshotCountBadge();
         openSnapshotsModal();
@@ -1067,6 +1138,13 @@ Use the provided tools systematically to complete all user requests accurately.`
     function executeTool(rawName, args) {
       const name = resolveToolName(rawName);
       console.log(`[WebPi Tool Call] Execution started: ${name}`, { tool: name, rawName, arguments: args });
+
+      // If active changes are being made from an old rollback, branch to new latest state
+      if (name !== "read_file" && isViewingRollback) {
+        isViewingRollback = false;
+        updateRollbackUI();
+      }
+
       try {
         let result;
         switch (name) {
@@ -1094,6 +1172,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             if (activeFilePath === p) loadFileToEditor(p);
             refreshPreview();
+            recordLatestState(`After write_file (${p})`);
             result = `Successfully wrote ${args.content?.length || 0} bytes to ${p}`;
             break;
           }
@@ -1127,6 +1206,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             if (activeFilePath === p) loadFileToEditor(p);
             refreshPreview();
+            recordLatestState(`After edit_file (${p})`);
             result = `Successfully edited '${p}' (replaced 1 instance).`;
             break;
           }
@@ -1141,6 +1221,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             loadFileToEditor(activeFilePath);
             refreshPreview();
+            recordLatestState(`After delete_file (${p})`);
             result = `Deleted file ${p}`;
             break;
           }
@@ -1148,6 +1229,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             const p = normalizePath(args.path);
             folders.add(p);
             renderFileTree();
+            recordLatestState(`After create_folder (${p})`);
             result = `Created folder '${p}'`;
             break;
           }
@@ -1165,6 +1247,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             if (!(activeFilePath in files)) activeFilePath = Object.keys(files)[0] || "";
             loadFileToEditor(activeFilePath);
             refreshPreview();
+            recordLatestState(`After delete_folder (${p})`);
             result = `Deleted folder '${p}' and ${count} contained files.`;
             break;
           }
@@ -1182,6 +1265,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             loadFileToEditor(activeFilePath);
             refreshPreview();
+            recordLatestState(`After move_file (${src} -> ${tgt})`);
             result = `Moved '${src}' to '${tgt}'`;
             break;
           }
@@ -1197,7 +1281,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
-    /* Helper: Retrieve execution response associated with a tool call */
     function getToolCallResponse(call, msgIdx) {
       if (!call) return null;
       if (call.response !== undefined && call.response !== null) {
@@ -1207,7 +1290,6 @@ Use the provided tools systematically to complete all user requests accurately.`
         };
       }
 
-      // Check in chatHistory for a tool message matching this call id
       if (call.id) {
         const match = chatHistory.find(m => m.role === "tool" && m.tool_call_id === call.id);
         if (match) {
@@ -1219,7 +1301,6 @@ Use the provided tools systematically to complete all user requests accurately.`
         }
       }
 
-      // Fallback: check adjacent tool messages directly after this assistant message
       if (msgIdx !== undefined && msgIdx >= 0) {
         for (let i = msgIdx + 1; i < chatHistory.length; i++) {
           const nextMsg = chatHistory[i];
@@ -1252,14 +1333,11 @@ Use the provided tools systematically to complete all user requests accurately.`
       const reservedOutput = Math.min(maxOut, Math.floor(maxCtx * 0.35));
       const budget = Math.max(4096, maxCtx - reservedOutput);
 
-      // Find the first actual user message in chat history
       const firstUserIdx = chatHistory.findIndex(m => m.role === "user");
       if (firstUserIdx === -1) return [systemMessage];
 
-      // Ignore any UI greeting that appeared before the first user message
       const conversationHistory = chatHistory.slice(firstUserIdx);
 
-      // Filter out empty turns and UI markers
       const validHistory = conversationHistory
         .filter(m => m.role !== "system" && m.role !== "ui-error")
         .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
@@ -1275,7 +1353,6 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       if (validHistory.length === 0) return [systemMessage];
 
-      // The user's initiating prompt remains anchored at the start
       const initialUserMsg = validHistory[0];
       const subsequentTurns = validHistory.slice(1);
 
@@ -1289,13 +1366,11 @@ Use the provided tools systematically to complete all user requests accurately.`
                      calcTokens([initialUserMsg]) +
                      calcTokens(subsequentTurns);
 
-      // Prune older intermediate turns if needed, preserving the latest context
       while (subsequentTurns.length > 2 && totalEst > budget) {
         const removed = subsequentTurns.shift();
         totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
       }
 
-      // Avoid leading orphan tool messages
       while (subsequentTurns.length > 0 && subsequentTurns[0].role === "tool") {
         subsequentTurns.shift();
       }
@@ -1507,7 +1582,7 @@ Use the provided tools systematically to complete all user requests accurately.`
               setAgentStatus(true, `Executing: ${name}...`);
               console.log(`[WebPi Agent Tool Call] ${name}`, { id: call.id, tool: name, arguments: args, snapshotId: snapId });
               const res = executeTool(name, args);
-              call.response = res; // Group response directly with tool call
+              call.response = res;
               addChatMessage("tool", res, null, call.id, name, snapId);
             }
             continue;
@@ -1566,6 +1641,10 @@ Use the provided tools systematically to complete all user requests accurately.`
       setAgentStatus(false);
       isAgentRunning = false;
       abortController = null;
+
+      if (!isViewingRollback) {
+        recordLatestState("Latest version at conclusion of agent loop");
+      }
     }
 
     function separateThinking(raw, explicit) {
@@ -1658,7 +1737,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
-    /* Toggle Call Inputs (Top Section) */
     function toggleToolCall(msgIdx, callIdx) {
       if (chatHistory[msgIdx]) {
         if (!chatHistory[msgIdx].toolCallsOpen) chatHistory[msgIdx].toolCallsOpen = {};
@@ -1678,7 +1756,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
-    /* Toggle Response Output (Bottom Section) */
     function toggleToolResponse(msgIdx, callIdx) {
       if (chatHistory[msgIdx]) {
         if (!chatHistory[msgIdx].toolResponsesOpen) chatHistory[msgIdx].toolResponsesOpen = {};
@@ -1698,7 +1775,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
-    function addChatMessage(role, content, tool_calls = null, tool_call_id = null, name = null, snapshotId = null) {
+    function addChatMessage(role, content, tool_calls = null, tool_call_id = null, name = null, snapshotId = null, allowHtml = false) {
       chatHistory.push({
         role,
         content,
@@ -1706,6 +1783,7 @@ Use the provided tools systematically to complete all user requests accurately.`
         tool_call_id,
         name,
         snapshotId,
+        allowHtml,
         reasoning: "",
         reasoningOpen: false,
         toolOutputOpen: false,
@@ -1722,7 +1800,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       const wasAtBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= 80;
       const prevScrollTop = container.scrollTop;
 
-      // Collect tool_call_ids grouped with assistant tool calls
       const handledToolCallIds = new Set();
       chatHistory.forEach(m => {
         if (m.tool_calls && Array.isArray(m.tool_calls)) {
@@ -1734,7 +1811,6 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       container.innerHTML = "";
       chatHistory.forEach((msg, idx) => {
-        // Skip standalone role="tool" messages if already stacked directly under their tool call
         if (msg.role === "tool" && msg.tool_call_id && handledToolCallIds.has(msg.tool_call_id)) {
           return;
         }
@@ -1781,7 +1857,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
-    /* Build single vertically-stacked tool call & response block */
     function renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming = false) {
       const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
       const argsRaw = t.function?.arguments || "";
@@ -1796,7 +1871,6 @@ Use the provided tools systematically to complete all user requests accurately.`
       if (!msg.toolCallsOpen) msg.toolCallsOpen = {};
       if (!msg.toolResponsesOpen) msg.toolResponsesOpen = {};
 
-      // Auto-open response details on error
       if (msg.toolResponsesOpen[callIdx] === undefined && isError) {
         msg.toolResponsesOpen[callIdx] = true;
       }
@@ -1818,7 +1892,6 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       const argsHtml = generateToolArgsHtml(fnName, argsRaw, isStreaming);
 
-      // Bottom section: Response setup
       let responseIcon = '<span style="color:var(--accent-amber); font-weight:bold;">⚙</span>';
       let responseStatusTitle = "Status";
       let responseSummary = "Waiting for tool execution...";
@@ -1912,11 +1985,10 @@ Use the provided tools systematically to complete all user requests accurately.`
       wrap.className = `msg-wrap ${msg.role}`;
 
       if (msg.role === "system") {
-        wrap.innerHTML = `<div class="bubble system">${escapeHtml(msg.content)}</div>`;
+        wrap.innerHTML = `<div class="bubble system">${msg.allowHtml ? msg.content : escapeHtml(msg.content)}</div>`;
         return wrap;
       }
 
-      // Standalone tool result fallback (if an unlinked tool response occurs)
       if (msg.role === "tool") {
         const isOpen = !!msg.toolOutputOpen;
         const firstLine = (msg.content || "").trim().split("\n")[0] || "completed";
@@ -2102,6 +2174,9 @@ Use the provided tools systematically to complete all user requests accurately.`
       captureSnapshot(`Manual edit of ${activeFilePath}`);
       files[activeFilePath] = document.getElementById("fileEditor").value;
       refreshPreview();
+      isViewingRollback = false;
+      updateRollbackUI();
+      recordLatestState(`Manual edit of ${activeFilePath}`);
     }
 
     function promptCreateFile() {
@@ -2114,6 +2189,9 @@ Use the provided tools systematically to complete all user requests accurately.`
           loadFileToEditor(norm);
           renderFileTree();
           refreshPreview();
+          isViewingRollback = false;
+          updateRollbackUI();
+          recordLatestState(`Create file ${norm}`);
           if (window.innerWidth <= 768) switchMobileTab('editor');
         }
       }
@@ -2125,6 +2203,9 @@ Use the provided tools systematically to complete all user requests accurately.`
         captureSnapshot(`Create folder ${f}`);
         folders.add(normalizePath(f));
         renderFileTree();
+        isViewingRollback = false;
+        updateRollbackUI();
+        recordLatestState(`Create folder ${f}`);
       }
     }
 
@@ -2215,7 +2296,10 @@ Use the provided tools systematically to complete all user requests accurately.`
         files,
         chatHistory,
         activeFilePath,
-        snapshots
+        snapshots,
+        latestState,
+        isViewingRollback,
+        currentRollbackCheckpoint
       };
       triggerDownload(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), `webpi-session-${new Date().toISOString().slice(0,10)}.json`);
     }
@@ -2232,6 +2316,14 @@ Use the provided tools systematically to complete all user requests accurately.`
             folders = new Set(data.folders || []);
             chatHistory = data.chatHistory;
             snapshots = data.snapshots || {};
+            latestState = data.latestState || null;
+            isViewingRollback = !!data.isViewingRollback;
+            currentRollbackCheckpoint = data.currentRollbackCheckpoint || "";
+
+            if (!latestState) {
+              recordLatestState("Imported session state");
+            }
+
             if (data.settings) {
               settings = { ...settings, ...data.settings };
               persistSettings();
@@ -2239,6 +2331,7 @@ Use the provided tools systematically to complete all user requests accurately.`
             activeFilePath = data.activeFilePath || Object.keys(files)[0] || "";
             updateSettingsUI();
             updateSnapshotCountBadge();
+            updateRollbackUI();
             renderFileTree();
             loadFileToEditor(activeFilePath);
             renderChatMessages();
@@ -2398,7 +2491,9 @@ Use the provided tools systematically to complete all user requests accurately.`
     window.addEventListener("DOMContentLoaded", () => {
       loadPersistedSettings();
       updateSettingsUI();
+      recordLatestState("Initial workspace state");
       updateSnapshotCountBadge();
+      updateRollbackUI();
       renderFileTree();
       loadFileToEditor(activeFilePath);
       refreshPreview();
