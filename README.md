@@ -62,7 +62,7 @@ Access the full interactive directory and launcher here:
 ### 🛠️ Standalone Tools & Visual Canvas Experiments
 | Project | Description / Stack | Source Code | Live Demo |
 | :--- | :--- | :---: | :---: |
-| **WebPi** | Browser-sandboxed complete agent - only local LLM API needed | [Docs](https://kaliliveuser.github.io/sandbox/WebPiDoc.html) [Samples](https://kaliliveuser.github.io/sandbox/WebPi260924.zip) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
+| **WebPi** | Complete browser-sandboxed agent - only local LLM API needed | [Docs](https://kaliliveuser.github.io/sandbox/WebPiDoc.html) [Samples](https://kaliliveuser.github.io/sandbox/WebPi260924.zip) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
 | **epub2mobi** | 100% local epub to mobi converter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/epub2mobi.html) | [Launch](https://kaliliveuser.github.io/sandbox/epub2mobi.html) |
 | **QR Code Generator** | Offline, client-side dynamic QR generator | [Code](https://github.com/kaliliveuser/sandbox/blob/main/qrcode.html) | [Launch](https://kaliliveuser.github.io/sandbox/qrcode.html) |
 | **Library Card Barcode** | Client-side barcode generator (Code 39 / 128) | [Code](https://github.com/kaliliveuser/sandbox/blob/main/librarycard.html) | [Launch](https://kaliliveuser.github.io/sandbox/librarycard.html) |
