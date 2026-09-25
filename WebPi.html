@@ -47,7 +47,7 @@
     .brand-title { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 0.5rem; }
     .badge { font-size: 11px; font-weight: normal; padding: 2px 8px; border-radius: 9999px; background: rgba(76, 29, 149, 0.5); color: var(--brand-light); border: 1px solid rgba(124, 58, 237, 0.4); }
     
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; background: transparent; color: var(--text-main); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; background: transparent; color: var(--text-main); white-space: nowrap; }
     .btn:hover { background: var(--bg-surface-hover); }
     .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3); }
     .btn-primary:hover { background: var(--brand-hover); }
@@ -176,7 +176,7 @@
     .msg-wrap { display: flex; flex-direction: column; width: 100%; }
     .msg-wrap.user { align-items: flex-end; }
     .msg-wrap.assistant { align-items: flex-start; }
-    .bubble { max-width: 90%; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.5; word-break: break-word; }
+    .bubble { max-width: 92%; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.5; word-break: break-word; }
     .bubble.user { background: var(--brand-primary); color: #fff; border-bottom-right-radius: 2px; }
     .bubble.assistant { background: var(--bg-surface); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--border-color); width: 100%; }
     .bubble.system { width: 100%; background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); }
@@ -192,22 +192,144 @@
       100% { opacity: 0.6; border-color: rgba(124, 58, 237, 0.4); }
     }
 
-    /* Expandable Tool Calls */
-    .tool-call-item { margin-top: 6px; border-radius: 6px; background: #0d0822; border: 1px solid rgba(124, 58, 237, 0.5); overflow: hidden; font-family: var(--font-mono); font-size: 11px; }
-    .tool-call-header { width: 100%; padding: 5px 8px; background: rgba(30, 16, 69, 0.6); border: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: var(--brand-light); font-family: var(--font-mono); font-size: 11px; text-align: left; }
-    .tool-call-header:hover { background: rgba(45, 24, 105, 0.8); }
-    .tool-call-header.streaming { animation: pulseGlow 1.5s infinite ease-in-out; }
-    .tool-call-body { padding: 8px; border-top: 1px solid rgba(124, 58, 237, 0.3); background: rgba(7, 11, 20, 0.9); max-height: 260px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; color: var(--text-main); font-size: 11px; }
-    
-    .tool-diff-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 4px; margin-bottom: 2px; }
-    .diff-removed { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fca5a5; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; }
-    .diff-added { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #86efac; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; }
+    /* ==========================================================================
+       STACKED TOOL CALLS & RESPONSES (ANTI-SQUASH RESPONSIVE DESIGN)
+       ========================================================================== */
+    .tool-call-item {
+      margin-top: 8px;
+      border-radius: 6px;
+      background: #090c18;
+      border: 1px solid rgba(124, 58, 237, 0.45);
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .tool-call-item.tool-error {
+      border-color: rgba(244, 63, 94, 0.6);
+    }
 
-    /* Expandable Tool Results */
-    .tool-output-box { width: 100%; border-radius: 8px; background: #0b1120; border: 1px solid rgba(124, 58, 237, 0.4); overflow: hidden; font-family: var(--font-mono); }
-    .tool-output-header { width: 100%; padding: 6px 10px; background: rgba(15, 23, 42, 0.8); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: none; color: var(--brand-light); font-size: 11px; font-family: var(--font-mono); text-align: left; }
+    /* Top: The Tool Call (Invocation / Inputs) */
+    .tool-call-top {
+      display: flex;
+      flex-direction: column;
+      background: rgba(26, 16, 56, 0.6);
+    }
+    .tool-call-header {
+      width: 100%;
+      padding: 6px 8px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--brand-light);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: left;
+      user-select: none;
+    }
+    .tool-call-header:hover {
+      background: rgba(43, 24, 94, 0.4);
+    }
+    .tool-call-header.streaming {
+      animation: pulseGlow 1.5s infinite ease-in-out;
+    }
+    .tool-call-title-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+      word-break: break-word;
+    }
+    .tool-call-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .tool-call-body {
+      padding: 8px;
+      border-top: 1px dashed rgba(124, 58, 237, 0.3);
+      background: rgba(7, 11, 20, 0.95);
+      max-height: 220px;
+      overflow-y: auto;
+      color: var(--text-main);
+      font-size: 11px;
+    }
+
+    /* Bottom: The Tool Response (Stacked directly under Call) */
+    .tool-response-bottom {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid rgba(124, 58, 237, 0.35);
+      background: rgba(11, 17, 32, 0.95);
+    }
+    .tool-response-bottom.error {
+      border-top-color: rgba(244, 63, 94, 0.5);
+      background: rgba(26, 10, 20, 0.85);
+    }
+    .tool-response-bottom.running {
+      background: rgba(15, 23, 42, 0.7);
+    }
+    .tool-response-header {
+      width: 100%;
+      padding: 6px 8px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tool-response-header:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tool-response-summary {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+      word-break: break-word;
+    }
+    .tool-response-body {
+      padding: 8px;
+      border-top: 1px dashed rgba(124, 58, 237, 0.25);
+      background: #070b14;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .tool-response-body.error {
+      color: #fca5a5;
+      border-top-color: rgba(244, 63, 94, 0.3);
+    }
+
+    .tool-diff-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 4px; margin-bottom: 2px; }
+    .diff-removed { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fca5a5; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+    .diff-added { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #86efac; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+
+    /* Expandable Standalone Tool Results (Fallback for unlinked results) */
+    .tool-output-box { width: 100%; border-radius: 8px; background: #0b1120; border: 1px solid rgba(124, 58, 237, 0.4); overflow: hidden; font-family: var(--font-mono); margin-top: 6px; }
+    .tool-output-header { width: 100%; padding: 6px 10px; background: rgba(15, 23, 42, 0.8); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; cursor: pointer; border: none; color: var(--brand-light); font-size: 11px; font-family: var(--font-mono); text-align: left; }
     .tool-output-header:hover { background: var(--bg-surface-hover); }
-    .tool-output-body { padding: 8px 10px; border-top: 1px solid rgba(124, 58, 237, 0.3); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
+    .tool-output-body { padding: 8px 10px; border-top: 1px solid rgba(124, 58, 237, 0.3); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; word-break: break-all; }
 
     /* Chat Input */
     .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); flex-shrink: 0; }
@@ -466,7 +588,7 @@
                 rows="3"
                 placeholder="Ask WebPi to build, scaffold, or modify your application..."
                 onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendPrompt(event); }"
-              >Create a self-contained, single-file, responsive website about . Make it attractive, handsome and sophisticated and give it a professional theme. Name the file .html</textarea>
+              >Create a self-contained, single-file, responsive webpage about X. Make the webpage attractive and sophisticated. Give it a professional theme and an option to switch to a light theme from a default dark theme. Use a descriptive, proper-cased single word to name the html file.</textarea>
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:10px; color:var(--text-dim);">Shift+Enter for newline</span>
                 <button type="submit" class="btn btn-primary">
@@ -944,16 +1066,25 @@ Use the provided tools systematically to complete all user requests accurately.`
 
     function executeTool(rawName, args) {
       const name = resolveToolName(rawName);
+      console.log(`[WebPi Tool Call] Execution started: ${name}`, { tool: name, rawName, arguments: args });
       try {
+        let result;
         switch (name) {
           case "read_file": {
             const p = normalizePath(args.path);
-            if (!(p in files)) return `Error: File '${p}' does not exist. Available files: ${Object.keys(files).join(", ") || "(none)"}`;
-            return files[p];
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist. Available files: ${Object.keys(files).join(", ") || "(none)"}`;
+            } else {
+              result = files[p];
+            }
+            break;
           }
           case "write_file": {
             const p = normalizePath(args.path);
-            if (!p) return `Error: No path provided.`;
+            if (!p) {
+              result = `Error: No path provided.`;
+              break;
+            }
             files[p] = args.content || "";
             const parts = p.split("/");
             if (parts.length > 1) {
@@ -963,13 +1094,18 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             if (activeFilePath === p) loadFileToEditor(p);
             refreshPreview();
-            return `Successfully wrote ${args.content?.length || 0} bytes to ${p}`;
+            result = `Successfully wrote ${args.content?.length || 0} bytes to ${p}`;
+            break;
           }
           case "edit_file": {
             const p = normalizePath(args.path);
-            if (!(p in files)) return `Error: File '${p}' does not exist.`;
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist.`;
+              break;
+            }
             if (typeof args.old_str !== "string" || typeof args.new_str !== "string") {
-              return `Error: 'old_str' and 'new_str' must both be strings.`;
+              result = `Error: 'old_str' and 'new_str' must both be strings.`;
+              break;
             }
 
             const currentNormalized = files[p].replace(/\r\n/g, "\n");
@@ -979,33 +1115,41 @@ Use the provided tools systematically to complete all user requests accurately.`
             const count = currentNormalized.split(oldNormalized).length - 1;
 
             if (count === 0) {
-              return `Error: 'old_str' was not found in '${p}'. Check exact whitespace, indentation, or call read_file to inspect current contents.`;
+              result = `Error: 'old_str' was not found in '${p}'. Check exact whitespace, indentation, or call read_file to inspect current contents.`;
+              break;
             }
             if (count > 1) {
-              return `Error: 'old_str' matched ${count} times in '${p}'. Please include more surrounding context lines in 'old_str' to make the match unique.`;
+              result = `Error: 'old_str' matched ${count} times in '${p}'. Please include more surrounding context lines in 'old_str' to make the match unique.`;
+              break;
             }
 
             files[p] = currentNormalized.replace(oldNormalized, () => newNormalized);
             renderFileTree();
             if (activeFilePath === p) loadFileToEditor(p);
             refreshPreview();
-            return `Successfully edited '${p}' (replaced 1 instance).`;
+            result = `Successfully edited '${p}' (replaced 1 instance).`;
+            break;
           }
           case "delete_file": {
             const p = normalizePath(args.path);
-            if (!(p in files)) return `Error: File '${p}' does not exist.`;
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist.`;
+              break;
+            }
             delete files[p];
             if (activeFilePath === p) activeFilePath = Object.keys(files)[0] || "";
             renderFileTree();
             loadFileToEditor(activeFilePath);
             refreshPreview();
-            return `Deleted file ${p}`;
+            result = `Deleted file ${p}`;
+            break;
           }
           case "create_folder": {
             const p = normalizePath(args.path);
             folders.add(p);
             renderFileTree();
-            return `Created folder '${p}'`;
+            result = `Created folder '${p}'`;
+            break;
           }
           case "delete_folder": {
             const p = normalizePath(args.path);
@@ -1021,12 +1165,16 @@ Use the provided tools systematically to complete all user requests accurately.`
             if (!(activeFilePath in files)) activeFilePath = Object.keys(files)[0] || "";
             loadFileToEditor(activeFilePath);
             refreshPreview();
-            return `Deleted folder '${p}' and ${count} contained files.`;
+            result = `Deleted folder '${p}' and ${count} contained files.`;
+            break;
           }
           case "move_file": {
             const src = normalizePath(args.source_path);
             let tgt = normalizePath(args.target_path);
-            if (!(src in files)) return `Error: Source '${src}' does not exist.`;
+            if (!(src in files)) {
+              result = `Error: Source '${src}' does not exist.`;
+              break;
+            }
             if (folders.has(tgt) || tgt.endsWith("/")) tgt = (tgt.endsWith("/") ? tgt : tgt + "/") + src.split("/").pop();
             files[tgt] = files[src];
             delete files[src];
@@ -1034,14 +1182,59 @@ Use the provided tools systematically to complete all user requests accurately.`
             renderFileTree();
             loadFileToEditor(activeFilePath);
             refreshPreview();
-            return `Moved '${src}' to '${tgt}'`;
+            result = `Moved '${src}' to '${tgt}'`;
+            break;
           }
           default:
-            return `Error: Unknown tool '${rawName}'`;
+            result = `Error: Unknown tool '${rawName}'`;
+            break;
         }
+        console.log(`[WebPi Tool Result] Completed: ${name}`, { tool: name, result });
+        return result;
       } catch (err) {
+        console.error(`[WebPi Tool Error] Failed: ${name}`, { tool: name, error: err.message });
         return `Execution error: ${err.message}`;
       }
+    }
+
+    /* Helper: Retrieve execution response associated with a tool call */
+    function getToolCallResponse(call, msgIdx) {
+      if (!call) return null;
+      if (call.response !== undefined && call.response !== null) {
+        return {
+          content: call.response,
+          snapshotId: call.snapshotId
+        };
+      }
+
+      // Check in chatHistory for a tool message matching this call id
+      if (call.id) {
+        const match = chatHistory.find(m => m.role === "tool" && m.tool_call_id === call.id);
+        if (match) {
+          return {
+            content: match.content,
+            snapshotId: match.snapshotId || call.snapshotId,
+            name: match.name
+          };
+        }
+      }
+
+      // Fallback: check adjacent tool messages directly after this assistant message
+      if (msgIdx !== undefined && msgIdx >= 0) {
+        for (let i = msgIdx + 1; i < chatHistory.length; i++) {
+          const nextMsg = chatHistory[i];
+          if (nextMsg.role === "assistant" || nextMsg.role === "user") break;
+          if (nextMsg.role === "tool" && (!nextMsg.tool_call_id || nextMsg.tool_call_id === call.id)) {
+            return {
+              content: nextMsg.content,
+              snapshotId: nextMsg.snapshotId || call.snapshotId,
+              name: nextMsg.name
+            };
+          }
+        }
+      }
+
+      return null;
     }
 
     /* ==========================================================================
@@ -1146,7 +1339,8 @@ Use the provided tools systematically to complete all user requests accurately.`
           reasoning: "",
           reasoningOpen: false,
           tool_calls: null,
-          toolCallsOpen: {}
+          toolCallsOpen: {},
+          toolResponsesOpen: {}
         });
         renderChatMessages();
 
@@ -1175,6 +1369,16 @@ Use the provided tools systematically to complete all user requests accurately.`
             requestBody.reasoning_effort = settings.reasoningEffort;
           }
 
+          console.log(`[WebPi API Request] Turn ${loopCount}`, {
+            endpoint,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${settings.apiKey ? '***' : ''}`
+            },
+            body: requestBody
+          });
+
           const response = await fetch(endpoint, {
             method: "POST",
             headers: {
@@ -1183,6 +1387,12 @@ Use the provided tools systematically to complete all user requests accurately.`
             },
             body: JSON.stringify(requestBody),
             signal: abortController.signal
+          });
+
+          console.log(`[WebPi API Response] Turn ${loopCount}`, {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
           });
 
           if (!response.ok) {
@@ -1295,7 +1505,9 @@ Use the provided tools systematically to complete all user requests accurately.`
               call.snapshotId = snapId;
 
               setAgentStatus(true, `Executing: ${name}...`);
+              console.log(`[WebPi Agent Tool Call] ${name}`, { id: call.id, tool: name, arguments: args, snapshotId: snapId });
               const res = executeTool(name, args);
+              call.response = res; // Group response directly with tool call
               addChatMessage("tool", res, null, call.id, name, snapId);
             }
             continue;
@@ -1303,14 +1515,33 @@ Use the provided tools systematically to complete all user requests accurately.`
 
           const fallback = parseFallbackCalls(chatHistory[currentMsgIndex].content);
           if (fallback) {
+            const fallbackId = "call_fallback_" + Date.now();
             const name = resolveToolName(fallback.name);
             const targetPath = fallback.args?.path || fallback.args?.source_path || "";
             const snapDesc = `Before ${name}${targetPath ? ' (' + targetPath + ')' : ''}`;
             const snapId = captureSnapshot(snapDesc);
 
+            const fallbackCall = {
+              id: fallbackId,
+              type: "function",
+              function: {
+                name: name,
+                arguments: JSON.stringify(fallback.args)
+              },
+              snapshotId: snapId,
+              response: null
+            };
+
+            if (!chatHistory[currentMsgIndex].tool_calls) {
+              chatHistory[currentMsgIndex].tool_calls = [];
+            }
+            chatHistory[currentMsgIndex].tool_calls.push(fallbackCall);
+
             setAgentStatus(true, `Executing: ${name}...`);
+            console.log(`[WebPi Fallback Tool Call] ${name}`, { tool: name, arguments: fallback.args, snapshotId: snapId });
             const res = executeTool(name, fallback.args);
-            addChatMessage("tool", res, null, "call_" + Date.now(), name, snapId);
+            fallbackCall.response = res;
+            addChatMessage("tool", res, null, fallbackId, name, snapId);
             continue;
           }
 
@@ -1322,8 +1553,10 @@ Use the provided tools systematically to complete all user requests accurately.`
           }
 
           if (err.name === "AbortError") {
+            console.warn("[WebPi API Request Aborted by User]");
             addChatMessage("system", "WebPi execution stopped by user.");
           } else {
+            console.error("[WebPi API Request Error]", err);
             addChatMessage("system", `⚠️ LLM Error: ${err.message}\nMake sure your endpoint (${settings.baseUrl}) is running with CORS enabled.`);
           }
           break;
@@ -1425,6 +1658,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
+    /* Toggle Call Inputs (Top Section) */
     function toggleToolCall(msgIdx, callIdx) {
       if (chatHistory[msgIdx]) {
         if (!chatHistory[msgIdx].toolCallsOpen) chatHistory[msgIdx].toolCallsOpen = {};
@@ -1433,15 +1667,33 @@ Use the provided tools systematically to complete all user requests accurately.`
         chatHistory[msgIdx].toolCallsOpen[callIdx] = newState;
 
         const body = document.getElementById(`tool-call-body-${msgIdx}-${callIdx}`);
-        const lbl = document.getElementById(`tool-call-label-${msgIdx}-${callIdx}`);
+        const arrow = document.getElementById(`tool-call-arrow-${msgIdx}-${callIdx}`);
         if (body) {
           body.classList.toggle("hidden", !newState);
-          if (newState) {
-            body.scrollTop = body.scrollHeight;
-          }
+          if (newState) body.scrollTop = 0;
         }
-        if (lbl) {
-          lbl.innerText = newState ? "hide" : "show";
+        if (arrow) {
+          arrow.innerText = newState ? "▾" : "▸";
+        }
+      }
+    }
+
+    /* Toggle Response Output (Bottom Section) */
+    function toggleToolResponse(msgIdx, callIdx) {
+      if (chatHistory[msgIdx]) {
+        if (!chatHistory[msgIdx].toolResponsesOpen) chatHistory[msgIdx].toolResponsesOpen = {};
+        const cur = !!chatHistory[msgIdx].toolResponsesOpen[callIdx];
+        const newState = !cur;
+        chatHistory[msgIdx].toolResponsesOpen[callIdx] = newState;
+
+        const body = document.getElementById(`tool-response-body-${msgIdx}-${callIdx}`);
+        const arrow = document.getElementById(`tool-response-arrow-${msgIdx}-${callIdx}`);
+        if (body) {
+          body.classList.toggle("hidden", !newState);
+          if (newState) body.scrollTop = 0;
+        }
+        if (arrow) {
+          arrow.innerText = newState ? "▾" : "▸";
         }
       }
     }
@@ -1457,7 +1709,8 @@ Use the provided tools systematically to complete all user requests accurately.`
         reasoning: "",
         reasoningOpen: false,
         toolOutputOpen: false,
-        toolCallsOpen: {}
+        toolCallsOpen: {},
+        toolResponsesOpen: {}
       });
       renderChatMessages(role === "user");
     }
@@ -1469,8 +1722,24 @@ Use the provided tools systematically to complete all user requests accurately.`
       const wasAtBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= 80;
       const prevScrollTop = container.scrollTop;
 
+      // Collect tool_call_ids grouped with assistant tool calls
+      const handledToolCallIds = new Set();
+      chatHistory.forEach(m => {
+        if (m.tool_calls && Array.isArray(m.tool_calls)) {
+          m.tool_calls.forEach(tc => {
+            if (tc.id) handledToolCallIds.add(tc.id);
+          });
+        }
+      });
+
       container.innerHTML = "";
-      chatHistory.forEach((msg, idx) => container.appendChild(createMessageDOM(msg, idx, false)));
+      chatHistory.forEach((msg, idx) => {
+        // Skip standalone role="tool" messages if already stacked directly under their tool call
+        if (msg.role === "tool" && msg.tool_call_id && handledToolCallIds.has(msg.tool_call_id)) {
+          return;
+        }
+        container.appendChild(createMessageDOM(msg, idx, false));
+      });
 
       if (forceScroll || wasAtBottom) {
         container.scrollTop = container.scrollHeight;
@@ -1480,7 +1749,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       handleChatScroll();
     }
 
-    function generateToolDetailHtml(fnName, argsRaw, isStreaming = false) {
+    function generateToolArgsHtml(fnName, argsRaw, isStreaming = false) {
       let parsed = null;
       try {
         parsed = JSON.parse(argsRaw);
@@ -1493,7 +1762,7 @@ Use the provided tools systematically to complete all user requests accurately.`
           return `<div><strong>File:</strong> ${escapeHtml(parsed.path || "")}</div>`;
         } else if (fnName === "write_file") {
           return `
-            <div style="margin-bottom:6px;"><strong>File:</strong> ${escapeHtml(parsed.path || "")} (${(parsed.content || "").length.toLocaleString()} characters)</div>
+            <div style="margin-bottom:6px;"><strong>File:</strong> ${escapeHtml(parsed.path || "")} (${(parsed.content || "").length.toLocaleString()} chars)</div>
             <div class="tool-diff-tag" style="color:var(--accent-green);">File Content:</div>
             <pre class="diff-added">${escapeHtml(parsed.content || "")}</pre>`;
         } else if (fnName === "edit_file") {
@@ -1512,125 +1781,129 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
     }
 
+    /* Build single vertically-stacked tool call & response block */
+    function renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming = false) {
+      const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
+      const argsRaw = t.function?.arguments || "";
+      const respObj = getToolCallResponse(t, msgIdx);
+      const hasResponse = !!respObj;
+      const isError = hasResponse && (
+        respObj.content.startsWith("Error:") ||
+        respObj.content.startsWith("Execution error:") ||
+        respObj.content.includes("Execution error")
+      );
+
+      if (!msg.toolCallsOpen) msg.toolCallsOpen = {};
+      if (!msg.toolResponsesOpen) msg.toolResponsesOpen = {};
+
+      // Auto-open response details on error
+      if (msg.toolResponsesOpen[callIdx] === undefined && isError) {
+        msg.toolResponsesOpen[callIdx] = true;
+      }
+
+      const isCallOpen = !!msg.toolCallsOpen[callIdx];
+      const isRespOpen = !!msg.toolResponsesOpen[callIdx];
+
+      let pathTag = "";
+      const pathMatch = argsRaw.match(/"path"\s*:\s*"([^"]+)"/);
+      if (pathMatch) {
+        pathTag = ` <span style="color:#ffffff; font-weight:600;">(${escapeHtml(pathMatch[1])})</span>`;
+      }
+      const sizeTag = argsRaw.length > 0 ? ` <span style="opacity:0.7; font-size:10px;">${argsRaw.length.toLocaleString()} chars</span>` : "";
+      const streamClass = isStreaming ? "streaming" : "";
+
+      const effectiveSnapId = t.snapshotId || respObj?.snapshotId;
+      const rollbackBtn = effectiveSnapId ? `
+        <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px; line-height:1.4;" onclick="restoreSnapshot('${effectiveSnapId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
+
+      const argsHtml = generateToolArgsHtml(fnName, argsRaw, isStreaming);
+
+      // Bottom section: Response setup
+      let responseIcon = '<span style="color:var(--accent-amber); font-weight:bold;">⚙</span>';
+      let responseStatusTitle = "Status";
+      let responseSummary = "Waiting for tool execution...";
+      let respContent = "";
+      let showDetailsToggle = false;
+
+      if (hasResponse) {
+        respContent = respObj.content || "";
+        const lines = respContent.trim().split("\n");
+        responseSummary = lines[0] || (isError ? "Execution failed" : "Completed");
+        showDetailsToggle = lines.length > 1 || respContent.length > 70;
+
+        if (isError) {
+          responseIcon = '<span style="color:var(--accent-rose); font-weight:bold;">✕</span>';
+          responseStatusTitle = "Error";
+        } else {
+          responseIcon = '<span style="color:var(--accent-green); font-weight:bold;">✓</span>';
+          responseStatusTitle = "Result";
+        }
+      } else if (isStreaming) {
+        responseIcon = '<span style="color:var(--brand-light); font-weight:bold;">⏳</span>';
+        responseStatusTitle = "Pending";
+        responseSummary = "Streaming tool arguments...";
+      } else {
+        responseIcon = '<span style="color:var(--accent-amber); font-weight:bold;">⏳</span>';
+        responseStatusTitle = "Running";
+        responseSummary = "Executing in workspace...";
+      }
+
+      return `
+        <div id="tool-call-item-${msgIdx}-${callIdx}" class="tool-call-item ${isError ? 'tool-error' : ''}">
+          <!-- TOP SECTION: TOOL CALL -->
+          <div class="tool-call-top">
+            <div id="tool-call-header-${msgIdx}-${callIdx}" class="tool-call-header ${streamClass}" onclick="toggleToolCall(${msgIdx}, ${callIdx})">
+              <div class="tool-call-title-group">
+                <span>⚙</span>
+                <strong>${escapeHtml(fnName)}</strong>
+                ${pathTag}
+                ${sizeTag}
+              </div>
+              <div class="tool-call-actions">
+                ${rollbackBtn}
+                <span id="tool-call-arrow-${msgIdx}-${callIdx}" style="font-size:11px; opacity:0.75; padding:0 2px;">${isCallOpen ? '▾' : '▸'}</span>
+              </div>
+            </div>
+            <div id="tool-call-body-${msgIdx}-${callIdx}" class="tool-call-body ${isCallOpen ? '' : 'hidden'}">
+              <div id="tool-call-content-${msgIdx}-${callIdx}">${argsHtml}</div>
+            </div>
+          </div>
+
+          <!-- BOTTOM SECTION: STACKED TOOL RESPONSE -->
+          <div class="tool-response-bottom ${isError ? 'error' : (hasResponse ? '' : 'running')}">
+            <div id="tool-response-header-${msgIdx}-${callIdx}" class="tool-response-header" onclick="${showDetailsToggle ? `toggleToolResponse(${msgIdx}, ${callIdx})` : ''}" style="${showDetailsToggle ? '' : 'cursor:default;'}">
+              <div class="tool-response-summary">
+                ${responseIcon}
+                <span style="font-weight:600; color:${isError ? 'var(--accent-rose)' : (hasResponse ? 'var(--accent-green)' : 'var(--accent-amber)')};">
+                  ${responseStatusTitle}:
+                </span>
+                <span style="color:var(--text-main); font-weight:normal;">${escapeHtml(responseSummary)}</span>
+              </div>
+              <div style="flex-shrink:0; margin-left:6px;">
+                ${showDetailsToggle ? `<span id="tool-response-arrow-${msgIdx}-${callIdx}" style="font-size:11px; opacity:0.75; color:var(--brand-light); padding:0 2px;">${isRespOpen ? '▾' : '▸'}</span>` : ''}
+              </div>
+            </div>
+            <div id="tool-response-body-${msgIdx}-${callIdx}" class="tool-response-body ${isError ? 'error' : ''} ${isRespOpen && showDetailsToggle ? '' : 'hidden'}">
+              ${escapeHtml(respContent)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderToolCallsToContainer(toolsDiv, msg, msgIdx, isStreaming = false) {
       const toolCalls = msg.tool_calls;
       if (!toolCalls || toolCalls.length === 0) {
         toolsDiv.innerHTML = "";
         return;
       }
-
-      if (!msg.toolCallsOpen) msg.toolCallsOpen = {};
-
-      toolCalls.forEach((t, callIdx) => {
-        const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
-        const argsRaw = t.function?.arguments || "";
-        const isOpen = !!msg.toolCallsOpen[callIdx];
-
-        let pathTag = "";
-        const pathMatch = argsRaw.match(/"path"\s*:\s*"([^"]+)"/);
-        if (pathMatch) {
-          pathTag = ` <span style="color:#f8fafc; font-weight:600;">(${escapeHtml(pathMatch[1])})</span>`;
-        }
-
-        const sizeTag = argsRaw.length > 0 ? ` <span style="opacity:0.75; font-size:10px;">${argsRaw.length.toLocaleString()} chars</span>` : "";
-        const streamClass = isStreaming ? "streaming" : "";
-
-        let itemElem = document.getElementById(`tool-call-item-${msgIdx}-${callIdx}`);
-        if (!itemElem) {
-          itemElem = document.createElement("div");
-          itemElem.id = `tool-call-item-${msgIdx}-${callIdx}`;
-          itemElem.className = "tool-call-item";
-
-          itemElem.innerHTML = `
-            <button type="button" id="tool-call-header-${msgIdx}-${callIdx}" class="tool-call-header ${streamClass}" onclick="toggleToolCall(${msgIdx}, ${callIdx})">
-              <span id="tool-call-title-${msgIdx}-${callIdx}"></span>
-              <div style="display:flex; align-items:center;">
-                <span id="tool-call-rollback-holder-${msgIdx}-${callIdx}"></span>
-                <span id="tool-call-label-${msgIdx}-${callIdx}" style="font-size:10px; opacity:0.8;">${isOpen ? "hide" : "show"}</span>
-              </div>
-            </button>
-            <div id="tool-call-body-${msgIdx}-${callIdx}" class="tool-call-body ${isOpen ? '' : 'hidden'}">
-              <div id="tool-call-content-${msgIdx}-${callIdx}"></div>
-            </div>
-          `;
-          toolsDiv.appendChild(itemElem);
-        }
-
-        // Update Header
-        const headerBtn = document.getElementById(`tool-call-header-${msgIdx}-${callIdx}`);
-        if (headerBtn) headerBtn.className = `tool-call-header ${streamClass}`;
-
-        const titleSpan = document.getElementById(`tool-call-title-${msgIdx}-${callIdx}`);
-        if (titleSpan) titleSpan.innerHTML = `⚙ <strong>${escapeHtml(fnName)}</strong>${pathTag}${sizeTag}`;
-
-        const labelSpan = document.getElementById(`tool-call-label-${msgIdx}-${callIdx}`);
-        if (labelSpan) labelSpan.innerText = isOpen ? "hide" : "show";
-
-        const rollbackHolder = document.getElementById(`tool-call-rollback-holder-${msgIdx}-${callIdx}`);
-        if (rollbackHolder) {
-          rollbackHolder.innerHTML = t.snapshotId ? `
-            <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px; margin-right:6px;" onclick="restoreSnapshot('${t.snapshotId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
-        }
-
-        // Update Body Content
-        const bodyElem = document.getElementById(`tool-call-body-${msgIdx}-${callIdx}`);
-        const contentElem = document.getElementById(`tool-call-content-${msgIdx}-${callIdx}`);
-        if (bodyElem && contentElem) {
-          bodyElem.classList.toggle("hidden", !isOpen);
-
-          const wasAtBottom = (bodyElem.scrollHeight - bodyElem.scrollTop - bodyElem.clientHeight) <= 40;
-          contentElem.innerHTML = generateToolDetailHtml(fnName, argsRaw, isStreaming);
-
-          if (wasAtBottom && isStreaming) {
-            bodyElem.scrollTop = bodyElem.scrollHeight;
-          }
-        }
-      });
-
-      const existingItems = toolsDiv.querySelectorAll(".tool-call-item");
-      for (let i = toolCalls.length; i < existingItems.length; i++) {
-        existingItems[i].remove();
-      }
+      toolsDiv.innerHTML = toolCalls.map((t, callIdx) => renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming)).join("");
     }
 
     function formatToolCalls(msg, msgIdx, isStreaming = false) {
       const toolCalls = msg.tool_calls;
       if (!toolCalls || toolCalls.length === 0) return "";
-      const openMap = msg.toolCallsOpen || {};
-
-      return toolCalls.map((t, callIdx) => {
-        const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
-        const argsRaw = t.function?.arguments || "";
-        const isOpen = !!openMap[callIdx];
-
-        let pathTag = "";
-        const pathMatch = argsRaw.match(/"path"\s*:\s*"([^"]+)"/);
-        if (pathMatch) {
-          pathTag = ` <span style="color:#f8fafc; font-weight:600;">(${escapeHtml(pathMatch[1])})</span>`;
-        }
-
-        const sizeTag = argsRaw.length > 0 ? ` <span style="opacity:0.75; font-size:10px;">${argsRaw.length.toLocaleString()} chars</span>` : "";
-        const streamClass = isStreaming ? "streaming" : "";
-
-        const detailHtml = generateToolDetailHtml(fnName, argsRaw, isStreaming);
-
-        const rollbackBtn = t.snapshotId ? `
-          <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px; margin-right:6px;" onclick="restoreSnapshot('${t.snapshotId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
-
-        return `
-          <div id="tool-call-item-${msgIdx}-${callIdx}" class="tool-call-item">
-            <button type="button" id="tool-call-header-${msgIdx}-${callIdx}" class="tool-call-header ${streamClass}" onclick="toggleToolCall(${msgIdx}, ${callIdx})">
-              <span id="tool-call-title-${msgIdx}-${callIdx}">⚙ <strong>${escapeHtml(fnName)}</strong>${pathTag}${sizeTag}</span>
-              <div style="display:flex; align-items:center;">
-                <span id="tool-call-rollback-holder-${msgIdx}-${callIdx}">${rollbackBtn}</span>
-                <span id="tool-call-label-${msgIdx}-${callIdx}" style="font-size:10px; opacity:0.8;">${isOpen ? "hide" : "show"}</span>
-              </div>
-            </button>
-            <div id="tool-call-body-${msgIdx}-${callIdx}" class="tool-call-body ${isOpen ? '' : 'hidden'}">
-              <div id="tool-call-content-${msgIdx}-${callIdx}">${detailHtml}</div>
-            </div>
-          </div>`;
-      }).join("");
+      return toolCalls.map((t, callIdx) => renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming)).join("");
     }
 
     function createMessageDOM(msg, idx, isStreaming = false) {
@@ -1643,13 +1916,14 @@ Use the provided tools systematically to complete all user requests accurately.`
         return wrap;
       }
 
+      // Standalone tool result fallback (if an unlinked tool response occurs)
       if (msg.role === "tool") {
         const isOpen = !!msg.toolOutputOpen;
         const firstLine = (msg.content || "").trim().split("\n")[0] || "completed";
         const shortPreview = firstLine.length > 45 ? firstLine.slice(0, 45) + "..." : firstLine;
 
         const rollbackBtn = msg.snapshotId ? `
-          <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px; margin-right:6px;" onclick="restoreSnapshot('${msg.snapshotId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
+          <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px;" onclick="restoreSnapshot('${msg.snapshotId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
 
         wrap.innerHTML = `
           <div class="tool-output-box">
