@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Procedural Asteroid Defense Command</title>
+  <style>
+    :root {
+      --bg: #070709;
+      --surface: #0f1015;
+      --border: #1f222e;
+      --border-bright: #323749;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #4b5563;
+      --cyan: #00f0ff;
+      --cyan-dim: rgba(0, 240, 255, 0.15);
+      --red: #ff3366;
+      --red-dim: rgba(255, 51, 102, 0.15);
+      --amber: #f59e0b;
+      --green: #10b981;
+      --font-mono: ui-monospace, "SF Pro Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg);
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: crosshair;
+    }
+
+    /* Minimalist Tactical HUD */
+    .hud-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.25rem;
+    }
+
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .telemetry-card {
+      background: rgba(15, 16, 21, 0.75);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .telemetry-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+
+    .telemetry-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .telemetry-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .telemetry-value.accent {
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan-dim);
+    }
+
+    .telemetry-value.danger {
+      color: var(--red);
+      text-shadow: 0 0 10px var(--red-dim);
+    }
+
+    .hud-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+    }
+
+    .battery-grid {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .battery-status {
+      min-width: 100px;
+    }
+
+    .meter-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .meter-fill {
+      height: 100%;
+      background: var(--cyan);
+      width: 100%;
+      transition: width 0.15s ease-out, background-color 0.2s;
+    }
+
+    .meter-fill.empty {
+      background: var(--red);
+    }
+
+    /* Modal / Overlay Layer */
+    .overlay-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(7, 7, 9, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-panel {
+      max-width: 540px;
+      width: 90%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .modal-desc {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .key-table {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem 1rem;
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .key-tag {
+      display: inline-block;
+      padding: 0.15rem 0.4rem;
+      background: #181920;
+      border: 1px solid var(--border-bright);
+      border-radius: 3px;
+      color: var(--cyan);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .btn-action {
+      background: var(--text-primary);
+      color: #000;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-action:active {
+      transform: translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="stage"></canvas>
+
+    <div class="hud-layer">
+      <div class="hud-header">
+        <div class="telemetry-card">
+          <div class="telemetry-row">
+            <span class="telemetry-label">Defense Grid</span>
+            <span class="telemetry-value accent" id="hud-score">000,000</span>
+          </div>
+          <div class="telemetry-row">
+            <span class="telemetry-label">Threat Wave</span>
+            <span class="telemetry-value" id="hud-wave">01</span>
+          </div>
+        </div>
+
+        <div class="telemetry-card" style="text-align: right;">
+          <div class="telemetry-row" style="justify-content: flex-end;">
+            <span class="telemetry-label">Chain Multiplier</span>
+            <span class="telemetry-value" id="hud-multiplier">x1.0</span>
+          </div>
+          <div class="telemetry-row" style="justify-content: flex-end;">
+            <span class="telemetry-label">Core Integrity</span>
+            <span class="telemetry-value danger" id="hud-integrity">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-footer">
+        <div class="battery-grid">
+          <div class="telemetry-card battery-status">
+            <span class="telemetry-label">Silo Alpha [1]</span>
+            <div class="meter-bar"><div class="meter-fill" id="meter-alpha"></div></div>
+          </div>
+          <div class="telemetry-card battery-status">
+            <span class="telemetry-label">Silo Bravo [2]</span>
+            <div class="meter-bar"><div class="meter-fill" id="meter-bravo"></div></div>
+          </div>
+          <div class="telemetry-card battery-status">
+            <span class="telemetry-label">Silo Charlie [3]</span>
+            <div class="meter-bar"><div class="meter-fill" id="meter-charlie"></div></div>
+          </div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="telemetry-row">
+            <span class="telemetry-label">Shield Buffer [SPACE]</span>
+            <span class="telemetry-value accent" id="hud-shield">READY</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UI Overlay (Menu & Game Over) -->
+    <div class="overlay-layer" id="overlay">
+      <div class="modal-panel" id="modal-content">
+        <span class="modal-tag" id="panel-tag">Tactical Command Protocol</span>
+        <h1 class="modal-title" id="panel-title">ORBITAL INTERCEPT SYSTEM</h1>
+        <p class="modal-desc" id="panel-desc">
+          Planetary surface clusters are targeted by procedural kinetic kill vehicles.
+          Deploy sub-orbital counter-measures to generate expanding blast envelopes and neutralize threats before impact.
+        </p>
+        
+        <div class="key-table">
+          <div><span class="key-tag">MOUSE / TAP</span></div>
+          <div>Target Sky Vector & Launch Nearest Interceptor</div>
+          <div><span class="key-tag">1, 2, 3</span></div>
+          <div>Manual Silo Selection (Alpha, Bravo, Charlie)</div>
+          <div><span class="key-tag">SPACE</span></div>
+          <div>Deploy High-Frequency Shield Overcharge</div>
+        </div>
+
+        <button class="btn-action" id="btn-engage">
+          <span>INITIALIZE SYSTEM</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * PROCEDURAL ASTEROID DEFENSE COMMAND
+     * High-Precision Engine & Synthetic Audio Architecture
+     */
+
+    // --- SOUND SYNTHESIS ENGINE (Assetless Web Audio API) ---
+    class TacticalAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.master = null;
+        this.droneOscA = null;
+        this.droneOscB = null;
+        this.isMuted = false;
+      }
+
+      init() {
+        if (this.ctx) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContextClass();
+
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.85;
+        this.master.connect(this.ctx.destination);
+
+        this.startAmbientGrid();
+      }
+
+      startAmbientGrid() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        
+        // Low Frequency Ambient Resonance Filter
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(120, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.04, now);
+
+        this.droneOscA = this.ctx.createOscillator();
+        this.droneOscA.type = 'sawtooth';
+        this.droneOscA.frequency.setValueAtTime(55, now); // A1
+
+        this.droneOscB = this.ctx.createOscillator();
+        this.droneOscB.type = 'sine';
+        this.droneOscB.frequency.setValueAtTime(55.4, now); // Subtle phasing
+
+        this.droneOscA.connect(filter);
+        this.droneOscB.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.master);
+
+        this.droneOscA.start(now);
+        this.droneOscB.start(now);
+      }
+
+      playLaunch(freq = 440) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.18);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.23);
+      }
+
+      playDetonation(radiusRatio = 1) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        // Sub-bass thump
+        const subOsc = this.ctx.createOscillator();
+        const subGain = this.ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(75 * radiusRatio, now);
+        subOsc.frequency.exponentialRampToValueAtTime(22, now + 0.45);
+
+        subGain.gain.setValueAtTime(0.45, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        subOsc.connect(subGain);
+        subGain.connect(this.master);
+        subOsc.start(now);
+        subOsc.stop(now + 0.5);
+
+        // Procedural White Noise Crunch for Shockwave
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.4);
+        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+
+        const whiteNoise = this.ctx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const noiseFilter = this.ctx.createBiquadFilter();
+        noiseFilter.type = 'lowpass';
+        noiseFilter.frequency.setValueAtTime(800 * radiusRatio, now);
+        noiseFilter.frequency.exponentialRampToValueAtTime(80, now + 0.38);
+
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.3, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+        whiteNoise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(this.master);
+
+        whiteNoise.start(now);
+        whiteNoise.stop(now + 0.4);
+      }
+
+      playWarning() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(660, now);
+        osc.frequency.setValueAtTime(440, now + 0.08);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.16);
+
+        osc.connect(gain);
+        gain.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.17);
+      }
+
+      playShieldPulse() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.35);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.42);
+      }
+
+      playUiClick() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(this.master);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    // --- GAME ENGINE & MATHEMATICAL PIPELINE ---
+    class GameEngine {
+      constructor() {
+        this.canvas = document.getElementById('stage');
+        this.ctx = this.canvas.getContext('2d', { alpha: false });
+        this.audio = new TacticalAudioEngine();
+
+        // High-DPI Matrix Configuration
+        this.dpr = window.devicePixelRatio || 1;
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+
+        // Core State
+        this.state = 'MENU'; // 'MENU' | 'PLAYING' | 'GAMEOVER'
+        this.score = 0;
+        this.wave = 1;
+        this.multiplier = 1.0;
+        this.coreIntegrity = 100;
+        this.shieldReady = true;
+        this.shieldCooldown = 0;
+        this.threatCountRemaining = 0;
+        this.timeInWave = 0;
+
+        // Fixed-Timestep Loop
+        this.fixedDelta = 1 / 60;
+        this.accumulator = 0;
+        this.lastTime = performance.now();
+
+        // Arrays & Pooled Memory
+        this.silos = [];
+        this.cities = [];
+        this.interceptors = [];
+        this.detonations = [];
+        this.asteroids = [];
+        this.particles = [];
+        this.debrisPool = [];
+
+        // Input
+        this.pointer = { x: 0, y: 0, isDown: false };
+        this.selectedSiloIndex = null; // null = Auto-select closest
+
+        // DOM Elements
+        this.hudScore = document.getElementById('hud-score');
+        this.hudWave = document.getElementById('hud-wave');
+        this.hudMultiplier = document.getElementById('hud-multiplier');
+        this.hudIntegrity = document.getElementById('hud-integrity');
+        this.hudShield = document.getElementById('hud-shield');
+        this.meterAlpha = document.getElementById('meter-alpha');
+        this.meterBravo = document.getElementById('meter-bravo');
+        this.meterCharlie = document.getElementById('meter-charlie');
+        this.overlay = document.getElementById('overlay');
+        this.panelTitle = document.getElementById('panel-title');
+        this.panelTag = document.getElementById('panel-tag');
+        this.panelDesc = document.getElementById('panel-desc');
+        this.btnEngage = document.getElementById('btn-engage');
+
+        this.initEnvironment();
+        this.bindEvents();
+        this.resize();
+        
+        requestAnimationFrame((t) => this.run(t));
+      }
+
+      initEnvironment() {
+        const groundY = this.height - 40;
+        
+        // 3 Defense Silos: Alpha (Left), Bravo (Center), Charlie (Right)
+        this.silos = [
+          { id: 0, x: this.width * 0.12, y: groundY, maxAmmo: 30, ammo: 30, reloadTimer: 0, name: 'ALPHA' },
+          { id: 1, x: this.width * 0.50, y: groundY - 10, maxAmmo: 40, ammo: 40, reloadTimer: 0, name: 'BRAVO' },
+          { id: 2, x: this.width * 0.88, y: groundY, maxAmmo: 30, ammo: 30, reloadTimer: 0, name: 'CHARLIE' }
+        ];
+
+        // 6 Surface Urban Reactor Cores
+        const citySpacing = this.width / 8;
+        this.cities = [
+          { x: this.width * 0.22, y: groundY, alive: true, health: 100 },
+          { x: this.width * 0.32, y: groundY, alive: true, health: 100 },
+          { x: this.width * 0.40, y: groundY, alive: true, health: 100 },
+          { x: this.width * 0.60, y: groundY, alive: true, health: 100 },
+          { x: this.width * 0.68, y: groundY, alive: true, health: 100 },
+          { x: this.width * 0.78, y: groundY, alive: true, health: 100 }
+        ];
+      }
+
+      bindEvents() {
+        window.addEventListener('resize', () => this.resize());
+
+        window.addEventListener('mousemove', (e) => {
+          this.pointer.x = e.clientX;
+          this.pointer.y = e.clientY;
+        });
+
+        window.addEventListener('mousedown', (e) => {
+          if (this.state === 'PLAYING') {
+            this.handleFire(e.clientX, e.clientY);
+          }
+        });
+
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length > 0) {
+            this.pointer.x = e.touches[0].clientX;
+            this.pointer.y = e.touches[0].clientY;
+            if (this.state === 'PLAYING') {
+              this.handleFire(this.pointer.x, this.pointer.y);
+            }
+          }
+        }, { passive: false });
+
+        window.addEventListener('keydown', (e) => {
+          if (e.repeat) return;
+          if (e.key === '1') this.selectedSiloIndex = 0;
+          if (e.key === '2') this.selectedSiloIndex = 1;
+          if (e.key === '3') this.selectedSiloIndex = 2;
+          if (e.code === 'Space') {
+            e.preventDefault();
+            this.triggerShieldPulse();
+          }
+        });
+
+        this.btnEngage.addEventListener('click', () => {
+          this.audio.init();
+          this.audio.playUiClick();
+          if (this.state === 'MENU' || this.state === 'GAMEOVER') {
+            this.startSession();
+          }
+        });
+      }
+
+      resize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.dpr = window.devicePixelRatio || 1;
+
+        this.canvas.width = Math.floor(this.width * this.dpr);
+        this.canvas.height = Math.floor(this.height * this.dpr);
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(this.dpr, this.dpr);
+
+        this.initEnvironment();
+      }
+
+      startSession() {
+        this.state = 'PLAYING';
+        this.score = 0;
+        this.wave = 1;
+        this.multiplier = 1.0;
+        this.coreIntegrity = 100;
+        this.shieldReady = true;
+        this.shieldCooldown = 0;
+        this.asteroids = [];
+        this.interceptors = [];
+        this.detonations = [];
+        this.particles = [];
+
+        this.silos.forEach(s => s.ammo = s.maxAmmo);
+        this.cities.forEach(c => { c.alive = true; c.health = 100; });
+
+        this.overlay.classList.add('hidden');
+        this.prepareWave(this.wave);
+      }
+
+      prepareWave(waveNumber) {
+        this.threatCountRemaining = 10 + waveNumber * 5;
+        this.timeInWave = 0;
+      }
+
+      handleFire(targetX, targetY) {
+        if (targetY > this.height - 70) return; // Prevent friendly fire below perimeter
+
+        let silo = null;
+        if (this.selectedSiloIndex !== null) {
+          silo = this.silos[this.selectedSiloIndex];
+          if (silo.ammo <= 0) silo = null;
+        }
+
+        // Auto-select nearest silo with available ammo
+        if (!silo) {
+          let minDistance = Infinity;
+          for (let i = 0; i < this.silos.length; i++) {
+            const s = this.silos[i];
+            if (s.ammo > 0) {
+              const dist = Math.hypot(targetX - s.x, targetY - s.y);
+              if (dist < minDistance) {
+                minDistance = dist;
+                silo = s;
+              }
+            }
+          }
+        }
+
+        if (!silo) {
+          this.audio.playWarning();
+          return;
+        }
+
+        silo.ammo--;
+        const speed = 750; // pixels per second
+        const dx = targetX - silo.x;
+        const dy = targetY - silo.y;
+        const dist = Math.hypot(dx, dy);
+        const flightDuration = dist / speed;
+
+        this.interceptors.push({
+          startX: silo.x,
+          startY: silo.y,
+          x: silo.x,
+          y: silo.y,
+          targetX,
+          targetY,
+          vx: (dx / dist) * speed,
+          vy: (dy / dist) * speed,
+          timeToTarget: flightDuration,
+          elapsed: 0
+        });
+
+        this.audio.playLaunch(500 + Math.random() * 200);
+      }
+
+      triggerShieldPulse() {
+        if (!this.shieldReady || this.state !== 'PLAYING') return;
+
+        this.shieldReady = false;
+        this.shieldCooldown = 15; // 15-second recharge
+        this.audio.playShieldPulse();
+
+        // Create broad kinetic shockwave spanning whole planetary boundary
+        this.detonations.push({
+          x: this.width * 0.5,
+          y: this.height - 30,
+          currentRadius: 10,
+          maxRadius: Math.max(this.width * 0.7, 600),
+          growthRate: 1200,
+          dissolveRate: 0.8,
+          alpha: 1.0,
+          isShield: true
+        });
+      }
+
+      spawnAsteroid() {
+        const startX = Math.random() * this.width;
+        // Target an active city or silo
+        const validTargets = [
+          ...this.cities.filter(c => c.alive),
+          ...this.silos.filter(s => s.ammo > 0)
+        ];
+
+        let targetX = this.width * Math.random();
+        let targetY = this.height - 40;
+
+        if (validTargets.length > 0 && Math.random() < 0.8) {
+          const t = validTargets[Math.floor(Math.random() * validTargets.length)];
+          targetX = t.x;
+        }
+
+        const dx = targetX - startX;
+        const dy = targetY - 0;
+        const dist = Math.hypot(dx, dy);
+
+        // Procedural Asteroid Complexity
+        const baseSpeed = 45 + this.wave * 12 + Math.random() * 35;
+        const radius = 10 + Math.random() * 14;
+        const numVertices = 7 + Math.floor(Math.random() * 5);
+        const polygon = [];
+        for (let i = 0; i < numVertices; i++) {
+          const angle = (i / numVertices) * Math.PI * 2;
+          const offset = 0.75 + Math.random() * 0.5;
+          polygon.push({
+            x: Math.cos(angle) * radius * offset,
+            y: Math.sin(angle) * radius * offset
+          });
+        }
+
+        this.asteroids.push({
+          x: startX,
+          y: 0,
+          vx: (dx / dist) * baseSpeed,
+          vy: (dy / dist) * baseSpeed,
+          radius,
+          polygon,
+          rotation: 0,
+          rotationSpeed: (Math.random() - 0.5) * 2,
+          health: radius > 18 ? 2 : 1,
+          isMirv: this.wave >= 3 && Math.random() < 0.25,
+          splitTriggered: false
+        });
+      }
+
+      spawnDebris(x, y, count = 12, color = 'var(--cyan)') {
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 40 + Math.random() * 260;
+          this.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 0.4 + Math.random() * 0.6,
+            maxLife: 1.0,
+            color
+          });
+        }
+      }
+
+      // --- SIMULATION TICK (Fixed Delta 60Hz) ---
+      tick(dt) {
+        if (this.state !== 'PLAYING') return;
+
+        this.timeInWave += dt;
+
+        // Threat Wave Dispatcher
+        if (this.threatCountRemaining > 0) {
+          const spawnInterval = Math.max(0.4, 2.2 - this.wave * 0.18);
+          if (Math.random() < dt / spawnInterval) {
+            this.spawnAsteroid();
+            this.threatCountRemaining--;
+          }
+        } else if (this.asteroids.length === 0 && this.detonations.length === 0) {
+          // Wave Cleared: Advance Stage & Recharge Ammo
+          this.wave++;
+          this.silos.forEach(s => s.ammo = Math.min(s.maxAmmo, s.ammo + 15));
+          this.multiplier += 0.2;
+          this.prepareWave(this.wave);
+          this.audio.playUiClick();
+        }
+
+        // Shield Recharge Logic
+        if (!this.shieldReady) {
+          this.shieldCooldown -= dt;
+          if (this.shieldCooldown <= 0) {
+            this.shieldReady = true;
+          }
+        }
+
+        // Update Interceptors
+        for (let i = this.interceptors.length - 1; i >= 0; i--) {
+          const missile = this.interceptors[i];
+          missile.elapsed += dt;
+          missile.x += missile.vx * dt;
+          missile.y += missile.vy * dt;
+
+          // Particle Trail
+          if (Math.random() < 0.6) {
+            this.particles.push({
+              x: missile.x,
+              y: missile.y,
+              vx: (Math.random() - 0.5) * 15,
+              vy: (Math.random() - 0.5) * 15,
+              life: 0.25,
+              maxLife: 0.25,
+              color: '#00f0ff'
+            });
+          }
+
+          if (missile.elapsed >= missile.timeToTarget) {
+            this.detonations.push({
+              x: missile.targetX,
+              y: missile.targetY,
+              currentRadius: 2,
+              maxRadius: 55,
+              growthRate: 110,
+              dissolveRate: 0.9,
+              alpha: 1.0,
+              isShield: false
+            });
+            this.audio.playDetonation(1.0);
+            this.interceptors.splice(i, 1);
+          }
+        }
+
+        // Update Detonation Envelopes
+        for (let i = this.detonations.length - 1; i >= 0; i--) {
+          const blast = this.detonations[i];
+          if (blast.currentRadius < blast.maxRadius) {
+            blast.currentRadius += blast.growthRate * dt;
+          } else {
+            blast.alpha -= blast.dissolveRate * dt;
+            if (blast.alpha <= 0) {
+              this.detonations.splice(i, 1);
+              continue;
+            }
+          }
+
+          // Broadphase Intersection check with Asteroids
+          for (let a = this.asteroids.length - 1; a >= 0; a--) {
+            const rock = this.asteroids[a];
+            const dist = Math.hypot(rock.x - blast.x, rock.y - blast.y);
+            if (dist <= blast.currentRadius + rock.radius) {
+              rock.health--;
+              if (rock.health <= 0) {
+                this.score += Math.floor(100 * this.multiplier);
+                this.multiplier = Math.min(5.0, this.multiplier + 0.1);
+                this.spawnDebris(rock.x, rock.y, 16, blast.isShield ? '#00f0ff' : '#ffffff');
+                this.audio.playDetonation(0.6);
+
+                // Chain-Reaction: Split Sub-Fragments
+                if (rock.radius > 16) {
+                  for (let s = 0; s < 2; s++) {
+                    this.asteroids.push({
+                      x: rock.x,
+                      y: rock.y,
+                      vx: rock.vx * 1.3 + (s === 0 ? -45 : 45),
+                      vy: rock.vy * 1.2,
+                      radius: rock.radius * 0.55,
+                      polygon: rock.polygon.map(p => ({ x: p.x * 0.55, y: p.y * 0.55 })),
+                      rotation: rock.rotation,
+                      rotationSpeed: rock.rotationSpeed * 1.5,
+                      health: 1,
+                      isMirv: false,
+                      splitTriggered: true
+                    });
+                  }
+                }
+
+                this.asteroids.splice(a, 1);
+              }
+            }
+          }
+        }
+
+        // Update Asteroids
+        for (let i = this.asteroids.length - 1; i >= 0; i--) {
+          const rock = this.asteroids[i];
+          rock.x += rock.vx * dt;
+          rock.y += rock.vy * dt;
+          rock.rotation += rock.rotationSpeed * dt;
+
+          // MIRV Warhead Split Behavior
+          if (rock.isMirv && !rock.splitTriggered && rock.y > this.height * 0.35) {
+            rock.splitTriggered = true;
+            for (let k = 0; k < 2; k++) {
+              this.asteroids.push({
+                x: rock.x,
+                y: rock.y,
+                vx: rock.vx + (k === 0 ? -30 : 30),
+                vy: rock.vy * 1.15,
+                radius: rock.radius * 0.7,
+                polygon: rock.polygon,
+                rotation: rock.rotation,
+                rotationSpeed: rock.rotationSpeed * 1.4,
+                health: 1,
+                isMirv: false,
+                splitTriggered: true
+              });
+            }
+          }
+
+          // Ground Impact Check
+          if (rock.y >= this.height - 40) {
+            this.handleGroundImpact(rock.x);
+            this.spawnDebris(rock.x, this.height - 40, 24, '#ff3366');
+            this.audio.playDetonation(1.4);
+            this.asteroids.splice(i, 1);
+          }
+        }
+
+        // Update Particles (Memory Pooled Life Cycle)
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt;
+          if (p.life <= 0) {
+            this.particles.splice(i, 1);
+          }
+        }
+
+        // Verify Core Integrity
+        const livingCities = this.cities.filter(c => c.alive).length;
+        this.coreIntegrity = Math.round((livingCities / this.cities.length) * 100);
+
+        if (this.coreIntegrity <= 0) {
+          this.triggerGameOver();
+        }
+
+        this.syncHud();
+      }
+
+      handleGroundImpact(impactX) {
+        this.multiplier = 1.0;
+
+        // Damage Closest City
+        let hitTarget = false;
+        for (const city of this.cities) {
+          if (city.alive && Math.abs(city.x - impactX) < 45) {
+            city.health -= 50;
+            if (city.health <= 0) city.alive = false;
+            hitTarget = true;
+            break;
+          }
+        }
+
+        // Or Damage Silo Ammo Reserves
+        if (!hitTarget) {
+          for (const silo of this.silos) {
+            if (Math.abs(silo.x - impactX) < 55) {
+              silo.ammo = Math.max(0, silo.ammo - 10);
+              break;
+            }
+          }
+        }
+      }
+
+      triggerGameOver() {
+        this.state = 'GAMEOVER';
+        this.panelTag.textContent = 'DEFENSE MATRIX BREACHED';
+        this.panelTitle.textContent = 'CRITICAL FAILURE';
+        this.panelDesc.textContent = `Planetary cores sustained catastrophic kinetic destruction on Wave ${this.wave}. Final verified command score: ${this.score.toLocaleString()}.`;
+        this.btnEngage.innerHTML = `<span>REBOOT PROTOCOL</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+        this.overlay.classList.remove('hidden');
+      }
+
+      syncHud() {
+        this.hudScore.textContent = this.score.toString().padStart(6, '0');
+        this.hudWave.textContent = this.wave.toString().padStart(2, '0');
+        this.hudMultiplier.textContent = `x${this.multiplier.toFixed(1)}`;
+        this.hudIntegrity.textContent = `${this.coreIntegrity}%`;
+        this.hudShield.textContent = this.shieldReady ? 'READY' : `${Math.ceil(this.shieldCooldown)}S`;
+
+        // Update Silo Ammo Bars
+        this.updateMeter(this.meterAlpha, this.silos[0]);
+        this.updateMeter(this.meterBravo, this.silos[1]);
+        this.updateMeter(this.meterCharlie, this.silos[2]);
+      }
+
+      updateMeter(domElem, silo) {
+        const ratio = Math.max(0, silo.ammo / silo.maxAmmo);
+        domElem.style.width = `${ratio * 100}%`;
+        if (ratio === 0) {
+          domElem.classList.add('empty');
+        } else {
+          domElem.classList.remove('empty');
+        }
+      }
+
+      // --- HIGH-PERFORMANCE CANVAS RENDERING PIPELINE ---
+      render() {
+        const ctx = this.ctx;
+        ctx.fillStyle = '#070709';
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // 1. Procedural Vector Cartesian Tactical Grid
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+        const gridSize = 64;
+        ctx.beginPath();
+        for (let x = 0; x < this.width; x += gridSize) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, this.height);
+        }
+        for (let y = 0; y < this.height; y += gridSize) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(this.width, y);
+        }
+        ctx.stroke();
+
+        // 2. Horizon Line
+        const groundY = this.height - 40;
+        ctx.strokeStyle = '#1f222e';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(this.width, groundY);
+        ctx.stroke();
+
+        // 3. Render Cities (Vector Urban Hubs)
+        for (const city of this.cities) {
+          if (!city.alive) {
+            // Demolished indicator
+            ctx.fillStyle = '#181920';
+            ctx.fillRect(city.x - 14, groundY - 4, 28, 4);
+            continue;
+          }
+          ctx.fillStyle = '#00f0ff';
+          ctx.shadowColor = 'rgba(0, 240, 255, 0.3)';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(city.x - 12, groundY - 14, 24, 14);
+
+          // Interior Reactor Core Light
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(city.x - 3, groundY - 10, 6, 6);
+          ctx.shadowBlur = 0;
+        }
+
+        // 4. Render Silos
+        for (let i = 0; i < this.silos.length; i++) {
+          const silo = this.silos[i];
+          const isSelected = this.selectedSiloIndex === i;
+
+          ctx.strokeStyle = isSelected ? '#00f0ff' : '#4b5563';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(silo.x, groundY, 18, Math.PI, 0);
+          ctx.stroke();
+
+          // Gun Turret Vector
+          const angle = Math.atan2(this.pointer.y - groundY, this.pointer.x - silo.x);
+          const barrelLength = 22;
+          ctx.beginPath();
+          ctx.moveTo(silo.x, groundY);
+          ctx.lineTo(
+            silo.x + Math.cos(angle) * barrelLength,
+            groundY + Math.sin(angle) * barrelLength
+          );
+          ctx.strokeStyle = silo.ammo > 0 ? '#f3f4f6' : '#ff3366';
+          ctx.stroke();
+        }
+
+        // 5. Render Interceptor Vectors & Destination Reticles
+        for (const mis of this.interceptors) {
+          // Trajectory Trail
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(mis.startX, mis.startY);
+          ctx.lineTo(mis.x, mis.y);
+          ctx.stroke();
+
+          // Interceptor Kinetic Point
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(mis.x - 1.5, mis.y - 1.5, 3, 3);
+
+          // Target X Marker
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.lineWidth = 1;
+          const s = 4;
+          ctx.beginPath();
+          ctx.moveTo(mis.targetX - s, mis.targetY - s);
+          ctx.lineTo(mis.targetX + s, mis.targetY + s);
+          ctx.moveTo(mis.targetX + s, mis.targetY - s);
+          ctx.lineTo(mis.targetX - s, mis.targetY + s);
+          ctx.stroke();
+        }
+
+        // 6. Render Expanding Blast Waves
+        for (const blast of this.detonations) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, blast.alpha);
+          ctx.strokeStyle = blast.isShield ? '#00f0ff' : '#ffffff';
+          ctx.fillStyle = blast.isShield ? 'rgba(0, 240, 255, 0.05)' : 'rgba(255, 255, 255, 0.08)';
+          ctx.lineWidth = 1.5;
+
+          ctx.beginPath();
+          ctx.arc(blast.x, blast.y, blast.currentRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 7. Render Procedural Asteroids
+        for (const rock of this.asteroids) {
+          ctx.save();
+          ctx.translate(rock.x, rock.y);
+          ctx.rotate(rock.rotation);
+
+          ctx.strokeStyle = rock.isMirv ? '#ffaa00' : '#f3f4f6';
+          ctx.fillStyle = '#0f1015';
+          ctx.lineWidth = 1.25;
+
+          ctx.beginPath();
+          for (let p = 0; p < rock.polygon.length; p++) {
+            const v = rock.polygon[p];
+            if (p === 0) ctx.moveTo(v.x, v.y);
+            else ctx.lineTo(v.x, v.y);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+
+          // Incoming Trajectory Projection
+          ctx.strokeStyle = 'rgba(255, 51, 102, 0.2)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(rock.x, rock.y);
+          ctx.lineTo(rock.x + rock.vx * 0.4, rock.y + rock.vy * 0.4);
+          ctx.stroke();
+        }
+
+        // 8. Render Vector Debris Particles
+        for (const p of this.particles) {
+          const alpha = p.life / p.maxLife;
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = alpha;
+          ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+        }
+        ctx.globalAlpha = 1.0;
+
+        // 9. Tactical Crosshair Pointer
+        if (this.state === 'PLAYING') {
+          const cx = this.pointer.x;
+          const cy = this.pointer.y;
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
+          ctx.lineWidth = 1;
+
+          // Crosshair Frame
+          const reticleSize = 9;
+          ctx.beginPath();
+          ctx.moveTo(cx - reticleSize, cy);
+          ctx.lineTo(cx + reticleSize, cy);
+          ctx.moveTo(cx, cy - reticleSize);
+          ctx.lineTo(cx, cy + reticleSize);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+          ctx.stroke();
+        }
+      }
+
+      // --- ENGINE CYCLE (Accumulator Pattern) ---
+      run(time) {
+        let frameDelta = (time - this.lastTime) / 1000;
+        this.lastTime = time;
+
+        // Clamp delta to prevent spiral of death on tab unfocus
+        if (frameDelta > 0.1) frameDelta = 0.1;
+        this.accumulator += frameDelta;
+
+        while (this.accumulator >= this.fixedDelta) {
+          this.tick(this.fixedDelta);
+          this.accumulator -= this.fixedDelta;
+        }
+
+        this.render();
+        requestAnimationFrame((t) => this.run(t));
+      }
+    }
+
+    // Direct Instantiation
+    window.addEventListener('DOMContentLoaded', () => {
+      new GameEngine();
+    });
+  </script>
+</body>
+</html>
