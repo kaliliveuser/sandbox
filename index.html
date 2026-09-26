@@ -108,7 +108,7 @@
         .subtitle {
             color: var(--text-muted);
             font-size: 1rem;
-            max-width: 540px;
+            max-width: 620px;
             margin: 0 auto;
         }
 
@@ -155,7 +155,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 35px 0 18px;
+            margin: 35px 0 16px;
             padding-bottom: 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -267,6 +267,7 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -290,7 +291,7 @@
             stroke-width: 2;
         }
 
-        /* Code Link Button */
+        /* Code / Aux Link Button */
         .code-link {
             background: rgba(255, 255, 255, 0.04);
             color: var(--text-muted);
@@ -303,7 +304,7 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Preview Button */
+        /* Preview / Launch Button */
         .preview-link {
             background: rgba(0, 240, 255, 0.08);
             color: var(--accent-cyan);
@@ -318,7 +319,7 @@
             transform: translateY(-1px);
         }
 
-        /* Document / PPTX Link */
+        /* Document / Resource Link */
         .doc-link {
             background: rgba(99, 102, 241, 0.1);
             color: #a5b4fc;
@@ -347,6 +348,7 @@
             background: var(--card-bg);
             border: 1px dashed var(--border-color);
             border-radius: var(--radius-md);
+            margin-top: 20px;
         }
 
         /* Responsive Design */
@@ -387,7 +389,7 @@
                 <span>Production Environment</span>
             </div>
             <h1>Gemini Evaluation</h1>
-            <p class="subtitle">Curated repository of experimental web builds, neural interfaces, and algorithmic demonstrations.</p>
+            <p class="subtitle">A curated collection of standalone web experiments, AI conversational interfaces, 3D graphics demos, classic arcade recreations, and zero-dependency offline utilities generated and evaluated with <b>Google Gemini</b> (including Gemini 3.7 Flash).</p>
         </header>
 
         <div class="controls">
@@ -395,509 +397,581 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="searchInput" class="search-bar" placeholder="Search projects, demos, or documents..." autocomplete="off">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search projects, tools, games, or specs..." autocomplete="off">
         </div>
 
-        <div class="section-header">
-            <h2>Test Projects</h2>
-            <span class="item-count" id="projectCount">26 MODULES</span>
-        </div>
+        <!-- 1. AI, Voice & Conversational Tools -->
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2>🤖 AI, Voice & Conversational Tools</h2>
+                <span class="item-count">3 MODULES</span>
+            </div>
+            <ul class="project-list">
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Ollama Voice Chat</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/converser2.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/converser2.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-        <ul class="project-list" id="projectList">
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">WebPi (Local)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/WebPiDoc.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Docs
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/WebPi.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Pollinations Chatbot</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/pollinations.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/pollinations.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">epub2mobi (Local)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/epub2mobi.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/epub2mobi.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Embedded Chatbot</span>
+                        <span class="tag">JS</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/chatbot.js" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/chatbot.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Ollama Voice Chat</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/converser2.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/converser2.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+        <!-- 2. 3D Simulations & Interactive Games -->
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2>🎮 3D Simulations & Interactive Games</h2>
+                <span class="item-count">5 MODULES</span>
+            </div>
+            <ul class="project-list">
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Snakes3D</span>
+                        <span class="tag">Gemini 3.7 Flash</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/Snakes3D_Gemini3.7Flash.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/Snakes3D_Gemini3.7Flash.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Arcade</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/arcade.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/arcade.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Minecraft Clone</span>
+                        <span class="tag">Gemini 3.7 Flash</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/minecraft.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/minecraft.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Snakes3D (Gemini 3.7 Flash)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/Snakes3D_Gemini3.7Flash.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/Snakes3D_Gemini3.7Flash.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Dodecahedron</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/dodecahedron.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/dodecahedron.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Minecraft (Gemini 3.7 Flash)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/minecraft.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/minecraft.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li> 
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Survival</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/survival2.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/survival2.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Asteroids</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/asteroids.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/asteroids.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li> 
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Arcade Hub</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/arcade.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/arcade.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Lunar Lander</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/lunar.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/lunar.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li> 
+        <!-- 3. Retro Classics & Canvas Experiments -->
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2>👾 Retro Classics & Canvas Experiments</h2>
+                <span class="item-count">11 MODULES</span>
+            </div>
+            <ul class="project-list">
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Asteroid Defence</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/AsteroidDefence.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/AsteroidDefence.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Space Invaders</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/invaders.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/invaders.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Asteroids</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/asteroids.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/asteroids.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Tetris</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/tetris.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/tetris.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Lunar Lander</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/lunar.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/lunar.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Frogger</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/frogger.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/frogger.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
-            
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Galaxian</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/galaxian.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/galaxian.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Space Invaders</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/invaders.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/invaders.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Artillery</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/artillery.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/artillery.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Tetris</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/tetris.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/tetris.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Snake</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/snake.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/snake.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Frogger</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/frogger.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/frogger.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Minesweeper</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/minesweeper.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/minesweeper.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Galaxian</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/galaxian.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/galaxian.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Solitaire</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/solitaire.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/solitaire.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Artillery</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/artillery.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/artillery.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Dodecahedron</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/dodecahedron.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/dodecahedron.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Snake</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/snake.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/snake.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Pollinations Chatbot</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/pollinations.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/pollinations.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Minesweeper</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/minesweeper.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/minesweeper.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Lava</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/lava.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/lava.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Solitaire</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/solitaire.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/solitaire.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Monolith</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/monolith.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/monolith.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+        <!-- 4. Standalone Tools & Visual Canvas Experiments -->
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2>🛠️ Standalone Tools & Visual Canvas Experiments</h2>
+                <span class="item-count">10 MODULES</span>
+            </div>
+            <ul class="project-list">
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">WebPi</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://kaliliveuser.github.io/sandbox/WebPiDoc.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            Docs
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/WebPi260924.zip" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Samples
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/WebPi.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Survival</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/survival2.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/survival2.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">AgentCraft</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/AgentCraft.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/AgentCraft.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Webcam</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/webcam.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/webcam.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">epub2mobi</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/epub2mobi.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/epub2mobi.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Quantum Computing for SW Eng</span>
-                    <span class="tag">PPTX</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://kaliliveuser.github.io/sandbox/QuantumForSWEng.pptx" class="btn doc-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                        Download / View
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">QR Code Generator</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/qrcode.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/qrcode.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Perturber</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/perturber.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/perturber.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Library Card Barcode</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/librarycard.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/librarycard.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Embedded Chatbot (standalone)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/chatbot.js" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/chatbot.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Countdown Calendar</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/calendar.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/calendar.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">QR Code Generator (offline)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/qrcode.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/qrcode.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Webcam Tool</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/webcam.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/webcam.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Library Card Barcode Generator (offline)</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/librarycard.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/librarycard.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Perturber</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/perturber.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/perturber.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-            <li class="project-item">
-                <div class="project-meta">
-                    <span class="project-indicator"></span>
-                    <span class="project-name">Countdown Calendar</span>
-                </div>
-                <div class="project-links">
-                    <a href="https://github.com/kaliliveuser/sandbox/blob/main/calendar.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Code
-                    </a>
-                    <a href="https://kaliliveuser.github.io/sandbox/calendar.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        Launch
-                    </a>
-                </div>
-            </li>
-        </ul>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Lava</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/lava.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/lava.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
 
-        <div class="section-header">
-            <h2>Documents & Specs</h2>
-            <span class="item-count">1 RESOURCE</span>
-        </div>
+                <li class="project-item">
+                    <div class="project-meta">
+                        <span class="project-indicator"></span>
+                        <span class="project-name">Monolith</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/kaliliveuser/sandbox/blob/main/monolith.html" class="btn code-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            Code
+                        </a>
+                        <a href="https://kaliliveuser.github.io/sandbox/monolith.html" class="btn preview-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            Launch
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
-        <ul class="document-list">
-            <li class="document-item">
-                <div class="project-meta">
-                    <span class="project-indicator" style="background: var(--accent-indigo);"></span>
-                    <span class="document-name">Prompts</span>
-                    <span class="tag" style="color: #a5b4fc; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.2);">TXT</span>
-                </div>
-                <div class="document-links">
-                    <a href="https://kaliliveuser.github.io/sandbox/prompts.txt" class="btn doc-link" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                        View Document
-                    </a>
-                </div>
-            </li>
-        </ul>
+        <!-- 5. Documents & Research Specs -->
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2>📄 Documents & Research Specs</h2>
+                <span class="item-count">2 RESOURCES</span>
+            </div>
+            <ul class="document-list">
+                <li class="document-item">
+                    <div class="project-meta">
+                        <span class="project-indicator" style="background: var(--accent-indigo);"></span>
+                        <span class="document-name">Quantum Computing for Software Engineers</span>
+                        <span class="tag" style="color: #a5b4fc; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.2);">PPTX</span>
+                    </div>
+                    <div class="document-links">
+                        <a href="https://kaliliveuser.github.io/sandbox/QuantumForSWEng.pptx" class="btn doc-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download Presentation
+                        </a>
+                    </div>
+                </li>
+
+                <li class="document-item">
+                    <div class="project-meta">
+                        <span class="project-indicator" style="background: var(--accent-indigo);"></span>
+                        <span class="document-name">Prompt Engineering Archive & Specs</span>
+                        <span class="tag" style="color: #a5b4fc; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.2);">TXT</span>
+                    </div>
+                    <div class="document-links">
+                        <a href="https://kaliliveuser.github.io/sandbox/prompts.txt" class="btn doc-link" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            View Prompts
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
 
         <div id="noResults" class="no-results">
             No matching projects found. Try searching for a different term.
@@ -905,26 +979,34 @@
     </div>
 
     <script>
-        // Instant filter feature
         const searchInput = document.getElementById('searchInput');
-        const projectItems = document.querySelectorAll('.project-item, .document-item');
+        const sections = document.querySelectorAll('.catalog-section');
         const noResults = document.getElementById('noResults');
 
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
-            let visibleCount = 0;
+            let totalVisible = 0;
 
-            projectItems.forEach(item => {
-                const text = item.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    item.style.display = 'flex';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
+            sections.forEach(section => {
+                const items = section.querySelectorAll('.project-item, .document-item');
+                let sectionVisible = 0;
+
+                items.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = 'flex';
+                        sectionVisible++;
+                        totalVisible++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // Hide entire category section if no matches found within it
+                section.style.display = sectionVisible === 0 ? 'none' : 'block';
             });
 
-            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+            noResults.style.display = totalVisible === 0 ? 'block' : 'none';
         });
     </script>
 </body>
