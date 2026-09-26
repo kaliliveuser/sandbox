@@ -479,8 +479,9 @@
     .code-editor { flex: 1; width: 100%; height: 100%; padding: 12px; background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; border: none; outline: none; resize: none; }
     
     /* Bottom Right: Preview Pane */
-    .preview-pane { height: calc(100% - var(--split-y, 50%)); flex: none; display: flex; flex-direction: column; min-height: 0; background: #fff; }
+    .preview-pane { height: calc(100% - var(--split-y, 50%)); flex: none; display: flex; flex-direction: column; min-height: 0; background: var(--bg-dark); }
     .preview-frame { width: 100%; height: 100%; border: none; background: #fff; }
+    .preview-frame.empty { background: var(--bg-dark); }
 
     /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: var(--modal-bg); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 1rem; }
@@ -984,6 +985,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       if (sel) sel.value = validTheme;
       const cfgSel = document.getElementById("cfgTheme");
       if (cfgSel) cfgSel.value = validTheme;
+      refreshPreview();
     }
 
     function changeTheme(themeName) {
@@ -2410,10 +2412,17 @@ Use the provided tools systematically to complete all user requests accurately.`
       let html = files["index.html"] || (activeFilePath.endsWith(".html") ? files[activeFilePath] : "");
 
       if (!html) {
-        frame.srcdoc = `<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#64748b;background:#0f172a;text-align:center;"><div><h3>Preview Sandbox</h3><p style="font-size:12px;">Preview your application here.</p></div></body></html>`;
+        frame.classList.add("empty");
+        const styles = getComputedStyle(document.documentElement);
+        const bgDark = styles.getPropertyValue("--bg-dark").trim() || "#0f172a";
+        const textDim = styles.getPropertyValue("--text-dim").trim() || "#64748b";
+        const textMuted = styles.getPropertyValue("--text-muted").trim() || "#94a3b8";
+
+        frame.srcdoc = `<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:${textDim};background:${bgDark};text-align:center;"><div><h3 style="color:${textMuted};">Sandbox Preview</h3><p style="font-size:12px;">Select an html file and click Run Preview.</p></div></body></html>`;
         return;
       }
 
+      frame.classList.remove("empty");
       let bundled = html;
       bundled = bundled.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi, (match, href) => {
         const n = normalizePath(href);
