@@ -46,6 +46,7 @@ Access the full interactive directory and launcher here:
 ### 👾 Retro Classics & Canvas Experiments
 | Project | Description / Stack | Source Code | Live Demo |
 | :--- | :--- | :---: | :---: |
+| **Asteroid Defence** | Missle Command except with asteroid | [Code](https://github.com/kaliliveuser/sandbox/blob/main/AsteroidDefence.html) | [Launch](https://kaliliveuser.github.io/sandbox/AsteroidDefence.html) |
 | **Asteroids** | Classic vector-style physics space shooter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/asteroids.html) | [Launch](https://kaliliveuser.github.io/sandbox/asteroids.html) |
 | **Lunar Lander** | Inertia & gravity-based landing simulation | [Code](https://github.com/kaliliveuser/sandbox/blob/main/lunar.html) | [Launch](https://kaliliveuser.github.io/sandbox/lunar.html) |
 | **Space Invaders** | Classic wave-defense arcade shooter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/invaders.html) | [Launch](https://kaliliveuser.github.io/sandbox/invaders.html) |
