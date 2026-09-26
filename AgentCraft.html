@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentCraft // Advanced Agent Prompt Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      
+      /* Dark Theme (Default) */
+      --bg-base: #0a0c10;
+      --bg-surface: #12161f;
+      --bg-surface-elevated: #1a202c;
+      --bg-surface-hover: #222938;
+      --border-subtle: #252d3d;
+      --border-strong: #38445c;
+      
+      --text-main: #f0f4fc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+      
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f1f5f9;
+      --bg-surface-hover: #e2e8f0;
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #94a3b8;
+      
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #0891b2 100%);
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Bar */
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text span {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: block;
+      font-family: var(--font-mono);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-strong);
+    }
+
+    .theme-toggle-btn {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main Workspace Grid */
+    main {
+      flex: 1;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: minmax(420px, 520px) minmax(0, 1fr);
+      gap: 1.5rem;
+      height: calc(100vh - 65px);
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* Left Panel: Configuration Modules */
+    .controls-panel {
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .controls-panel::-webkit-scrollbar,
+    .prompt-output-code::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .controls-panel::-webkit-scrollbar-thumb,
+    .prompt-output-code::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: var(--radius-full);
+    }
+
+    /* Collapsible Cards / Accordions */
+    .config-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg-surface);
+    }
+
+    .card-header:hover {
+      background: var(--bg-surface-hover);
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-title svg {
+      color: var(--accent);
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      background: var(--bg-surface-elevated);
+      color: var(--text-secondary);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .chevron {
+      transition: transform 0.2s ease;
+      color: var(--text-tertiary);
+    }
+
+    .config-card.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      display: none;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .config-card.open .card-body {
+      display: flex;
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-select, .form-input, .form-textarea {
+      width: 100%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      padding: 0.65rem 0.85rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-select:focus, .form-input:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Directive Checkboxes */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background: var(--bg-surface-elevated);
+      cursor: pointer;
+      display: inline-grid;
+      place-content: center;
+      flex-shrink: 0;
+    }
+
+    .checkbox-label input[type="checkbox"]:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked::before {
+      content: "";
+      width: 8px;
+      height: 4px;
+      border-left: 2px solid white;
+      border-bottom: 2px solid white;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    /* Output Section */
+    .output-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      height: 100%;
+    }
+
+    .output-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+    }
+
+    .output-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .output-meta span {
+      background: var(--bg-surface-elevated);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .prompt-output-container {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .prompt-output-code {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.25rem;
+      background: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+      border: none;
+      outline: none;
+      resize: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--accent);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="logo-badge">λ</div>
+        <div class="brand-text">
+          <h1>AgentCraft</h1>
+          <span>SYSTEM PROMPT ARCHITECT v2.4</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button id="resetBtn" class="btn-secondary" title="Reset to defaults">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset
+        </button>
+        <button id="themeToggle" class="btn-secondary theme-toggle-btn" aria-label="Toggle theme">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Workspace -->
+  <main>
+    <!-- Left Configuration Panel -->
+    <div class="controls-panel">
+
+      <!-- Module 1: Project Domain & Archetype -->
+      <div class="config-card open">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            Archetype & Target System
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="domainCategory">Domain Category</label>
+            <select id="domainCategory" class="form-select">
+              <option value="webApp" selected>Web Applications & Interactive Tools</option>
+              <option value="pandocEbook">Digital eBooks & Publishing (Pandoc/ePub)</option>
+              <option value="blender3D">Blender 3D Scripting & Animation (bpy)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="subArchetype">Specific Archetype</label>
+            <select id="subArchetype" class="form-select"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="primaryLanguage">Core Language / Stack</label>
+            <select id="primaryLanguage" class="form-select"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 2: Expert Persona & Reasoning Directive -->
+      <div class="config-card open">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Expert Persona & Reasoning
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="expertPersona">AI Expert Persona</label>
+            <select id="expertPersona" class="form-select"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="agentModality">Reasoning & Execution Mode</label>
+            <select id="agentModality" class="form-select">
+              <option value="singleTurnExecution">Single-Turn Direct Implementation (Zero Placeholders)</option>
+              <option value="chainOfThought">Architectural CoT + Verified Modular Generation</option>
+              <option value="autonomousAgent">Autonomous Agent Directive (ReAct / Stepwise Checklist)</option>
+              <option value="interactiveCollaborator">Pair Programmer (Explain Nuances & Edge Cases)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 3: Specific Project Requirements -->
+      <div class="config-card open">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Project Specifications
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="projectName">Project Title / Identifier</label>
+            <input type="text" id="projectName" class="form-input" value="Quantum Wavepacket Visualizer">
+          </div>
+
+          <div class="form-group">
+            <label for="keyFeatures">Core Features & Specifications (Comma or line separated)</label>
+            <textarea id="keyFeatures" class="form-textarea" placeholder="List key features...">Real-time 2D grid wavefunction simulation, time-dependent Schrödinger equation integration, customizable potential barriers, interactive mouse vortex perturbation, interactive slider controls for particle mass and wave frequency, colorized phase angle shader.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="uiThemeStyle">Visual / Architectural Style</label>
+            <select id="uiThemeStyle" class="form-select">
+              <option value="modernDark" selected>High-Tech Dark Minimalist (Vercel/Linear style)</option>
+              <option value="academic">Rigorous Academic / Clean Editorial</option>
+              <option value="skeuomorphic">Scientific Instrument / Hardware Cockpit</option>
+              <option value="cyberpunk">High Contrast Cyberpunk / Retro Terminal</option>
+              <option value="cleanCorporate">Crisp Corporate Enterprise</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 4: Rigor & Technical Directives -->
+      <div class="config-card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Quality & Architecture Directives
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="card-body">
+          <div class="checkbox-grid">
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirSelfContained" checked>
+              <span>Single-File / Zero Bundler</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirNoStubs" checked>
+              <span>No Code Placeholders</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirResponsive" checked>
+              <span>Responsive / Fluid UI</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirErrorHandling" checked>
+              <span>Defensive Error Handling</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirCleanTypes">
+              <span>Strict Typing / Contracts</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="dirPerfOptimized" checked>
+              <span>High Framerate / O(n) Optimization</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Prompt Preview Panel -->
+    <div class="output-panel">
+      <div class="output-header">
+        <div class="output-meta">
+          <span id="charCount">0 chars</span>
+          <span id="wordCount">0 words</span>
+          <span id="stackBadge">Stack</span>
+        </div>
+        <div class="output-actions">
+          <button id="copyBtn" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Prompt
+          </button>
+        </div>
+      </div>
+      <div class="prompt-output-container">
+        <textarea id="promptOutput" class="prompt-output-code" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    Prompt copied to clipboard!
+  </div>
+
+  <script>
+    /* Archetype & Persona Data Repository */
+    const DATA_STORE = {
+      webApp: {
+        archetypes: [
+          { id: "scientificLab", name: "Interactive Scientific / Lab Simulator", defaultTitle: "Interactive Wave-Particle Physics Lab", defaultFeatures: "Real-time canvas computation, Runge-Kutta numerical integration, parameter dials (damping, mass, dt), graph plotter, dynamic telemetry stats." },
+          { id: "browserGame", name: "Assetless 2D/3D Web Game (Canvas/Three.js)", defaultTitle: "Procedural Asteroid Defense Command", defaultFeatures: "Procedural audio via Web Audio API, vector particle bursts, 60fps fixed-timestep loop, keyboard/touch input, state machine (Menu, Playing, GameOver)." },
+          { id: "studioTool", name: "Creative Studio / Generator Tool", defaultTitle: "Procedural SVG Shader & Texture Studio", defaultFeatures: "Layer-based compositing, node-style sliders, SVG/PNG export with blob download, real-time live preview canvas, undo/redo stack." },
+          { id: "singleFileApp", name: "Utility App / Dashboard (Like this one)", defaultTitle: "Local-First JSON Schema & Payload Architect", defaultFeatures: "Dual pane responsive layout, drag-and-drop file import, clipboard synchronization, theme switcher with CSS variables, search/filter debounce." }
+        ],
+        languages: [
+          { id: "jsVanilla", name: "Modern JavaScript (ES6+ Native Web APIs)" },
+          { id: "tsVanilla", name: "TypeScript (Strict, Pure DOM & Canvas)" },
+          { id: "htmlTailwind", name: "HTML5 + Tailwind CSS (via CDN) + Modern JS" },
+          { id: "threejs", name: "JavaScript + Three.js (r128 CDN) + WebGL" },
+          { id: "wasmCpp", name: "C++ (Emscripten / WebAssembly) + JS Wrapper" }
+        ],
+        personas: [
+          { id: "leadCreativeDev", title: "Principal Creative Technologist & Game Architect", desc: "Expert in performance optimization, canvas graphics, Web Audio API, and high-framerate rendering pipelines." },
+          { id: "simPhysicist", title: "Computational Simulation & Numerical Modeling Specialist", desc: "Expert in physical differential equations, numerical stability, responsive UI instrumentation, and mathematical precision." },
+          { id: "staffUiArch", title: "Staff Frontend Architect & Design Systems Lead", desc: "Expert in ergonomic UI/UX, responsive layouts, accessible semantic markup, state transitions, and single-file tools." }
+        ]
+      },
+      pandocEbook: {
+        archetypes: [
+          { id: "technicalManual", name: "Technical Handbook / Developer Manual", defaultTitle: "Systems Programming with Modern C++: Architectural Patterns", defaultFeatures: "Pandoc Markdown syntax, YAML metadata block with epub properties, syntax-highlighted code blocks, admonition callout boxes, cross-references and footnotes." },
+          { id: "illustratedNovel", name: "Illustrated Fiction / Literary ePub", defaultTitle: "Chronicles of the Silicon Spires", defaultFeatures: "Semantic HTML5/EPUB3 styling, decorative CSS drop caps, scene break flourishes, custom fonts declaration, dedicated colophon and frontispiece." },
+          { id: "academicMonograph", name: "Academic Monograph / Scientific Paper", defaultTitle: "Topological Quantum Systems & Condensed Matter", defaultFeatures: "MathJax / LaTeX equation syntax compatible with Pandoc ePub rendering, BibTeX citations, tables, figure captions, comprehensive multi-level TOC." }
+        ],
+        languages: [
+          { id: "pandocMd", name: "Pandoc Markdown + Custom CSS for ePub3" },
+          { id: "pandocLatex", name: "LaTeX / Pandoc Hybrid for PDF & ePub Output" },
+          { id: "xmlXhtml", name: "Raw XHTML5 + EPUB3 Spec + CSS" }
+        ],
+        personas: [
+          { id: "masterTypographer", title: "Master Digital Typographer & ePub Production Engineer", desc: "Specialist in Pandoc compilation chains, valid EPUB3 standards, reader engine idiosyncrasies (Kindle, Apple Books, Kobo), and micro-typography." },
+          { id: "techAuthor", title: "Principal Technical Writer & Book Architect", desc: "Specialist in didactic pacing, clear hierarchy, syntax styling, callouts, and clean build command chains." }
+        ]
+      },
+      blender3D: {
+        archetypes: [
+          { id: "proceduralMesh", name: "Procedural Geometry & Object Generator", defaultTitle: "Procedural Bio-Mechanical Coral Reef Generator", defaultFeatures: "Mathematical vertex/polygon assembly via bmesh, procedural modifiers (Subsurf, Displace, Wireframe), PBR shader node tree creation, clean collection grouping." },
+          { id: "riggedAnimation", name: "Kinetic Animation & Rigging Automation", defaultTitle: "Automated Mechanical Iris & Piston Animation", defaultFeatures: "Armature bone generation, inverse kinematics (IK) constraints, driver assignment, f-curve keyframing via bpy, cyclic timeline playback." },
+          { id: "turntableRenderer", name: "Automated Studio Turntable & Camera Lighting Rig", defaultTitle: "Product Studio Showcase & Lighting Orchestrator", defaultFeatures: "Three-point procedural softbox lighting setup, 360-degree camera tracking constraint, Cycles/Eevee render engine presets, batch frame rendering pipeline." }
+        ],
+        languages: [
+          { id: "bpyPython", name: "Python 3 (Blender 4.x / bpy API + mathutils)" },
+          { id: "bpyBmesh", name: "Python (High-Performance bmesh & Vector Math)" },
+          { id: "blenderAddon", name: "Modular Blender Addon Template (bpy.types.Panel & Operator)" }
+        ],
+        personas: [
+          { id: "blenderTechArtist", title: "Senior Blender Technical Artist & Python Pipeline TD", desc: "Expert in Blender 4.x bpy internals, procedural geometry math, shader node graph generation, and deterministic scene builds." },
+          { id: "vfxDirector", title: "3D Procedural VFX & Generative Simulation Director", desc: "Specialist in algorithmic visual effects, camera direction, modifier stack dynamics, and parametric asset suites." }
+        ]
+      }
+    };
+
+    /* DOM References */
+    const domainCategory = document.getElementById("domainCategory");
+    const subArchetype = document.getElementById("subArchetype");
+    const primaryLanguage = document.getElementById("primaryLanguage");
+    const expertPersona = document.getElementById("expertPersona");
+    const agentModality = document.getElementById("agentModality");
+    const projectName = document.getElementById("projectName");
+    const keyFeatures = document.getElementById("keyFeatures");
+    const uiThemeStyle = document.getElementById("uiThemeStyle");
+    const promptOutput = document.getElementById("promptOutput");
+    const charCount = document.getElementById("charCount");
+    const wordCount = document.getElementById("wordCount");
+    const stackBadge = document.getElementById("stackBadge");
+    const copyBtn = document.getElementById("copyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const themeToggle = document.getElementById("themeToggle");
+    const toast = document.getElementById("toast");
+
+    // Quality Directives Checkboxes
+    const dirSelfContained = document.getElementById("dirSelfContained");
+    const dirNoStubs = document.getElementById("dirNoStubs");
+    const dirResponsive = document.getElementById("dirResponsive");
+    const dirErrorHandling = document.getElementById("dirErrorHandling");
+    const dirCleanTypes = document.getElementById("dirCleanTypes");
+    const dirPerfOptimized = document.getElementById("dirPerfOptimized");
+
+    /* Populate Dropdowns based on Category */
+    function syncDropdowns(isInitial = false) {
+      const cat = domainCategory.value;
+      const data = DATA_STORE[cat];
+
+      // Populate Archetypes
+      const prevArch = subArchetype.value;
+      subArchetype.innerHTML = "";
+      data.archetypes.forEach(arch => {
+        const opt = document.createElement("option");
+        opt.value = arch.id;
+        opt.textContent = arch.name;
+        subArchetype.appendChild(opt);
+      });
+      if (prevArch && data.archetypes.some(a => a.id === prevArch)) {
+        subArchetype.value = prevArch;
+      }
+
+      // Populate Languages
+      primaryLanguage.innerHTML = "";
+      data.languages.forEach(lang => {
+        const opt = document.createElement("option");
+        opt.value = lang.id;
+        opt.textContent = lang.name;
+        primaryLanguage.appendChild(opt);
+      });
+
+      // Populate Personas
+      expertPersona.innerHTML = "";
+      data.personas.forEach(pers => {
+        const opt = document.createElement("option");
+        opt.value = pers.id;
+        opt.textContent = `${pers.title}`;
+        opt.title = pers.desc;
+        expertPersona.appendChild(opt);
+      });
+
+      // If switching categories and not initial load, update default text inputs
+      if (!isInitial) {
+        const activeArch = data.archetypes[0];
+        projectName.value = activeArch.defaultTitle;
+        keyFeatures.value = activeArch.defaultFeatures;
+      }
+
+      generatePrompt();
+    }
+
+    function onArchetypeChange() {
+      const cat = domainCategory.value;
+      const data = DATA_STORE[cat];
+      const selected = data.archetypes.find(a => a.id === subArchetype.value);
+      if (selected) {
+        projectName.value = selected.defaultTitle;
+        keyFeatures.value = selected.defaultFeatures;
+      }
+      generatePrompt();
+    }
+
+    /* Generator Logic */
+    function generatePrompt() {
+      const catKey = domainCategory.value;
+      const catData = DATA_STORE[catKey];
+      const activeArchetype = catData.archetypes.find(a => a.id === subArchetype.value) || catData.archetypes[0];
+      const activeLanguage = catData.languages.find(l => l.id === primaryLanguage.value) || catData.languages[0];
+      const activePersona = catData.personas.find(p => p.id === expertPersona.value) || catData.personas[0];
+      
+      const title = projectName.value.trim() || activeArchetype.defaultTitle;
+      const features = keyFeatures.value.trim();
+      const theme = uiThemeStyle.options[uiThemeStyle.selectedIndex].text;
+      const modality = agentModality.options[agentModality.selectedIndex].text;
+
+      stackBadge.textContent = activeLanguage.name.split(' ')[0];
+
+      let domainSpecificGuidance = "";
+      if (catKey === "webApp") {
+        domainSpecificGuidance = `
+### DOMAIN-SPECIFIC WEB STANDARDS:
+1. **Self-Contained Architecture:** Return complete HTML with embedded \`<style>\` and \`<script>\` tags. No local external assets (images, audio). Use SVG data-URIs, Web Audio API synthesis, or procedural canvas drawing.
+2. **Fluid Visual Ergonomics:** Theme style must embody "${theme}". Leverage CSS variables for dynamic tokens, high-DPI canvas scaling (\`devicePixelRatio\`), and responsive flex/grid layouts.
+3. **Robust Event Loop:** For simulations or games, decouple physics updates using a fixed delta-time accumulator inside \`requestAnimationFrame\`. Handle window resize cleanly.`;
+      } else if (catKey === "pandocEbook") {
+        domainSpecificGuidance = `
+### DOMAIN-SPECIFIC PANDOC & EPUB STANDARDS:
+1. **Semantic Pandoc Markdown:** Provide complete source Markdown prefixed with an exhaustive YAML frontmatter block (\`title\`, \`author\`, \`lang\`, \`rights\`, \`toc-depth: 3\`).
+2. **ePub3 Compliance:** Ensure code blocks use valid language specifiers. Add custom CSS rules for EPUB readers (handling margin resets, Kindle mobi compatibility, drop caps with \`.dropcap\`, and callout admonitions).
+3. **Pandoc CLI Build Directive:** Provide the exact \`pandoc\` command line instruction to compile the Markdown and CSS into a clean, validated \`.epub\` file.`;
+      } else if (catKey === "blender3D") {
+        domainSpecificGuidance = `
+### DOMAIN-SPECIFIC BLENDER (bpy) STANDARDS:
+1. **Blender 4.x API Compatibility:** Use modern \`bpy\` methods. Avoid deprecated operators. Clean up context by checking \`bpy.context.active_object\` and ensuring mesh/object data is linked to the active collection.
+2. **Mathematical Precision & BMesh:** When generating procedural vertices/polygons, construct geometry via \`bmesh\` with \`bmesh.new()\`, transform vertices mathematically, and write back using \`bmesh.ops\` before freeing.
+3. **Execution Safety & Idempotency:** The script must clear preexisting objects of the same name or target collection so it can be re-run repeatedly without scene duplication or namespace pollution.`;
+      }
+
+      const qualityDirectives = [];
+      if (dirSelfContained.checked) qualityDirectives.push("- Single-File Rule: The entire deliverable must be fully functional in a single unified script/file with no unstated prerequisites.");
+      if (dirNoStubs.checked) qualityDirectives.push("- Zero Placeholder Policy: Write production-grade code. Never emit stubs, '// TODO', or omit repetitive routines. Fully implement every algorithm.");
+      if (dirResponsive.checked) qualityDirectives.push("- Responsive Scalability: Adapt seamlessly to variable viewports, display ratios, or scale inputs without UI clashing or clipping.");
+      if (dirErrorHandling.checked) qualityDirectives.push("- Defensive Architecture: Implement graceful failure modes, input sanitization, and fallback options for browser/runtime variations.");
+      if (dirCleanTypes.checked) qualityDirectives.push("- Rigorous Typing & Signatures: Include clear type contracts (JSDoc, TypeScript interfaces, Python type annotations, or C++ templates).");
+      if (dirPerfOptimized.checked) qualityDirectives.push("- Performance Budget: Avoid O(n²) bottlenecks, optimize memory allocation inside loops, and eliminate unnecessary redraws or DOM thrashing.");
+
+      const promptText = `<!-- SYSTEM DIRECTIVE: AGENT ACTIVATION -->
+You are acting as the following expert authority:
+ROLE: ${activePersona.title}
+SPECIALIZATION: ${activePersona.desc}
+EXECUTION MODALITY: ${modality}
+
+---
+
+### MISSION OBJECTIVE
+Architect and deliver a production-ready, fully engineered artifact titled:
+**"${title}"**
+
+### TARGET ENVIRONMENT & ARTIFACT SPECIFICATION
+- **Domain:** ${domainCategory.options[domainCategory.selectedIndex].text}
+- **Archetype:** ${activeArchetype.name}
+- **Primary Language / Stack:** ${activeLanguage.name}
+- **Design Philosophy / Visual Tone:** ${theme}
+
+### CORE REQUIREMENTS & SPECIFICATIONS
+${features ? features.split('\n').map(line => line.trim().startsWith('-') ? line : `- ${line}`).join('\n') : '- Build an outstanding, complete reference implementation matching this archetype.'}
+${domainSpecificGuidance}
+
+### ENGINEERING DIRECTIVES & QUALITY CONSTRAINTS
+${qualityDirectives.join('\n')}
+
+### INSTRUCTIONS TO THE AGENT
+1. Internalize the persona's technical vocabulary and architectural rigor.
+2. If CoT (Chain-of-Thought) is active, summarize the system architecture, mathematical formulas, and data flow before outputting code.
+3. Present the definitive code block ready for direct execution or compilation.`;
+
+      promptOutput.value = promptText.trim();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const text = promptOutput.value;
+      charCount.textContent = `${text.length.toLocaleString()} chars`;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words.toLocaleString()} words`;
+    }
+
+    function toggleCard(headerEl) {
+      const card = headerEl.closest('.config-card');
+      card.classList.toggle('open');
+    }
+
+    /* Event Listeners */
+    domainCategory.addEventListener('change', () => syncDropdowns(false));
+    subArchetype.addEventListener('change', onArchetypeChange);
+    primaryLanguage.addEventListener('change', generatePrompt);
+    expertPersona.addEventListener('change', generatePrompt);
+    agentModality.addEventListener('change', generatePrompt);
+    projectName.addEventListener('input', generatePrompt);
+    keyFeatures.addEventListener('input', generatePrompt);
+    uiThemeStyle.addEventListener('change', generatePrompt);
+
+    [dirSelfContained, dirNoStubs, dirResponsive, dirErrorHandling, dirCleanTypes, dirPerfOptimized].forEach(cb => {
+      cb.addEventListener('change', generatePrompt);
+    });
+
+    /* Copy to Clipboard with Feedback */
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(promptOutput.value);
+        showToast("System prompt copied to clipboard!");
+      } catch (err) {
+        promptOutput.select();
+        document.execCommand('copy');
+        showToast("Prompt copied to clipboard!");
+      }
+    });
+
+    function showToast(msg) {
+      toast.querySelector('span')?.remove();
+      const span = document.createElement('span');
+      span.textContent = msg;
+      toast.appendChild(span);
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        span.remove();
+      }, 2600);
+    }
+
+    /* Reset Application */
+    resetBtn.addEventListener('click', () => {
+      domainCategory.value = "webApp";
+      syncDropdowns(true);
+      dirSelfContained.checked = true;
+      dirNoStubs.checked = true;
+      dirResponsive.checked = true;
+      dirErrorHandling.checked = true;
+      dirCleanTypes.checked = false;
+      dirPerfOptimized.checked = true;
+      generatePrompt();
+      showToast("Reset to default configuration");
+    });
+
+    /* Theme Toggle */
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', targetTheme);
+      
+      const icon = document.getElementById('themeIcon');
+      if (targetTheme === 'light') {
+        // Moon icon
+        icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        // Sun icon
+        icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+      }
+    });
+
+    // Initialize on page load
+    syncDropdowns(true);
+  </script>
+</body>
+</html>
