@@ -63,7 +63,7 @@ Access the full interactive directory and launcher here:
 ### 🛠️ Standalone Tools & Visual Canvas Experiments
 | Project | Description / Stack | Source Code | Live Demo |
 | :--- | :--- | :---: | :---: |
-| **WebPi** | Complete browser-sandboxed agent (Prototype only - [Official Site] (https://github.com/isangtao/WebPi) | [Docs](https://kaliliveuser.github.io/sandbox/WebPiDoc.html) [Samples](https://kaliliveuser.github.io/sandbox/WebPi260924.zip) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
+| **WebPi** | Complete browser-sandboxed agent (Prototype) - [Official Site](https://github.com/isangtao/WebPi) | [Docs](https://kaliliveuser.github.io/sandbox/WebPiDoc.html) [Samples](https://kaliliveuser.github.io/sandbox/WebPi260924.zip) | [Launch](https://kaliliveuser.github.io/sandbox/WebPi.html) |
 | **AgentCraft** | System prompt architect | [Code](https://github.com/kaliliveuser/sandbox/blob/main/AgentCraft.html) | [Launch](https://kaliliveuser.github.io/sandbox/AgentCraft.html) |
 | **epub2mobi** | 100% local epub to mobi converter | [Code](https://github.com/kaliliveuser/sandbox/blob/main/epub2mobi.html) | [Launch](https://kaliliveuser.github.io/sandbox/epub2mobi.html) |
 | **QR Code Generator** | Offline, client-side dynamic QR generator | [Code](https://github.com/kaliliveuser/sandbox/blob/main/qrcode.html) | [Launch](https://kaliliveuser.github.io/sandbox/qrcode.html) |
