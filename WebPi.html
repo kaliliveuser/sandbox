@@ -951,8 +951,8 @@
       contextWindow: 262144,
       maxTokens: 98304,
       systemPrompt: `You are WebPi, an autonomous coding agent.
-You can read, write, edit, delete, and move files to implement the requested software.
-Always inspect existing code before making edits.
+You can list, read, write, edit, delete, and move files to implement the requested software.
+Always inspect existing code before making edits. Use list_files to check files in workspace.
 When editing files with edit_file:
 - Ensure 'old_str' has sufficient unique lines of context so it only matches once.
 - If making multiple distinct changes to the same file, do them carefully, or use write_file if rewriting large portions of the file is cleaner.
@@ -1206,6 +1206,18 @@ Use the provided tools systematically to complete all user requests accurately.`
       {
         type: "function",
         function: {
+          name: "list_files",
+          description: "List all existing files and directory folders in the workspace.",
+          parameters: {
+            type: "object",
+            properties: {},
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "read_file",
           description: "Read the full contents of a file from the workspace.",
           parameters: {
@@ -1312,7 +1324,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       const name = resolveToolName(rawName);
       console.log(`[WebPi Tool Call] Execution started: ${name}`, { tool: name, rawName, arguments: args });
 
-      if (name !== "read_file" && isViewingRollback) {
+      if (name !== "read_file" && name !== "list_files" && isViewingRollback) {
         isViewingRollback = false;
         updateRollbackUI();
       }
@@ -1320,6 +1332,12 @@ Use the provided tools systematically to complete all user requests accurately.`
       try {
         let result;
         switch (name) {
+          case "list_files": {
+            const fileList = Object.keys(files).sort();
+            const folderList = Array.from(folders).sort();
+            result = `Files (${fileList.length}):\n${fileList.join("\n") || "(none)"}\n\nFolders (${folderList.length}):\n${folderList.join("\n") || "(none)"}`;
+            break;
+          }
           case "read_file": {
             const p = normalizePath(args.path);
             if (!(p in files)) {
@@ -1510,12 +1528,43 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       const conversationHistory = chatHistory.slice(firstUserIdx);
 
+      // SANITIZE & PRUNE PAST TURNS TO PROTECT PROMPT CACHE AND TOKEN BUDGET
       const validHistory = conversationHistory
         .filter(m => m.role !== "system" && m.role !== "ui-error")
         .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
-        .map(m => {
+        .map((m, idx, arr) => {
+          const isPastTurn = idx < arr.length - 2;
           const item = { role: m.role, content: m.content || "" };
-          if (m.tool_calls) item.tool_calls = m.tool_calls;
+
+          if (m.tool_calls) {
+            // Compress past huge file write payloads in older turns to avoid re-sending megabytes of code
+            item.tool_calls = m.tool_calls.map(tc => {
+              if (isPastTurn && (tc.function?.name === "write_file" || tc.function?.name === "edit_file")) {
+                try {
+                  const parsed = JSON.parse(tc.function.arguments);
+                  if (tc.function.name === "write_file") {
+                    return {
+                      ...tc,
+                      function: {
+                        ...tc.function,
+                        arguments: JSON.stringify({ path: parsed.path, content: `[Content committed to ${parsed.path} (${(parsed.content || "").length} chars)]` })
+                      }
+                    };
+                  } else if (tc.function.name === "edit_file") {
+                    return {
+                      ...tc,
+                      function: {
+                        ...tc.function,
+                        arguments: JSON.stringify({ path: parsed.path, old_str: "[diff applied]", new_str: "[diff applied]" })
+                      }
+                    };
+                  }
+                } catch (e) { return tc; }
+              }
+              return tc;
+            });
+          }
+
           if (m.tool_call_id) {
             item.tool_call_id = m.tool_call_id;
             item.name = m.name;
@@ -1566,9 +1615,10 @@ Use the provided tools systematically to complete all user requests accurately.`
       abortController = new AbortController();
       setAgentStatus(true, "WebPi is thinking...");
 
+      // STATIC SYSTEM PROMPT PRESERVES LOCAL LLM PREFIX / KV CACHING ACROSS ALL TURNS
       const systemMessage = {
         role: "system",
-        content: `${settings.systemPrompt}\n\nCURRENT WORKSPACE FILES:\n${Object.keys(files).join("\n") || "(empty)"}`
+        content: settings.systemPrompt
       };
 
       let loopCount = 0;
@@ -2006,7 +2056,9 @@ Use the provided tools systematically to complete all user requests accurately.`
       }
 
       if (parsed) {
-        if (fnName === "read_file") {
+        if (fnName === "list_files") {
+          return `<div><em>List workspace files & folders</em></div>`;
+        } else if (fnName === "read_file") {
           return `<div><strong>File:</strong> ${escapeHtml(parsed.path || "")}</div>`;
         } else if (fnName === "write_file") {
           return `
