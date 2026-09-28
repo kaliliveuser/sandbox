@@ -185,7 +185,7 @@ Experience
 
 Founder
 AGI Labs Inc. Canada
-Aug 2014 - Present
+Aug 2014 - Sep 2026
 Vancouver, Canada Area
 • Developing biologically plausible alternatives to backpropagation and stochastic gradient descent.
 • Developing real-time, reinforcement-learning architectures that dynamically models its environment internally and self-organizes through evolutionary algorithms.
